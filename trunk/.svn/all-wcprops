@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 31
+/svn/rossnet/!svn/ver/450/trunk
+END
+Doxyfile.user.in
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/svn/rossnet/!svn/ver/388/trunk/Doxyfile.user.in
+END
+CTestConfig.cmake
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/svn/rossnet/!svn/ver/318/trunk/CTestConfig.cmake
+END
+CMakeLists.txt
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/svn/rossnet/!svn/ver/388/trunk/CMakeLists.txt
+END

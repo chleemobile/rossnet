@@ -1,0 +1,77 @@
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/rossnet/!svn/ver/231/trunk/rnf/modules/network/ip/save
+END
+ip-types.h
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/rossnet/!svn/ver/231/trunk/rnf/modules/network/ip/save/ip-types.h
+END
+ip-extern.h
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/rossnet/!svn/ver/167/trunk/rnf/modules/network/ip/save/ip-extern.h
+END
+ip-global.c
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/rossnet/!svn/ver/167/trunk/rnf/modules/network/ip/save/ip-global.c
+END
+ip-model.c
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/rossnet/!svn/ver/167/trunk/rnf/modules/network/ip/save/ip-model.c
+END
+ip-upstream.c
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/rossnet/!svn/ver/167/trunk/rnf/modules/network/ip/save/ip-upstream.c
+END
+ip-xml.c
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/rossnet/!svn/ver/167/trunk/rnf/modules/network/ip/save/ip-xml.c
+END
+ip.c
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/svn/rossnet/!svn/ver/167/trunk/rnf/modules/network/ip/save/ip.c
+END
+ip-downstream.c
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/rossnet/!svn/ver/167/trunk/rnf/modules/network/ip/save/ip-downstream.c
+END
+ip-rc-downstream.c
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/rossnet/!svn/ver/167/trunk/rnf/modules/network/ip/save/ip-rc-downstream.c
+END
+ip-packet.c
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/rossnet/!svn/ver/167/trunk/rnf/modules/network/ip/save/ip-packet.c
+END
+ip-routing.c
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/rossnet/!svn/ver/167/trunk/rnf/modules/network/ip/save/ip-routing.c
+END
+ip.h
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/svn/rossnet/!svn/ver/167/trunk/rnf/modules/network/ip/save/ip.h
+END

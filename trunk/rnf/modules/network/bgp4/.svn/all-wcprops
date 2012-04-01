@@ -1,0 +1,149 @@
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/svn/rossnet/!svn/ver/312/trunk/rnf/modules/network/bgp4
+END
+bgp-mrai.c
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/rossnet/!svn/ver/167/trunk/rnf/modules/network/bgp4/bgp-mrai.c
+END
+bgp-connect.c
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/rossnet/!svn/ver/167/trunk/rnf/modules/network/bgp4/bgp-connect.c
+END
+bgp-decision.c
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/rossnet/!svn/ver/167/trunk/rnf/modules/network/bgp4/bgp-decision.c
+END
+bgp-route.c
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/rossnet/!svn/ver/167/trunk/rnf/modules/network/bgp4/bgp-route.c
+END
+bgp-stats.c
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/rossnet/!svn/ver/167/trunk/rnf/modules/network/bgp4/bgp-stats.c
+END
+bgp-global.c
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/rossnet/!svn/ver/312/trunk/rnf/modules/network/bgp4/bgp-global.c
+END
+bgp-utils.c
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/rossnet/!svn/ver/167/trunk/rnf/modules/network/bgp4/bgp-utils.c
+END
+bgp-xml.c
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svn/rossnet/!svn/ver/167/trunk/rnf/modules/network/bgp4/bgp-xml.c
+END
+bgp-open.c
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/rossnet/!svn/ver/167/trunk/rnf/modules/network/bgp4/bgp-open.c
+END
+bgp-init.c
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/rossnet/!svn/ver/167/trunk/rnf/modules/network/bgp4/bgp-init.c
+END
+bgp-keepalive.c
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/rossnet/!svn/ver/167/trunk/rnf/modules/network/bgp4/bgp-keepalive.c
+END
+bgp-ospf.c
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/rossnet/!svn/ver/167/trunk/rnf/modules/network/bgp4/bgp-ospf.c
+END
+bgp.h
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/rossnet/!svn/ver/167/trunk/rnf/modules/network/bgp4/bgp.h
+END
+bgp-notify.c
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/rossnet/!svn/ver/167/trunk/rnf/modules/network/bgp4/bgp-notify.c
+END
+bgp-types.h
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/rossnet/!svn/ver/231/trunk/rnf/modules/network/bgp4/bgp-types.h
+END
+bgp-extern.h
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/rossnet/!svn/ver/167/trunk/rnf/modules/network/bgp4/bgp-extern.h
+END
+bgp-router.c
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/rossnet/!svn/ver/167/trunk/rnf/modules/network/bgp4/bgp-router.c
+END
+bgp-timer.c
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/rossnet/!svn/ver/167/trunk/rnf/modules/network/bgp4/bgp-timer.c
+END
+bgp-nbr.c
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svn/rossnet/!svn/ver/167/trunk/rnf/modules/network/bgp4/bgp-nbr.c
+END
+bgp-rc-router.c
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/rossnet/!svn/ver/167/trunk/rnf/modules/network/bgp4/bgp-rc-router.c
+END
+bgp-update.c
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/rossnet/!svn/ver/167/trunk/rnf/modules/network/bgp4/bgp-update.c
+END
+bgp-main.c
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/rossnet/!svn/ver/167/trunk/rnf/modules/network/bgp4/bgp-main.c
+END
+CMakeLists.txt
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/rossnet/!svn/ver/232/trunk/rnf/modules/network/bgp4/CMakeLists.txt
+END
+.cvsignore
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/rossnet/!svn/ver/167/trunk/rnf/modules/network/bgp4/.cvsignore
+END

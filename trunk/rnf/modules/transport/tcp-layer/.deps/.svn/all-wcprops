@@ -1,0 +1,41 @@
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/rossnet/!svn/ver/167/trunk/rnf/modules/transport/tcp-layer/.deps
+END
+tcp-layer-util.Plo
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/rossnet/!svn/ver/167/trunk/rnf/modules/transport/tcp-layer/.deps/tcp-layer-util.Plo
+END
+tcp-layer-process.Plo
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/rossnet/!svn/ver/167/trunk/rnf/modules/transport/tcp-layer/.deps/tcp-layer-process.Plo
+END
+tcp-layer-global.Plo
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/rossnet/!svn/ver/167/trunk/rnf/modules/transport/tcp-layer/.deps/tcp-layer-global.Plo
+END
+tcp-layer-process-rc.Plo
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/rossnet/!svn/ver/167/trunk/rnf/modules/transport/tcp-layer/.deps/tcp-layer-process-rc.Plo
+END
+tcp-layer-xml.Plo
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/rossnet/!svn/ver/167/trunk/rnf/modules/transport/tcp-layer/.deps/tcp-layer-xml.Plo
+END
+tcp-layer.Plo
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/rossnet/!svn/ver/167/trunk/rnf/modules/transport/tcp-layer/.deps/tcp-layer.Plo
+END

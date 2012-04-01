@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/svn/rossnet/!svn/ver/167/trunk/rnf/tools/internet7/save
+END
+bgp-route.file
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/rossnet/!svn/ver/167/trunk/rnf/tools/internet7/save/bgp-route.file
+END
+ospf-lsa.file
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/rossnet/!svn/ver/167/trunk/rnf/tools/internet7/save/ospf-lsa.file
+END
+internet7.rt
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/rossnet/!svn/ver/167/trunk/rnf/tools/internet7/save/internet7.rt
+END

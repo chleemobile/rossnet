@@ -1,0 +1,11 @@
+#!/bin/sh
+
+export ARCH=x86_64
+export CC=mpicc
+export CXX=mpicxx
+
+cmake ../rossnet/trunk
+
+make -j 12
+
+exit

@@ -1,0 +1,132 @@
+10
+
+dir
+450
+https://wolf.cs.rpi.edu/svn/rossnet/trunk/rnf/modules/application
+https://wolf.cs.rpi.edu/svn/rossnet
+
+
+
+2010-06-16T18:27:49.515191Z
+231
+anderm7@LAB.CS.RPI.EDU
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2481c9be-fdbf-de11-a427-00b0d041e3d9
+
+http
+dir
+
+num
+dir
+
+bootp
+dir
+
+smtp
+dir
+
+dns
+dir
+
+ip-traffic
+dir
+
+nfs
+dir
+
+phold
+dir
+
+ftp
+dir
+
+rlogin
+dir
+
+epi
+dir
+
+snmp
+dir
+
+.cvsignore
+file
+
+
+
+
+2011-09-21T02:47:20.000000Z
+faa9fb0577e83b0c15472e15dbbd1696
+2009-07-23T18:37:27.698139Z
+27
+bauerdrpi
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+9
+
+CMakeLists.txt
+file
+
+
+
+
+2011-09-21T02:47:20.000000Z
+8f7db923d90a0f5b40c6339d92c7cb7a
+2009-10-22T00:34:26.726970Z
+162
+laprej
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+46
+

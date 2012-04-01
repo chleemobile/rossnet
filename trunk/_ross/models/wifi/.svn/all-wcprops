@@ -1,0 +1,47 @@
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/svn/rossnet/!svn/ver/361/trunk/ross/models/wifi
+END
+prop-loss.c
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/svn/rossnet/!svn/ver/254/trunk/ross/models/wifi/prop-loss.c
+END
+wifi.c
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/svn/rossnet/!svn/ver/344/trunk/ross/models/wifi/wifi.c
+END
+coding-error.h
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/rossnet/!svn/ver/249/trunk/ross/models/wifi/coding-error.h
+END
+prop-loss.h
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/svn/rossnet/!svn/ver/331/trunk/ross/models/wifi/prop-loss.h
+END
+wifi.h
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/svn/rossnet/!svn/ver/335/trunk/ross/models/wifi/wifi.h
+END
+coding-error.c
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/rossnet/!svn/ver/248/trunk/ross/models/wifi/coding-error.c
+END
+CMakeLists.txt
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/rossnet/!svn/ver/361/trunk/ross/models/wifi/CMakeLists.txt
+END

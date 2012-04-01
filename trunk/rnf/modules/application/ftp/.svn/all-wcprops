@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/rossnet/!svn/ver/231/trunk/rnf/modules/application/ftp
+END
+ftp.h
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/rossnet/!svn/ver/167/trunk/rnf/modules/application/ftp/ftp.h
+END
+ftp-types.h
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/rossnet/!svn/ver/231/trunk/rnf/modules/application/ftp/ftp-types.h
+END
+ftp-extern.h
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/rossnet/!svn/ver/167/trunk/rnf/modules/application/ftp/ftp-extern.h
+END
+ftp-global.c
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/rossnet/!svn/ver/167/trunk/rnf/modules/application/ftp/ftp-global.c
+END
+ftp-xml.c
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/rossnet/!svn/ver/167/trunk/rnf/modules/application/ftp/ftp-xml.c
+END
+ftp.c
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/rossnet/!svn/ver/167/trunk/rnf/modules/application/ftp/ftp.c
+END
+ftp-init.c
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/rossnet/!svn/ver/167/trunk/rnf/modules/application/ftp/ftp-init.c
+END
+.cvsignore
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/rossnet/!svn/ver/167/trunk/rnf/modules/application/ftp/.cvsignore
+END

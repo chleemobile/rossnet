@@ -1,0 +1,17 @@
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svn/rossnet/!svn/ver/440/trunk/ross/models/propagation/free-space
+END
+prop-loss.c
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/rossnet/!svn/ver/440/trunk/ross/models/propagation/free-space/prop-loss.c
+END
+prop-loss.h
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/rossnet/!svn/ver/440/trunk/ross/models/propagation/free-space/prop-loss.h
+END

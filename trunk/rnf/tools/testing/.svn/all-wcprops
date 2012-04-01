@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/svn/rossnet/!svn/ver/167/trunk/rnf/tools/testing
+END
+links.xml
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/rossnet/!svn/ver/167/trunk/rnf/tools/testing/links.xml
+END
+Node.pm
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/svn/rossnet/!svn/ver/167/trunk/rnf/tools/testing/Node.pm
+END
+rf_to_rn-ptr.pl
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/rossnet/!svn/ver/167/trunk/rnf/tools/testing/rf_to_rn-ptr.pl
+END
+co.in
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/svn/rossnet/!svn/ver/167/trunk/rnf/tools/testing/co.in
+END
+ic.txt
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/svn/rossnet/!svn/ver/167/trunk/rnf/tools/testing/ic.txt
+END
+ip.rt
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/svn/rossnet/!svn/ver/167/trunk/rnf/tools/testing/ip.rt
+END
+testing.xml
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/rossnet/!svn/ver/167/trunk/rnf/tools/testing/testing.xml
+END
+profile.txt
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/rossnet/!svn/ver/167/trunk/rnf/tools/testing/profile.txt
+END

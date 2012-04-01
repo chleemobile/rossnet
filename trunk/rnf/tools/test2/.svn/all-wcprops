@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/svn/rossnet/!svn/ver/167/trunk/rnf/tools/test2
+END
+links.xml
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/svn/rossnet/!svn/ver/167/trunk/rnf/tools/test2/links.xml
+END
+test2.xml
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/svn/rossnet/!svn/ver/167/trunk/rnf/tools/test2/test2.xml
+END
+test2-ip.xml
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/svn/rossnet/!svn/ver/167/trunk/rnf/tools/test2/test2-ip.xml
+END

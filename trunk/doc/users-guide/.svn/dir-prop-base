@@ -1,0 +1,12 @@
+K 10
+svn:ignore
+V 137
+rn-users-guide.log
+rn-users-guide.dvi
+rn-users-guide.aux
+ross-rossnet-ug.aux
+ross-rossnet-ug.dvi
+ross-rossnet-ug.log
+ross-rossnet-ug.toc
+
+END

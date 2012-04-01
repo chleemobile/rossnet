@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/rossnet/!svn/ver/231/trunk/rnf/modules/application/phold
+END
+phold-xml.c
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/rossnet/!svn/ver/167/trunk/rnf/modules/application/phold/phold-xml.c
+END
+phold.c
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/rossnet/!svn/ver/167/trunk/rnf/modules/application/phold/phold.c
+END
+phold.h
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/rossnet/!svn/ver/231/trunk/rnf/modules/application/phold/phold.h
+END
+.cvsignore
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/rossnet/!svn/ver/167/trunk/rnf/modules/application/phold/.cvsignore
+END
+CMakeLists.txt
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/rossnet/!svn/ver/223/trunk/rnf/modules/application/phold/CMakeLists.txt
+END

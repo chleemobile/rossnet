@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/svn/rossnet/!svn/ver/167/trunk/rnf/tools/bgp-ospf
+END
+links.xml
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/svn/rossnet/!svn/ver/167/trunk/rnf/tools/bgp-ospf/links.xml
+END
+test2.xml
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/svn/rossnet/!svn/ver/167/trunk/rnf/tools/bgp-ospf/test2.xml
+END
+bgp-ospf.xml
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/rossnet/!svn/ver/167/trunk/rnf/tools/bgp-ospf/bgp-ospf.xml
+END

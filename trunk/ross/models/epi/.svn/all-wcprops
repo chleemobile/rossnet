@@ -1,0 +1,167 @@
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/svn/rossnet/!svn/ver/388/trunk/ross/models/epi
+END
+queue-heap.c
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/svn/rossnet/!svn/ver/231/trunk/ross/models/epi/queue-heap.c
+END
+homes.dat
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/svn/rossnet/!svn/ver/174/trunk/ross/models/epi/homes.dat
+END
+agents.dat
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/svn/rossnet/!svn/ver/174/trunk/ross/models/epi/agents.dat
+END
+.svnignore
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/svn/rossnet/!svn/ver/174/trunk/ross/models/epi/.svnignore
+END
+def-disease.log
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/rossnet/!svn/ver/174/trunk/ross/models/epi/def-disease.log
+END
+epi-agent.c
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/rossnet/!svn/ver/174/trunk/ross/models/epi/epi-agent.c
+END
+epi-stats.c
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/rossnet/!svn/ver/174/trunk/ross/models/epi/epi-stats.c
+END
+epi-num.c
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/svn/rossnet/!svn/ver/174/trunk/ross/models/epi/epi-num.c
+END
+epi-model.c
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/rossnet/!svn/ver/174/trunk/ross/models/epi/epi-model.c
+END
+epi-global.c
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/svn/rossnet/!svn/ver/174/trunk/ross/models/epi/epi-global.c
+END
+epi-xml.c
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/svn/rossnet/!svn/ver/174/trunk/ross/models/epi/epi-xml.c
+END
+.gdbinit
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/svn/rossnet/!svn/ver/174/trunk/ross/models/epi/.gdbinit
+END
+epi-seir.c
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/svn/rossnet/!svn/ver/174/trunk/ross/models/epi/epi-seir.c
+END
+epi.c
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/svn/rossnet/!svn/ver/174/trunk/ross/models/epi/epi.c
+END
+epi-agent.h
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/rossnet/!svn/ver/231/trunk/ross/models/epi/epi-agent.h
+END
+Incubating.log
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/rossnet/!svn/ver/174/trunk/ross/models/epi/Incubating.log
+END
+epi.h
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/svn/rossnet/!svn/ver/174/trunk/ross/models/epi/epi.h
+END
+hospital.log
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/svn/rossnet/!svn/ver/174/trunk/ross/models/epi/hospital.log
+END
+epi-types.h
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/rossnet/!svn/ver/231/trunk/ross/models/epi/epi-types.h
+END
+epi-extern.h
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/svn/rossnet/!svn/ver/174/trunk/ross/models/epi/epi-extern.h
+END
+HIV.log
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/svn/rossnet/!svn/ver/174/trunk/ross/models/epi/HIV.log
+END
+epi-report.c
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/svn/rossnet/!svn/ver/174/trunk/ross/models/epi/epi-report.c
+END
+ic.txt
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/svn/rossnet/!svn/ver/174/trunk/ross/models/epi/ic.txt
+END
+Influenza.log
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/rossnet/!svn/ver/174/trunk/ross/models/epi/Influenza.log
+END
+epi-timer.c
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/rossnet/!svn/ver/174/trunk/ross/models/epi/epi-timer.c
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/svn/rossnet/!svn/ver/388/trunk/ross/models/epi/Makefile
+END
+.ross_network
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/rossnet/!svn/ver/174/trunk/ross/models/epi/.ross_network
+END

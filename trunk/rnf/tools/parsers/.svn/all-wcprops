@@ -1,0 +1,107 @@
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/svn/rossnet/!svn/ver/226/trunk/rnf/tools/parsers
+END
+convert
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/svn/rossnet/!svn/ver/226/trunk/rnf/tools/parsers/convert
+END
+16-rand-1500000-4.config
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/rossnet/!svn/ver/167/trunk/rnf/tools/parsers/16-rand-1500000-4.config
+END
+optimize.c
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/svn/rossnet/!svn/ver/226/trunk/rnf/tools/parsers/optimize.c
+END
+rf_to_rn.pl
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/rossnet/!svn/ver/167/trunk/rnf/tools/parsers/rf_to_rn.pl
+END
+ip.pl
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/svn/rossnet/!svn/ver/226/trunk/rnf/tools/parsers/ip.pl
+END
+rf_to_rn-ptr.pl
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/rossnet/!svn/ver/167/trunk/rnf/tools/parsers/rf_to_rn-ptr.pl
+END
+rf_to_rn.c
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/svn/rossnet/!svn/ver/226/trunk/rnf/tools/parsers/rf_to_rn.c
+END
+yaung_to_rn.pl
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/svn/rossnet/!svn/ver/167/trunk/rnf/tools/parsers/yaung_to_rn.pl
+END
+rf_to_ross.c
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/rossnet/!svn/ver/226/trunk/rnf/tools/parsers/rf_to_ross.c
+END
+Node.pm
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/svn/rossnet/!svn/ver/167/trunk/rnf/tools/parsers/Node.pm
+END
+convert.c
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/rossnet/!svn/ver/226/trunk/rnf/tools/parsers/convert.c
+END
+campus_to_rn.pl
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/rossnet/!svn/ver/167/trunk/rnf/tools/parsers/campus_to_rn.pl
+END
+Node-ptr.pm
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/rossnet/!svn/ver/167/trunk/rnf/tools/parsers/Node-ptr.pm
+END
+NcsNode.pm
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/svn/rossnet/!svn/ver/167/trunk/rnf/tools/parsers/NcsNode.pm
+END
+rf_metis_rn
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/rossnet/!svn/ver/226/trunk/rnf/tools/parsers/rf_metis_rn
+END
+ncs_parser.pl
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/rossnet/!svn/ver/167/trunk/rnf/tools/parsers/ncs_parser.pl
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/svn/rossnet/!svn/ver/226/trunk/rnf/tools/parsers/Makefile
+END

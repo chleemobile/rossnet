@@ -1,0 +1,17 @@
+K 25
+svn:wc:ra_dav:version-url
+V 35
+/svn/rossnet/!svn/ver/388/trunk/rnf
+END
+.svnignore
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/svn/rossnet/!svn/ver/167/trunk/rnf/.svnignore
+END
+CMakeLists.txt
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/svn/rossnet/!svn/ver/327/trunk/rnf/CMakeLists.txt
+END
