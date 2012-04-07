@@ -7,24 +7,33 @@
 
 #define MEAN_DEPARTURE 30.0
 #define MEAN_LAND 10.0
+#define NUMBER_OF_LP 1024
 
 using std::max;
 using namespace std;
 
-typedef struct airport_state airport_state;
-typedef struct airport_message airport_message;
+typedef struct air_traffic_state air_traffic_state;
+typedef struct air_traffic_message air_traffic_message;
 
-enum airport_event_t
+enum air_traffic_event_t
 {
-	ARRIVAL = 1, 
-	DEPARTURE,
-	LAND
+    DEP_REQ=1,
+    TAXI_OUT,
+    TAKE_OFF_REQ,
+    TAKE_OFF,
+    ON_THE_AIR,
+    LANDING_REQ,
+    LANDING,
+    ARRIVAL_REQ,
+    TAXI_IN,
+    ARRIVAL
 };
 
-typedef enum airport_event_t airport_event_t;
+typedef enum air_traffic_event_t air_traffic_event_t;
 
-struct airport_state
+struct air_traffic_state
 {
+    
 	int		landings;
 	int		planes_in_the_sky;
 	int		planes_on_the_ground;
@@ -35,33 +44,24 @@ struct airport_state
     int rn;
 };
 
-struct airport_message
+struct air_traffic_message
 {
-	airport_event_t	 type;
+	air_traffic_event_t	 type;
 
 	tw_stime	 waiting_time;
 	tw_stime	 saved_furthest_flight_landing;
 
 };
 
-#define NUMBER_OF_LP 1024
 
 static int nlp = NUMBER_OF_LP;
 static tw_lpid	 nlp_per_pe = NUMBER_OF_LP;
 
-static int sqrt_nlp = 0;
-static int sqrt_nlp_1 =0;
-
 static tw_stime	 mean_flight_time = 1;
 static int       opt_mem = 1000;
-static int	 planes_per_airport = 1;
+static int       planes_per_airport = 1;
 
 static tw_stime	 wait_time_avg = 0.0;
 
-static stack<int> in_the_sky_stack = stack<int>();
-static stack<int> on_the_ground_stack = stack<int>();
-static stack<int> landing_stack = stack<int>();
-static stack<int> waiting_time_stack = stack<int>();
-static stack<int> furthest_flight_landing_stack = stack<int>();
 
 #endif
