@@ -4,7 +4,9 @@
 #include <ross.h>
 #include "iostream"
 #include <stack>
+#include "LocalTrafficController.hpp"
 
+#define DEP_PREPARE 10.0
 #define MEAN_DEPARTURE 30.0
 #define MEAN_LAND 10.0
 #define NUMBER_OF_LP 1024
@@ -12,8 +14,9 @@
 using std::max;
 using namespace std;
 
-typedef struct air_traffic_state air_traffic_state;
+typedef struct airport_state airport_state;
 typedef struct air_traffic_message air_traffic_message;
+typedef struct aircraft aircraft;
 
 enum air_traffic_event_t
 {
@@ -31,7 +34,7 @@ enum air_traffic_event_t
 
 typedef enum air_traffic_event_t air_traffic_event_t;
 
-struct air_traffic_state
+struct airport_state
 {
     
 	int		landings;
@@ -42,6 +45,9 @@ struct air_traffic_state
 	tw_stime	furthest_flight_landing;
     
     int rn;
+    aircraft                *airplane;
+    LocalTrafficController  *traffic_controller;
+    
 };
 
 struct air_traffic_message
@@ -50,9 +56,15 @@ struct air_traffic_message
 
 	tw_stime	 waiting_time;
 	tw_stime	 saved_furthest_flight_landing;
+    aircraft     *airplane;
 
 };
 
+struct aircraft
+{
+    int type;
+    int dest;
+};
 
 static int nlp = NUMBER_OF_LP;
 static tw_lpid	 nlp_per_pe = NUMBER_OF_LP;

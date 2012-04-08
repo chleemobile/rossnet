@@ -14,6 +14,8 @@
   David Bauer
 */
 
+int set_dest(int current_location);
+
 tw_peid
 mapping(tw_lpid gid)
 {
@@ -22,7 +24,7 @@ mapping(tw_lpid gid)
 
 
 void
-init(air_traffic_state * s, tw_lp * lp)
+init(airport_state * s, tw_lp * lp)
 {
     BSStack* stack = new BSStack();
     lp->stack_pointer = stack;
@@ -37,19 +39,22 @@ init(air_traffic_state * s, tw_lp * lp)
     s->waiting_time = 0.0;
     s->furthest_flight_landing = 0.0;
     
+    LocalTrafficController *traffic_controller = new LocalTrafficController();
+    s->traffic_controller = traffic_controller;
+
     for(i = 0; i < planes_per_airport; i++)
     {
-        e = tw_event_new(lp->gid, bs_rand_exponential(s->rn, MEAN_DEPARTURE), lp);
-//        e = tw_event_new(lp->gid, bs_rand_exponential2(s->rn, MEAN_DEPARTURE, lp), lp);
-
+        e = tw_event_new(lp->gid, bs_rand_exponential(s->rn, 1), lp);
         m = (air_traffic_message*)tw_event_data(e);
+        aircraft *airplane = (aircraft*)malloc(sizeof(aircraft));
+        m->airplane = airplane;
         m->type = DEP_REQ;
         tw_event_send(e);
     }
 }
 
 void
-event_handler(air_traffic_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * lp)
+event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * lp)
 {    
     int rand_result;
     tw_lpid dst_lp;
@@ -61,68 +66,195 @@ event_handler(air_traffic_state * s, tw_bf * bf, air_traffic_message * msg, tw_l
     {
         case DEP_REQ:
         {
+            s->airplane = msg->airplane;
+            if(s->traffic_controller->dep_req())
+            {
+                s->airplane->dest = set_dest(lp->gid);
+                /*
+                set route will be added later
+                */
+                ts =  s->traffic_controller->cal_dep_prep_time();
+                e = tw_event_new(lp->gid, ts, lp);
+                m = (air_traffic_message*)tw_event_data(e);
+                m->type = TAXI_OUT;
 
+            }
+            else
+            {
+                ts = s->traffic_controller->cal_delay();
+                e = tw_event_new(lp->gid, ts, lp);
+                m = (air_traffic_message*)tw_event_data(e);
+                m->type = DEP_REQ;
+            }
+            m->airplane = msg->airplane;
+            tw_event_send(e);
+            
             break;
         }
             
         case TAXI_OUT:
         {
+            s->airplane = msg->airplane;
+            ts = (tw_stime)s->traffic_controller->cal_taxi_out_time();
+            e = tw_event_new(lp->gid, ts, lp);
 
+            m = (air_traffic_message*)tw_event_data(e);
+            m->type = TAKE_OFF_REQ;
+            m->airplane = msg->airplane;
+            
+            tw_event_send(e);
+            
             break;
         }
             
         case TAKE_OFF_REQ:
         {
-
+            s->airplane = msg->airplane;
+            if(s->traffic_controller->take_off_req())
+            {
+                ts = (tw_stime)s->traffic_controller->cal_take_off_prep_time();
+                e = tw_event_new(lp->gid, ts, lp);
+                m = (air_traffic_message*)tw_event_data(e);
+                m->type = TAKE_OFF;
+                
+            }
+            else
+            {
+                ts = s->traffic_controller->cal_delay();
+                e = tw_event_new(lp->gid, ts, lp);
+                m = (air_traffic_message*)tw_event_data(e);
+                m->type = TAKE_OFF_REQ;
+            }
+            m->airplane = msg->airplane;
+            tw_event_send(e);
+            
             break;
         }
 
         case TAKE_OFF:
         {
+            s->airplane = msg->airplane;
+            ts = (tw_stime)s->traffic_controller->cal_take_off_time();
+            e = tw_event_new(s->airplane->dest, ts, lp);
+            m = (air_traffic_message*)tw_event_data(e);
+            m->type = ON_THE_AIR;
+            m->airplane = s->airplane;
             
+            tw_event_send(e);
             break;
         }
             
         case ON_THE_AIR:
         {
-            
+            s->airplane = msg->airplane;
+            /*
+             update next sector will be added to here
+             */
+            int next_sector = 1;
+            int dest = s->airplane->dest;
+            if(next_sector == dest)
+            {
+                
+            }
+            else
+            {
+                //sector transit req will be added
+                bool approved = true;
+                if (approved) 
+                {
+
+                }
+                else
+                {
+                    
+                }
+            }
             break;
         }
             
         case LANDING_REQ:
         {
-            
-            break;
+            s->airplane = msg->airplane;
+            if(s->traffic_controller->landing_req())
+            {
+                ts = (tw_stime)s->traffic_controller->cal_landing_prep_time();
+                e = tw_event_new(lp->gid, ts, lp);
+                m = (air_traffic_message*)tw_event_data(e);
+                m->type = LANDING;
+                
+            }
+            else
+            {
+                ts = s->traffic_controller->cal_delay();
+                e = tw_event_new(lp->gid, ts, lp);
+                m = (air_traffic_message*)tw_event_data(e);
+                m->type = LANDING_REQ;
+            }
+            m->airplane = msg->airplane;
+            tw_event_send(e);
         } 
             
         case LANDING:
         {
+            s->airplane = msg->airplane;
+            ts = (tw_stime)s->traffic_controller->cal_landing_time();
+            e = tw_event_new(lp->gid, ts, lp);
+            m = (air_traffic_message*)tw_event_data(e);
+            m->type = ARRIVAL_REQ;
+            m->airplane = s->airplane;
             
+            tw_event_send(e);
             break;
         }   
             
         case ARRIVAL_REQ:
         {
+            s->airplane = msg->airplane;
+            if(s->traffic_controller->arrival_req())
+            {
+                ts =  s->traffic_controller->cal_arrival_prep_time();
+                e = tw_event_new(lp->gid, ts, lp);
+                m = (air_traffic_message*)tw_event_data(e);
+                m->type = TAXI_IN;
+                
+            }
+            else
+            {
+                ts = s->traffic_controller->cal_delay();
+                e = tw_event_new(lp->gid, ts, lp);
+                m = (air_traffic_message*)tw_event_data(e);
+                m->type = ARRIVAL_REQ;
+            }
+            m->airplane = msg->airplane;
+            tw_event_send(e);
             
             break;
         }  
             
         case TAXI_IN:
         {
+            s->airplane = msg->airplane;
+            ts = (tw_stime)s->traffic_controller->cal_taxi_in_time();
+            e = tw_event_new(lp->gid, ts, lp);
             
+            m = (air_traffic_message*)tw_event_data(e);
+            m->type = ARRIVAL;
+            m->airplane = msg->airplane;
+            
+            tw_event_send(e);
             break;
         }  
             
         case ARRIVAL:
         {
-            
+            s->airplane = msg->airplane;
             break;
         }              
     }
 }
 
 void
-rc_event_handler(air_traffic_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * lp)
+rc_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * lp)
 {    
     switch(msg->type)
     {
@@ -189,7 +321,7 @@ rc_event_handler(air_traffic_state * s, tw_bf * bf, air_traffic_message * msg, t
 }
 
 void
-final(air_traffic_state * s, tw_lp * lp)
+final(airport_state * s, tw_lp * lp)
 {
 	wait_time_avg += ((s->waiting_time / (double) s->landings) / nlp_per_pe);
 }
@@ -207,7 +339,7 @@ tw_lptype airport_lps[] =
 		(revent_f) rc_event_handler,
 		(final_f) final,
 		(map_f) mapping,
-		sizeof(air_traffic_state),
+		sizeof(airport_state),
 	},
 	{0},
 };
@@ -259,4 +391,19 @@ main(int argc, char **argv, char **env)
 	}	
 
 	return 0;
+}
+
+int set_dest(int current_location)
+{
+    return 1;
+}
+
+int dep_req()
+{
+    return 1;
+}
+
+tw_stime cal_delay()
+{
+    return 1;
 }
