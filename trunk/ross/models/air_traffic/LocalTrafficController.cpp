@@ -15,11 +15,6 @@ bool LocalTrafficController::dep_req()
     return true;
 }
 
-bool LocalTrafficController::take_off_req()
-{
-    return true;
-}
-
 bool LocalTrafficController::landing_req()
 {
     return true;

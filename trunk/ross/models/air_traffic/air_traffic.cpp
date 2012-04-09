@@ -51,6 +51,17 @@ init(airport_state * s, tw_lp * lp)
         m->type = DEP_REQ;
         tw_event_send(e);
     }
+    
+    /*
+     We initally set 10 region controllers
+     LP gid 0 to 9 -> Region controller
+     10 to 1023 -> Airport
+     */
+    if(lp->gid <10)
+    {
+        RegionTrafficController *region_controller = new RegionTrafficController();
+        s->region_controller = region_controller;
+    }
 }
 
 void
@@ -101,19 +112,40 @@ event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * 
             m = (air_traffic_message*)tw_event_data(e);
             m->type = TAKE_OFF_REQ;
             m->airplane = msg->airplane;
-            
+            m->msg_from = lp->gid;
             tw_event_send(e);
             
             break;
         }
             
+        /*
+         Send a request to the region controller as an evetn since we have two different LPs
+         */
         case TAKE_OFF_REQ:
         {
             s->airplane = msg->airplane;
-            if(s->traffic_controller->take_off_req())
+            ts = 1; //should select a reasonable time
+            int region_controller_id = 1; //should select a region controller
+            e = tw_event_new(region_controller_id, ts, lp);
+            
+            m = (air_traffic_message*)tw_event_data(e);
+            m->type = TAKE_OFF_REP;
+            m->airplane = msg->airplane;
+            tw_event_send(e);
+            
+            break;
+        }
+
+        /*
+         Region Traffic Controller will receive this event
+         */
+        case TAKE_OFF_REP:
+        {
+            s->airplane = msg->airplane;
+            if(s->region_controller->take_off_req())
             {
-                ts = (tw_stime)s->traffic_controller->cal_take_off_prep_time();
-                e = tw_event_new(lp->gid, ts, lp);
+                ts = 1;
+                e = tw_event_new(m->msg_from, ts, lp);
                 m = (air_traffic_message*)tw_event_data(e);
                 m->type = TAKE_OFF;
                 
@@ -121,7 +153,7 @@ event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * 
             else
             {
                 ts = s->traffic_controller->cal_delay();
-                e = tw_event_new(lp->gid, ts, lp);
+                e = tw_event_new(m->msg_from, ts, lp);
                 m = (air_traffic_message*)tw_event_data(e);
                 m->type = TAKE_OFF_REQ;
             }
@@ -129,8 +161,8 @@ event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * 
             tw_event_send(e);
             
             break;
-        }
-
+        }            
+            
         case TAKE_OFF:
         {
             s->airplane = msg->airplane;
@@ -366,7 +398,12 @@ main(int argc, char **argv, char **env)
 	nlp_per_pe /= (tw_nnodes() * g_tw_npe);
 	g_tw_events_per_pe =(planes_per_airport * nlp_per_pe / g_tw_npe) + opt_mem;
 	tw_define_lps(nlp_per_pe, sizeof(air_traffic_message), 0);
-
+    
+    /*
+     We have two different LPs
+     One represents an airport
+     The other one represents Region Controller
+     */
 	for(i = 0; i < g_tw_nlp; i++)
 		tw_lp_settype(i, &airport_lps[0]);
 

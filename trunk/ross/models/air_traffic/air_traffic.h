@@ -5,11 +5,13 @@
 #include "iostream"
 #include <stack>
 #include "LocalTrafficController.hpp"
+#include "RegionTrafficController.hpp"
 
 #define DEP_PREPARE 10.0
 #define MEAN_DEPARTURE 30.0
 #define MEAN_LAND 10.0
 #define NUMBER_OF_LP 1024
+#define NUMBER_OF_REGION_CONTROLLER 10
 
 using std::max;
 using namespace std;
@@ -23,6 +25,7 @@ enum air_traffic_event_t
     DEP_REQ=1,
     TAXI_OUT,
     TAKE_OFF_REQ,
+    TAKE_OFF_REP,
     TAKE_OFF,
     ON_THE_AIR,
     LANDING_REQ,
@@ -47,7 +50,7 @@ struct airport_state
     int rn;
     aircraft                *airplane;
     LocalTrafficController  *traffic_controller;
-    
+    RegionTrafficController *region_controller;
 };
 
 struct air_traffic_message
@@ -57,7 +60,7 @@ struct air_traffic_message
 	tw_stime	 waiting_time;
 	tw_stime	 saved_furthest_flight_landing;
     aircraft     *airplane;
-
+    int          msg_from;
 };
 
 struct aircraft

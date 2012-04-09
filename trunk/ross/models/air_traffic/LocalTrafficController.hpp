@@ -10,7 +10,6 @@ public:
     ~LocalTrafficController();
 
     bool dep_req();
-    bool take_off_req();
     bool landing_req();
     bool arrival_req();
     
