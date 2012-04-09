@@ -28,6 +28,7 @@ enum air_traffic_event_t
     TAKE_OFF_REP,
     TAKE_OFF,
     ON_THE_AIR,
+    TRANSIT_REQ,
     LANDING_REQ,
     LANDING,
     ARRIVAL_REQ,
@@ -66,7 +67,8 @@ struct air_traffic_message
 struct aircraft
 {
     int type;
-    int dest;
+    int dest_region;
+    int dest_airport;
 };
 
 static int nlp = NUMBER_OF_LP;

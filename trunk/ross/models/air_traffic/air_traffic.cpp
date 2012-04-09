@@ -14,7 +14,7 @@
   David Bauer
 */
 
-int set_dest(int current_location);
+int set_dest_region(int current_location);
 
 tw_peid
 mapping(tw_lpid gid)
@@ -80,7 +80,7 @@ event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * 
             s->airplane = msg->airplane;
             if(s->traffic_controller->dep_req())
             {
-                s->airplane->dest = set_dest(lp->gid);
+                s->airplane->dest_region = set_dest_region(lp->gid);
                 /*
                 set route will be added later
                 */
@@ -88,7 +88,6 @@ event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * 
                 e = tw_event_new(lp->gid, ts, lp);
                 m = (air_traffic_message*)tw_event_data(e);
                 m->type = TAXI_OUT;
-
             }
             else
             {
@@ -112,14 +111,13 @@ event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * 
             m = (air_traffic_message*)tw_event_data(e);
             m->type = TAKE_OFF_REQ;
             m->airplane = msg->airplane;
-            m->msg_from = lp->gid;
             tw_event_send(e);
             
             break;
         }
             
         /*
-         Send a request to the region controller as an evetn since we have two different LPs
+         Send a request to the region controller since we have two different LPs
          */
         case TAKE_OFF_REQ:
         {
@@ -131,13 +129,15 @@ event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * 
             m = (air_traffic_message*)tw_event_data(e);
             m->type = TAKE_OFF_REP;
             m->airplane = msg->airplane;
+            m->msg_from = lp->gid;
+
             tw_event_send(e);
             
             break;
         }
 
         /*
-         Region Traffic Controller will receive this event
+         Region controller will receive this event
          */
         case TAKE_OFF_REP:
         {
@@ -162,12 +162,17 @@ event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * 
             
             break;
         }            
-            
+           
+        /*
+         Send an event to the region controller
+         */
         case TAKE_OFF:
         {
             s->airplane = msg->airplane;
             ts = (tw_stime)s->traffic_controller->cal_take_off_time();
-            e = tw_event_new(s->airplane->dest, ts, lp);
+            int region_controller_id = 1; //should select a region controller
+            e = tw_event_new(region_controller_id, ts, lp);
+            
             m = (air_traffic_message*)tw_event_data(e);
             m->type = ON_THE_AIR;
             m->airplane = s->airplane;
@@ -176,33 +181,73 @@ event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * 
             break;
         }
             
+        /*
+         Region controller will receive this event
+        */     
         case ON_THE_AIR:
         {
             s->airplane = msg->airplane;
             /*
-             update next sector will be added to here
+             updating the next sector will be added to here
              */
-            int next_sector = 1;
-            int dest = s->airplane->dest;
-            if(next_sector == dest)
+            int next_region = 1;
+            if(next_region == s->airplane->dest_region)
             {
+                ts = (tw_stime)s->region_controller->cal_flight_time();
+                /*
+                 send an event to airport 
+                 */
+                e = tw_event_new(s->airplane->dest_airport, ts, lp);
+                
+                m = (air_traffic_message*)tw_event_data(e);
+                m->type = LANDING_REQ;
+            }
+            else
+            {
+                /*
+                 Flight time to the next region
+                 */
+                ts = (tw_stime)s->region_controller->cal_flight_time();
+                e = tw_event_new(next_region, ts, lp);
+                
+                m = (air_traffic_message*)tw_event_data(e);
+                m->type = TRANSIT_REQ;
+                m->msg_from = lp->gid;
+
+            }
+            m->airplane = s->airplane;
+            tw_event_send(e);
+
+            break;
+        }
+            
+        /*
+        Region controller will receive this event
+        */
+        case TRANSIT_REQ:
+        {
+            s->airplane = msg->airplane;
+            if(s->region_controller->transit_req(1,1))
+            {
+                ts = s->region_controller->cal_transit_time();
+                e = tw_event_new(lp->gid, ts, lp);
+                m = (air_traffic_message*)tw_event_data(e);
+                m->type = ON_THE_AIR;
                 
             }
             else
             {
-                //sector transit req will be added
-                bool approved = true;
-                if (approved) 
-                {
-
-                }
-                else
-                {
-                    
-                }
+                ts = s->traffic_controller->cal_delay();
+                e = tw_event_new(m->msg_from, ts, lp);
+                m = (air_traffic_message*)tw_event_data(e);
+                m->type = ON_THE_AIR;
+                //should re-update the next region updated in ON_THE_AIR event 
             }
+            m->airplane = msg->airplane;
+            tw_event_send(e);
+            
             break;
-        }
+        }             
             
         case LANDING_REQ:
         {
@@ -213,7 +258,6 @@ event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * 
                 e = tw_event_new(lp->gid, ts, lp);
                 m = (air_traffic_message*)tw_event_data(e);
                 m->type = LANDING;
-                
             }
             else
             {
@@ -430,17 +474,9 @@ main(int argc, char **argv, char **env)
 	return 0;
 }
 
-int set_dest(int current_location)
+int set_dest_region(int current_location)
 {
     return 1;
 }
 
-int dep_req()
-{
-    return 1;
-}
 
-tw_stime cal_delay()
-{
-    return 1;
-}

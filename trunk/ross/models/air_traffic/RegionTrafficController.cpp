@@ -24,3 +24,13 @@ int RegionTrafficController::cal_delay()
 {
     return 1;
 }
+
+int RegionTrafficController::cal_flight_time()
+{
+    return 1;
+}
+
+int RegionTrafficController::cal_transit_time()
+{
+    return 1;
+}
