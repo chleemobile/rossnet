@@ -2,7 +2,7 @@ INCLUDE_DIRECTORIES(${ROSS_SOURCE_DIR})
 INCLUDE_DIRECTORIES("/opt/local/include")
 
 SET(air_traffic_srcs
-	air_traffic.cpp		air_traffic.h LocalTrafficController.cpp LocalTrafficController.hpp RegionTrafficController.cpp RegionTrafficController.hpp)
+	air_traffic.cpp		air_traffic.h LocalTrafficController.cpp LocalTrafficController.hpp RegionTrafficController.cpp RegionTrafficController.hpp Aircraft.cpp Aircraft.hpp)
 
 
 ADD_EXECUTABLE(air_traffic ${air_traffic_srcs})

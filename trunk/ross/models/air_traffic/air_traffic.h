@@ -6,6 +6,7 @@
 #include <stack>
 #include "LocalTrafficController.hpp"
 #include "RegionTrafficController.hpp"
+#include "Aircraft.hpp"
 
 #define DEP_PREPARE 10.0
 #define MEAN_DEPARTURE 30.0
@@ -49,7 +50,7 @@ struct airport_state
 	tw_stime	furthest_flight_landing;
     
     int rn;
-    aircraft                *airplane;
+    Aircraft                *airplane;
     LocalTrafficController  *traffic_controller;
     RegionTrafficController *region_controller;
 };
@@ -60,23 +61,16 @@ struct air_traffic_message
 
 	tw_stime	 waiting_time;
 	tw_stime	 saved_furthest_flight_landing;
-    aircraft     *airplane;
+    Aircraft     *airplane;
     int          msg_from;
-};
-
-struct aircraft
-{
-    int type;
-    int dest_region;
-    int dest_airport;
 };
 
 static int nlp = NUMBER_OF_LP;
 static tw_lpid	 nlp_per_pe = NUMBER_OF_LP;
 
 static tw_stime	 mean_flight_time = 1;
-static int       opt_mem = 1000;
-static int       planes_per_airport = 1;
+static int       opt_mem = 100000;
+static int       planes_per_airport = 100;
 
 static tw_stime	 wait_time_avg = 0.0;
 

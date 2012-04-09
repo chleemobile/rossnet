@@ -14,7 +14,6 @@
   David Bauer
 */
 
-int set_dest_region(int current_location);
 
 tw_peid
 mapping(tw_lpid gid)
@@ -46,7 +45,7 @@ init(airport_state * s, tw_lp * lp)
     {
         e = tw_event_new(lp->gid, bs_rand_exponential(s->rn, 1), lp);
         m = (air_traffic_message*)tw_event_data(e);
-        aircraft *airplane = (aircraft*)malloc(sizeof(aircraft));
+        Aircraft *airplane = new Aircraft();
         m->airplane = airplane;
         m->type = DEP_REQ;
         tw_event_send(e);
@@ -80,7 +79,7 @@ event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * 
             s->airplane = msg->airplane;
             if(s->traffic_controller->dep_req())
             {
-                s->airplane->dest_region = set_dest_region(lp->gid);
+                s->airplane->set_dest_region(1);
                 /*
                 set route will be added later
                 */
@@ -191,13 +190,13 @@ event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * 
              updating the next sector will be added to here
              */
             int next_region = 1;
-            if(next_region == s->airplane->dest_region)
+            if(next_region == s->airplane->get_dest_region())
             {
                 ts = (tw_stime)s->region_controller->cal_flight_time();
                 /*
                  send an event to airport 
                  */
-                e = tw_event_new(s->airplane->dest_airport, ts, lp);
+                e = tw_event_new(s->airplane->get_dest_airport(), ts, lp);
                 
                 m = (air_traffic_message*)tw_event_data(e);
                 m->type = LANDING_REQ;
@@ -324,6 +323,7 @@ event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * 
         case ARRIVAL:
         {
             s->airplane = msg->airplane;
+            
             break;
         }              
     }
@@ -473,10 +473,3 @@ main(int argc, char **argv, char **env)
 
 	return 0;
 }
-
-int set_dest_region(int current_location)
-{
-    return 1;
-}
-
-
