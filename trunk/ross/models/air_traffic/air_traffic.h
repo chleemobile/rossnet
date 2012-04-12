@@ -1,25 +1,40 @@
 #ifndef INC_airport_h
 #define INC_airport_h
 
+class Aircraft;;
+class LocalTrafficController;
+class RegionTrafficController;
+
 #include <ross.h>
 #include "iostream"
 #include <stack>
-#include "LocalTrafficController.hpp"
-#include "RegionTrafficController.hpp"
-#include "Aircraft.hpp"
+
+
+#define DEBUG 1
+#define NUMBER_OF_LP 33
+#define NUMBER_OF_REGION_CONTROLLER 3
+
+#define NUMBER_OF_LARGE_REGION_CONTROLLER (NUMBER_OF_REGION_CONTROLLER / 3)
+#define NUMBER_OF_MEDIUM_REGION_CONTROLLER (NUMBER_OF_REGION_CONTROLLER / 3)
+#define NUMBER_OF_SMALL_REGION_CONTROLLER (NUMBER_OF_REGION_CONTROLLER / 3)
+
+#define NUMBER_OF_LARGE_AIRPORT ((NUMBER_OF_LP - NUMBER_OF_REGION_CONTROLLER) / NUMBER_OF_REGION_CONTROLLER)
+#define NUMBER_OF_MEDIUM_AIRPORT ((NUMBER_OF_LP - NUMBER_OF_REGION_CONTROLLER) / NUMBER_OF_REGION_CONTROLLER)
+#define NUMBER_OF_SMALL_AIRPORT ((NUMBER_OF_LP - NUMBER_OF_REGION_CONTROLLER) / NUMBER_OF_REGION_CONTROLLER)
+
+#define NUMBER_OF_RUNWAY_LARGE_AIRPORT 20
+#define NUMBER_OF_RUNWAY_MEDIUM_AIRPORT 10
+#define NUMBER_OF_RUNWAY_SMALL_AIRPORT 5
 
 #define DEP_PREPARE 10.0
 #define MEAN_DEPARTURE 30.0
 #define MEAN_LAND 10.0
-#define NUMBER_OF_LP 1024
-#define NUMBER_OF_REGION_CONTROLLER 10
 
 using std::max;
 using namespace std;
 
 typedef struct airport_state airport_state;
 typedef struct air_traffic_message air_traffic_message;
-typedef struct aircraft aircraft;
 
 enum air_traffic_event_t
 {
@@ -41,15 +56,9 @@ typedef enum air_traffic_event_t air_traffic_event_t;
 
 struct airport_state
 {
-    
-	int		landings;
-	int		planes_in_the_sky;
-	int		planes_on_the_ground;
-
-	tw_stime	waiting_time;
-	tw_stime	furthest_flight_landing;
-    
     int rn;
+    int number_of_runway;
+    
     Aircraft                *airplane;
     LocalTrafficController  *traffic_controller;
     RegionTrafficController *region_controller;
@@ -58,9 +67,7 @@ struct airport_state
 struct air_traffic_message
 {
 	air_traffic_event_t	 type;
-
-	tw_stime	 waiting_time;
-	tw_stime	 saved_furthest_flight_landing;
+    
     Aircraft     *airplane;
     int          msg_from;
 };
@@ -70,7 +77,7 @@ static tw_lpid	 nlp_per_pe = NUMBER_OF_LP;
 
 static tw_stime	 mean_flight_time = 1;
 static int       opt_mem = 100000;
-static int       planes_per_airport = 100;
+static int       planes_per_airport = 1;
 
 static tw_stime	 wait_time_avg = 0.0;
 

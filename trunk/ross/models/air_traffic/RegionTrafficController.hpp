@@ -1,14 +1,27 @@
 #ifndef __REGION_TRAFFIC_CONTROLLER__
 #define __REGION_TRAFFIC_CONTROLLER__
 
+struct airport_state;
+
+#define AIRCRAFT_CAPACITY_OF_LARGE_REGION 200
+#define AIRCRAFT_CAPACITY_OF_MEDIUM_REGION 100
+#define AIRCRAFT_CAPACITY_OF_SMALL_REGION 50
+
 class RegionTrafficController
 {
 private:
-    int max_capacity;
-    int num_airplanes;
+    int m_max_capacity;
+    int m_num_airplanes;
     
 public:
-    RegionTrafficController();
+    enum RegionType
+    {
+        Small,
+        Medium,
+        Large
+    };
+    
+    RegionTrafficController(RegionType type);
     ~RegionTrafficController();
     
     /*

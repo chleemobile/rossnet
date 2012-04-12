@@ -22,6 +22,8 @@ public:
     
     int get_dest_airport();
     int get_dest_region();
+    int get_id();
+    int get_next_region();
 
 };
 

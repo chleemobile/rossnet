@@ -33,3 +33,13 @@ int Aircraft::get_dest_region()
 {
     return m_dest_region;
 }
+
+int Aircraft::get_id()
+{
+    return m_id;
+}
+
+int Aircraft::get_next_region()
+{
+    return m_dest_region;
+}
