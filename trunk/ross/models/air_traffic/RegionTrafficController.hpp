@@ -28,8 +28,9 @@ public:
      set num_airplanes
      */
     bool take_off_req();
-    bool transit_req(int from, int to);
-
+    bool transit_req();
+    void hand_off();
+    
     int cal_delay();
     int cal_flight_time();
     int cal_transit_time();

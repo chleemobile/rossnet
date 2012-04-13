@@ -5,7 +5,7 @@ int Aircraft::m_id_generator = 0;
 Aircraft::Aircraft()
 {
     m_id_generator++;
-    m_id = m_id_generator++;
+    m_id = m_id_generator;
 }
 
 Aircraft::~Aircraft()
@@ -13,6 +13,10 @@ Aircraft::~Aircraft()
     
 }
 
+void Aircraft::set_route(int source, int end)
+{
+    
+}
 
 void Aircraft::set_dest_airport(int dest_airport)
 {

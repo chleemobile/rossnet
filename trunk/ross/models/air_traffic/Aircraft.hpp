@@ -9,12 +9,20 @@ private:
     int m_dest_region;
     int m_dest_airport;
     int m_id;
+
+    /*
+     Due to the restriction of Backstroke,
+     we can not use arrays (consecutive data structure).
+     
+     */
+
     
 public:
     Aircraft();
     ~Aircraft();
     static int m_id_generator;
     
+    void set_route(int source, int end);
     void update_next_region();
     
     void set_dest_airport(int dest_airport);

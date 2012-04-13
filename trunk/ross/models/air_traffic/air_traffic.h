@@ -11,8 +11,8 @@ class RegionTrafficController;
 
 
 #define DEBUG 1
-#define NUMBER_OF_LP 33
-#define NUMBER_OF_REGION_CONTROLLER 3
+#define NUMBER_OF_LP 2
+#define NUMBER_OF_REGION_CONTROLLER 1
 
 #define NUMBER_OF_LARGE_REGION_CONTROLLER (NUMBER_OF_REGION_CONTROLLER / 3)
 #define NUMBER_OF_MEDIUM_REGION_CONTROLLER (NUMBER_OF_REGION_CONTROLLER / 3)
@@ -45,6 +45,7 @@ enum air_traffic_event_t
     TAKE_OFF,
     ON_THE_AIR,
     TRANSIT_REQ,
+    HAND_OFF,
     LANDING_REQ,
     LANDING,
     ARRIVAL_REQ,
@@ -57,7 +58,6 @@ typedef enum air_traffic_event_t air_traffic_event_t;
 struct airport_state
 {
     int rn;
-    int number_of_runway;
     
     Aircraft                *airplane;
     LocalTrafficController  *traffic_controller;

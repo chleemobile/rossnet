@@ -39,9 +39,20 @@ bool RegionTrafficController::take_off_req()
     return false;
 }
 
-bool RegionTrafficController::transit_req(int from, int to)
+bool RegionTrafficController::transit_req()
 {
-    return true;
+    if(m_num_airplanes < m_max_capacity)
+    {
+        m_num_airplanes++;
+        return true;
+    }
+    return false;
+}
+
+void RegionTrafficController::hand_off()
+{
+    m_num_airplanes--;
+    assert(m_num_airplanes>=0);
 }
 
 int RegionTrafficController::cal_delay()
