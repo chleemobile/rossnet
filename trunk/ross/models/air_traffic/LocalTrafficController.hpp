@@ -5,6 +5,14 @@
 #define NUMBER_OF_RUNWAY_MEDIUM_AIRPORT 10
 #define NUMBER_OF_RUNWAY_SMALL_AIRPORT 5
 
+#define MEAN_DEP_PREPARE 10.0
+#define MEAN_DEPARTURE 30.0
+#define MEAN_LAND 10.0
+#define MEAN_DELAY 10.0
+
+typedef double (*rn_f_exp) (int &, double);
+typedef long (*rn_f_int) (int &, long, long);
+
 class LocalTrafficController
 {
 private:
@@ -28,10 +36,10 @@ public:
     
     void free_runway();
     
-    int cal_dep_prep_time();
-    int cal_delay();
+    double cal_dep_prep_time(int &seed, rn_f_exp f_ptr);
+    double cal_delay(int &seed, rn_f_exp f_ptr);
     
-    int cal_taxi_out_time();
+    long cal_taxi_out_time(int &seed, rn_f_int f_ptr);
 
     int cal_take_off_prep_time();
     int cal_take_off_time();

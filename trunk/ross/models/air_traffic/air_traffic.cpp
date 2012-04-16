@@ -92,7 +92,7 @@ event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * 
                  set route will be added later
                  */
                 
-                ts =  s->traffic_controller->cal_dep_prep_time();
+                ts =  s->traffic_controller->cal_dep_prep_time(s->rn, bs_rand_exponential);
                 e = tw_event_new(lp->gid, ts, lp);
                 
                 m = (air_traffic_message*)tw_event_data(e);
@@ -103,7 +103,7 @@ event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * 
             }
             else
             {
-                ts = s->traffic_controller->cal_delay();
+                ts = s->traffic_controller->cal_delay(s->rn, bs_rand_exponential);
                 e = tw_event_new(lp->gid, ts, lp);
 
                 m = (air_traffic_message*)tw_event_data(e);
@@ -122,7 +122,7 @@ event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * 
         case TAXI_OUT:
         {
             s->airplane = msg->airplane;
-            ts = (tw_stime)s->traffic_controller->cal_taxi_out_time();
+            ts = (tw_stime)s->traffic_controller->cal_taxi_out_time(s->rn, bs_rand_integer);
             e = tw_event_new(lp->gid, ts, lp);
 
             m = (air_traffic_message*)tw_event_data(e);
@@ -176,7 +176,7 @@ event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * 
             }
             else
             {
-                ts = s->traffic_controller->cal_delay();
+                ts = s->traffic_controller->cal_delay(s->rn, bs_rand_exponential);
                 e = tw_event_new(msg->msg_from, ts, lp);
 
                 m = (air_traffic_message*)tw_event_data(e);
@@ -277,7 +277,7 @@ event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * 
             }
             else
             {
-                ts = s->traffic_controller->cal_delay();
+                ts = s->traffic_controller->cal_delay(s->rn, bs_rand_exponential);
                 e = tw_event_new(msg->msg_from, ts, lp);
 
                 m = (air_traffic_message*)tw_event_data(e);
@@ -325,7 +325,7 @@ event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * 
             }
             else
             {
-                ts = s->traffic_controller->cal_delay();
+                ts = s->traffic_controller->cal_delay(s->rn, bs_rand_exponential);
                 e = tw_event_new(lp->gid, ts, lp);
 
                 m = (air_traffic_message*)tw_event_data(e);
@@ -368,7 +368,7 @@ event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * 
             }
             else
             {
-                ts = s->traffic_controller->cal_delay();
+                ts = s->traffic_controller->cal_delay(s->rn, bs_rand_exponential);
                 e = tw_event_new(lp->gid, ts, lp);
 
                 m = (air_traffic_message*)tw_event_data(e);

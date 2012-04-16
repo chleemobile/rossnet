@@ -30,8 +30,6 @@ inline double bs_rand_exponential(int& a, double Lambda)
 
 
 
-
-
 inline double bs_rand_unif2(int& a, tw_lp* lp)
 {
     __store__(a, lp);
