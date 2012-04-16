@@ -41,8 +41,12 @@ bool LocalTrafficController::dep_req()
 
 bool LocalTrafficController::landing_req()
 {
-    return true;
-}
+    if(m_num_of_runway_in_use < m_num_of_runway)
+    {
+        m_num_of_runway_in_use++;
+        return true;
+    }
+    return false;}
 
 bool LocalTrafficController::arrival_req()
 {

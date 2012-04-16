@@ -10,9 +10,9 @@ class RegionTrafficController;
 #include <stack>
 
 
-#define DEBUG 1
-#define NUMBER_OF_LP 1024
-#define NUMBER_OF_REGION_CONTROLLER 21
+#define DEBUG 0
+#define NUMBER_OF_LP 220
+#define NUMBER_OF_REGION_CONTROLLER 20
 
 #define NUMBER_OF_LARGE_REGION_CONTROLLER (NUMBER_OF_REGION_CONTROLLER / 3)
 #define NUMBER_OF_MEDIUM_REGION_CONTROLLER (NUMBER_OF_REGION_CONTROLLER / 3)
@@ -70,7 +70,7 @@ static tw_lpid	 nlp_per_pe = NUMBER_OF_LP;
 
 static tw_stime	 mean_flight_time = 1;
 static int       opt_mem = 100000;
-static int       planes_per_airport = 1;
+static int       planes_per_airport = 100;
 
 static tw_stime	 wait_time_avg = 0.0;
 

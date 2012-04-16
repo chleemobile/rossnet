@@ -28,8 +28,6 @@ inline double bs_rand_exponential(int& a, double Lambda)
 	return (-Lambda * log(bs_rand_unif(a)));
 }
 
-
-
 inline double bs_rand_unif2(int& a, tw_lp* lp)
 {
     __store__(a, lp);
@@ -37,7 +35,6 @@ inline double bs_rand_unif2(int& a, tw_lp* lp)
     a = (((a * 32719) + 3) % bs_rand_lim);
     return (a+1) / (double)(bs_rand_lim+1);
 }
-
 
 inline void bs_rand_rvs(int& a, tw_lp* lp)
 {

@@ -7,15 +7,15 @@
 #include "Aircraft.hpp"
 
 /*
-  Air_Traffic.cpp
-  Air Traffic Simulator
-  20120406
-  Chayong Lee
-
-  2008/2/16
-  Modified for ROSS 4.0
-  David Bauer
-*/
+ Air_Traffic.cpp
+ Air Traffic Simulator
+ 20120406
+ Chayong Lee
+ 
+ 2008/2/16
+ Modified for ROSS 4.0
+ David Bauer
+ */
 
 
 tw_peid
@@ -36,19 +36,7 @@ init(airport_state * s, tw_lp * lp)
     tw_event *e;
     air_traffic_message *m;
     
-    LocalTrafficController *traffic_controller = new LocalTrafficController(LocalTrafficController::Small);
-    s->traffic_controller = traffic_controller;
-    s->rn = init_seed++;
-
-    for(i = 0; i < planes_per_airport; i++)
-    {
-        e = tw_event_new(lp->gid, bs_rand_exponential(s->rn, 1), lp);
-        m = (air_traffic_message*)tw_event_data(e);
-        Aircraft *airplane = new Aircraft();
-        m->airplane = airplane;
-        m->type = DEP_REQ;
-        tw_event_send(e);
-    }
+    
     
     /*
      We initally set 10 region controllers
@@ -57,8 +45,25 @@ init(airport_state * s, tw_lp * lp)
      */
     if(lp->gid <NUMBER_OF_REGION_CONTROLLER)
     {
-        RegionTrafficController *region_controller = new RegionTrafficController(RegionTrafficController::Small);
+        RegionTrafficController *region_controller = new RegionTrafficController(RegionTrafficController::Large);
         s->region_controller = region_controller;
+    }
+    else
+    {
+        LocalTrafficController *traffic_controller = new LocalTrafficController(LocalTrafficController::Large);
+        s->traffic_controller = traffic_controller;
+        s->rn = init_seed++;
+        
+        for(i = 0; i < planes_per_airport; i++)
+        {
+            e = tw_event_new(lp->gid, bs_rand_exponential(s->rn, 1), lp);
+            m = (air_traffic_message*)tw_event_data(e);
+            Aircraft *airplane = new Aircraft();
+            m->airplane = airplane;
+            m->type = DEP_REQ;
+            tw_event_send(e);
+        }
+        
     }
 }
 
@@ -81,9 +86,9 @@ event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * 
                 int dest_region = bs_rand_integer(s->rn, 0, NUMBER_OF_REGION_CONTROLLER-1);
                 int dest_airport = bs_rand_integer(s->rn, NUMBER_OF_REGION_CONTROLLER, NUMBER_OF_LP-1); 
                 
-//                cout<<"airplane "<<s->airplane->get_id()
-//                    <<", dest airport: "<<dest_airport
-//                    <<", dest region : "<<dest_region<<endl;
+                //                cout<<"airplane "<<s->airplane->get_id()
+                //                    <<", dest airport: "<<dest_airport
+                //                    <<", dest region : "<<dest_region<<endl;
                 
                 s->airplane->set_dest_region(dest_region);
                 s->airplane->set_dest_airport(dest_airport);
@@ -105,7 +110,7 @@ event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * 
             {
                 ts = s->traffic_controller->cal_delay(s->rn, bs_rand_exponential);
                 e = tw_event_new(lp->gid, ts, lp);
-
+                
                 m = (air_traffic_message*)tw_event_data(e);
                 m->type = DEP_REQ;
                 
@@ -124,7 +129,7 @@ event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * 
             s->airplane = msg->airplane;
             ts = (tw_stime)s->traffic_controller->cal_taxi_out_time(s->rn, bs_rand_integer);
             e = tw_event_new(lp->gid, ts, lp);
-
+            
             m = (air_traffic_message*)tw_event_data(e);
             m->type = TAKE_OFF_REQ;
             m->airplane = msg->airplane;
@@ -144,7 +149,7 @@ event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * 
             ts = 1; //should select a reasonable time
             int region_controller_id = s->airplane->get_next_region();
             e = tw_event_new(region_controller_id, ts, lp);
-
+            
             m = (air_traffic_message*)tw_event_data(e);
             m->type = TAKE_OFF_REP;
             m->airplane = msg->airplane;
@@ -168,7 +173,7 @@ event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * 
             {
                 ts = 1;
                 e = tw_event_new(msg->msg_from, ts, lp);
-
+                
                 m = (air_traffic_message*)tw_event_data(e);
                 m->type = TAKE_OFF;
                 
@@ -176,9 +181,9 @@ event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * 
             }
             else
             {
-                ts = s->traffic_controller->cal_delay(s->rn, bs_rand_exponential);
+                ts = s->region_controller->cal_delay();
                 e = tw_event_new(msg->msg_from, ts, lp);
-
+                
                 m = (air_traffic_message*)tw_event_data(e);
                 m->type = TAKE_OFF_REQ;
                 if(DEBUG)cout<<"TAKE_OFF_REP Rejected, region controller "<<lp->gid<< " is receiving a request from "<<msg->msg_from<<endl;
@@ -200,7 +205,7 @@ event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * 
             ts = (tw_stime)s->traffic_controller->cal_take_off_time();
             int next_region = s->airplane->get_next_region();
             e = tw_event_new(next_region, ts, lp);
-
+            
             m = (air_traffic_message*)tw_event_data(e);
             m->type = ON_THE_AIR;
             m->airplane = s->airplane;
@@ -234,7 +239,8 @@ event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * 
                  */
                 //cout<<"sending landing request to "<<s->airplane->get_dest_airport()<<endl;
                 e = tw_event_new(s->airplane->get_dest_airport(), ts, lp);
-
+                
+                s->region_controller->hand_off();
                 m = (air_traffic_message*)tw_event_data(e);
                 m->type = LANDING_REQ;
             }
@@ -245,7 +251,7 @@ event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * 
                  */
                 ts = (tw_stime)s->region_controller->cal_flight_time();
                 e = tw_event_new(next_region, ts, lp);
-
+                
                 m = (air_traffic_message*)tw_event_data(e);
                 m->type = TRANSIT_REQ;
                 m->msg_from = lp->gid;
@@ -268,7 +274,7 @@ event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * 
             {
                 ts = s->region_controller->cal_transit_time();
                 e = tw_event_new(msg->msg_from, ts, lp);
-
+                
                 m = (air_traffic_message*)tw_event_data(e);
                 m->type = HAND_OFF;
                 m->msg_from = lp->gid;
@@ -277,9 +283,9 @@ event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * 
             }
             else
             {
-                ts = s->traffic_controller->cal_delay(s->rn, bs_rand_exponential);
+                ts = s->region_controller->cal_delay();
                 e = tw_event_new(msg->msg_from, ts, lp);
-
+                
                 m = (air_traffic_message*)tw_event_data(e);
                 m->type = ON_THE_AIR;
                 //should re-update the next region updated in ON_THE_AIR event 
@@ -288,7 +294,7 @@ event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * 
             }
             m->airplane = msg->airplane;
             tw_event_send(e);
-                        
+            
             break;
         }             
             
@@ -297,7 +303,7 @@ event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * 
             s->airplane = msg->airplane;
             ts = 1;
             e = tw_event_new(msg->msg_from, ts, lp);
-
+            
             m = (air_traffic_message*)tw_event_data(e);
             m->type = ON_THE_AIR;
             m->airplane = s->airplane;
@@ -319,7 +325,7 @@ event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * 
                 //ts = bs_rand_exponential(s->rn, 5);
                 //cout<<"ts"<<ts<<endl;
                 e = tw_event_new(lp->gid, ts, lp);
-
+                
                 m = (air_traffic_message*)tw_event_data(e);
                 m->type = LANDING;
             }
@@ -327,7 +333,7 @@ event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * 
             {
                 ts = s->traffic_controller->cal_delay(s->rn, bs_rand_exponential);
                 e = tw_event_new(lp->gid, ts, lp);
-
+                
                 m = (air_traffic_message*)tw_event_data(e);
                 m->type = LANDING_REQ;
             }
@@ -343,14 +349,14 @@ event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * 
             s->airplane = msg->airplane;
             ts = (tw_stime)s->traffic_controller->cal_landing_time();
             e = tw_event_new(lp->gid, ts, lp);
-
+            
             m = (air_traffic_message*)tw_event_data(e);
             m->type = ARRIVAL_REQ;
             m->airplane = s->airplane;
             
             tw_event_send(e);
             if(DEBUG)cout<<"LANDING, aiport "<<lp->gid<<"from"<<msg->msg_from<<"eid "<<e->event_id<<endl;            
-            
+            s->traffic_controller->free_runway();
             break;
         }   
             
@@ -361,7 +367,7 @@ event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * 
             {
                 ts =  s->traffic_controller->cal_arrival_prep_time();
                 e = tw_event_new(lp->gid, ts, lp);
-
+                
                 m = (air_traffic_message*)tw_event_data(e);
                 m->type = TAXI_IN;
                 
@@ -370,7 +376,7 @@ event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * 
             {
                 ts = s->traffic_controller->cal_delay(s->rn, bs_rand_exponential);
                 e = tw_event_new(lp->gid, ts, lp);
-
+                
                 m = (air_traffic_message*)tw_event_data(e);
                 m->type = ARRIVAL_REQ;
             }
@@ -385,14 +391,14 @@ event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * 
             s->airplane = msg->airplane;
             ts = (tw_stime)s->traffic_controller->cal_taxi_in_time();
             e = tw_event_new(lp->gid, ts, lp);
-
+            
             m = (air_traffic_message*)tw_event_data(e);
             m->type = ARRIVAL;
             m->airplane = msg->airplane;
             
             tw_event_send(e);
             if(DEBUG)cout<<"TAXI_IN"<<endl;            
-
+            
             break;
         }  
             
