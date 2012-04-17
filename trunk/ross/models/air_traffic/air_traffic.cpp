@@ -24,7 +24,6 @@ mapping(tw_lpid gid)
 	return (tw_peid) gid / g_tw_nlp;
 }
 
-
 void
 init(airport_state * s, tw_lp * lp)
 {
