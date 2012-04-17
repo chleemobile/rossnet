@@ -36,13 +36,6 @@ init(airport_state * s, tw_lp * lp)
     tw_event *e;
     air_traffic_message *m;
     
-    
-    
-    /*
-     We initally set 10 region controllers
-     LP gid 0 to 9 -> Region controller
-     10 to 1023 -> Airport
-     */
     if(lp->gid <NUMBER_OF_REGION_CONTROLLER)
     {
         RegionTrafficController *region_controller = new RegionTrafficController(RegionTrafficController::Large);
@@ -50,7 +43,79 @@ init(airport_state * s, tw_lp * lp)
     }
     else
     {
-        LocalTrafficController *traffic_controller = new LocalTrafficController(LocalTrafficController::Large);
+        LocalTrafficController *traffic_controller;
+        
+        if (lp->gid == 20 ||
+            lp->gid == 39 ||
+            lp->gid == 73 ||
+            lp->gid == 93 ||            
+            lp->gid == 115||
+            lp->gid == 149||            
+            lp->gid == 167||
+            lp->gid == 181||            
+            lp->gid == 227||            
+            lp->gid == 244||                        
+            lp->gid == 319||                        
+            (lp->gid >= 54 && lp->gid <= 56)   ||
+            (lp->gid >= 202 && lp->gid <= 203) ||            
+            (lp->gid >= 255 && lp->gid <= 256) ||                        
+            (lp->gid >= 270 && lp->gid <= 272) ||    
+            (lp->gid >= 295 && lp->gid <= 296) ||                
+            (lp->gid >= 303 && lp->gid <= 305) ||                
+            (lp->gid >= 338 && lp->gid <= 340) )
+        {
+            traffic_controller = new LocalTrafficController(LocalTrafficController::Large);
+        }
+        else if (lp->gid == 21 ||
+                 lp->gid == 39 ||
+                 lp->gid == 110 ||
+                 lp->gid == 116 ||
+                 lp->gid == 168 ||
+                 lp->gid == 204 ||
+                 lp->gid == 320 ||                 
+                 (lp->gid >= 40 && lp->gid <= 43)   ||
+                 (lp->gid >= 57 && lp->gid <= 59)   ||                 
+                 (lp->gid >= 150 && lp->gid <= 152) ||
+                 (lp->gid >= 182 && lp->gid <= 185) ||
+                 (lp->gid >= 215 && lp->gid <= 216) ||                 
+                 (lp->gid >= 228 && lp->gid <= 230) ||                                  
+                 (lp->gid >= 245 && lp->gid <= 246) ||                 
+                 (lp->gid >= 273 && lp->gid <= 275) ||                                  
+                 (lp->gid >= 306 && lp->gid <= 307) ||                                                   
+                 (lp->gid >= 341 && lp->gid <= 342))                                                                       
+        {
+            traffic_controller = new LocalTrafficController(LocalTrafficController::Medium);       
+        }
+        else if (lp->gid == 22 ||
+                 lp->gid == 44 ||
+                 lp->gid == 94 ||
+                 lp->gid == 343||            
+                 (lp->gid >= 60 && lp->gid <= 62)   ||
+                 (lp->gid >= 74 && lp->gid <= 75) ||
+                 (lp->gid >= 111 && lp->gid <= 112) ||
+                 (lp->gid >= 117 && lp->gid <= 120) ||                                  
+                 (lp->gid >= 153 && lp->gid <= 155) ||                                  
+                 (lp->gid >= 169 && lp->gid <= 171) ||                 
+                 (lp->gid >= 186 && lp->gid <= 188) ||                 
+                 (lp->gid >= 205 && lp->gid <= 207) ||
+                 (lp->gid >= 217 && lp->gid <= 219) ||                 
+                 (lp->gid >= 231 && lp->gid <= 234) ||                 
+                 (lp->gid >= 247 && lp->gid <= 250) ||                                  
+                 (lp->gid >= 257 && lp->gid <= 261) ||                                  
+                 (lp->gid >= 276 && lp->gid <= 281) ||                                                   
+                 (lp->gid >= 297 && lp->gid <= 298) ||                                                   
+                 (lp->gid >= 308 && lp->gid <= 310) ||                                                   
+                 (lp->gid >= 321 && lp->gid <= 327))
+        {
+            traffic_controller = new LocalTrafficController(LocalTrafficController::Small); 
+        }
+        else
+        {
+            traffic_controller = new LocalTrafficController(LocalTrafficController::NH);
+        }
+        
+        
+        
         s->traffic_controller = traffic_controller;
         s->rn = init_seed++;
         

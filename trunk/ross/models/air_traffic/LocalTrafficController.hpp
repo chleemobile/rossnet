@@ -1,9 +1,11 @@
 #ifndef __LOCAL_TRAFFIC_CONTROLLER__
 #define __LOCAL_TRAFFIC_CONTROLLER__
 
-#define NUMBER_OF_RUNWAY_LARGE_AIRPORT 20
-#define NUMBER_OF_RUNWAY_MEDIUM_AIRPORT 10
-#define NUMBER_OF_RUNWAY_SMALL_AIRPORT 5
+
+#define NUMBER_OF_RUNWAY_LARGE_AIRPORT 6
+#define NUMBER_OF_RUNWAY_MEDIUM_AIRPORT 3
+#define NUMBER_OF_RUNWAY_SMALL_AIRPORT 2
+#define NUMBER_OF_RUNWAY_NH_AIRPORT 1
 
 #define MEAN_DEP_PREPARE 10.0
 #define MEAN_DEPARTURE 30.0
@@ -24,7 +26,8 @@ public:
     {
         Small,
         Medium,
-        Large
+        Large,
+        NH
     };
     
     LocalTrafficController(AirportType type);

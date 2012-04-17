@@ -16,6 +16,10 @@ LocalTrafficController::LocalTrafficController(AirportType type)
     {
         m_num_of_runway = NUMBER_OF_RUNWAY_LARGE_AIRPORT;
     }
+    else if(type == NH)
+    {
+        m_num_of_runway = NUMBER_OF_RUNWAY_LARGE_AIRPORT;
+    }    
     else
     {
         cout<<"LocalTrafficController, Invalid Type"<<endl;
