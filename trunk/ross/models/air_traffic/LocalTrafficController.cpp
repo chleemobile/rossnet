@@ -18,7 +18,7 @@ LocalTrafficController::LocalTrafficController(AirportType type)
     }
     else if(type == NH)
     {
-        m_num_of_runway = NUMBER_OF_RUNWAY_LARGE_AIRPORT;
+        m_num_of_runway = NUMBER_OF_RUNWAY_NH_AIRPORT;
     }    
     else
     {
