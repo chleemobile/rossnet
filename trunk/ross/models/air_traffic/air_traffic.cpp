@@ -2,9 +2,6 @@
 #include "rctypes.h"
 #include <backstroke/rand.h>
 #include <math.h>
-#include "LocalTrafficController.hpp"
-#include "RegionTrafficController.hpp"
-#include "Aircraft.hpp"
 
 /*
  Air_Traffic.cpp
@@ -36,13 +33,6 @@ init(airport_state * s, tw_lp * lp)
     tw_event *e;
     air_traffic_message *m;
     
-    
-    
-    /*
-     We initally set 10 region controllers
-     LP gid 0 to 9 -> Region controller
-     10 to 1023 -> Airport
-     */
     if(lp->gid <NUMBER_OF_REGION_CONTROLLER)
     {
         s->max_capacity = 20;
@@ -305,7 +295,8 @@ event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * 
             if(s->runway_in_use < s->max_runway)
             {
                 s->runway_in_use++;
-                
+                assert(s->runway_in_use <= s->max_runway);
+
                 ts = bs_rand_exponential(s->rn, 1);
                 e = tw_event_new(lp->gid, ts, lp);
                 
@@ -343,8 +334,11 @@ event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * 
             
         case ARRIVAL_REQ:
         {
-            if(1)
+            if(s->runway_in_use < s->max_runway)
             {
+                s->runway_in_use++;
+                assert(s->runway_in_use <= s->max_runway);
+                
                 ts = bs_rand_exponential(s->rn, 1);
                 e = tw_event_new(lp->gid, ts, lp);
                 
@@ -379,6 +373,9 @@ event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * 
             
         case ARRIVAL:
         {
+            s->runway_in_use--;
+            assert(s->runway_in_use >= 0);
+
             if(DEBUG)cout<<"ARRIVAL" <<lp->gid<<endl;
             
             break;

@@ -1,10 +1,6 @@
 #ifndef INC_airport_h
 #define INC_airport_h
 
-class Aircraft;;
-class LocalTrafficController;
-class RegionTrafficController;
-
 #include <ross.h>
 #include "iostream"
 #include <stack>
@@ -12,8 +8,20 @@ class RegionTrafficController;
 
 #define DEBUG 0
 #define NUMBER_OF_LP 220
-#define NUMBER_OF_REGION_CONTROLLER 20
+#define NUMBER_OF_REGION_CONTROLLER 100
 
+#define MEAN_DEP_PREPARE 10.0
+#define MEAN_DEPARTURE 30.0
+#define MEAN_LAND 10.0
+#define MEAN_DELAY 10.0
+
+#define NUMBER_OF_RUNWAY_LARGE_AIRPORT 20
+#define NUMBER_OF_RUNWAY_MEDIUM_AIRPORT 10
+#define NUMBER_OF_RUNWAY_SMALL_AIRPORT 5
+
+#define AIRCRAFT_CAPACITY_OF_LARGE_REGION 200
+#define AIRCRAFT_CAPACITY_OF_MEDIUM_REGION 100
+#define AIRCRAFT_CAPACITY_OF_SMALL_REGION 50
 
 using std::max;
 using namespace std;
