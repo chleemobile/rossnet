@@ -14,14 +14,6 @@ class RegionTrafficController;
 #define NUMBER_OF_LP 220
 #define NUMBER_OF_REGION_CONTROLLER 20
 
-#define NUMBER_OF_LARGE_REGION_CONTROLLER (NUMBER_OF_REGION_CONTROLLER / 3)
-#define NUMBER_OF_MEDIUM_REGION_CONTROLLER (NUMBER_OF_REGION_CONTROLLER / 3)
-#define NUMBER_OF_SMALL_REGION_CONTROLLER (NUMBER_OF_REGION_CONTROLLER / 3)
-
-#define NUMBER_OF_LARGE_AIRPORT ((NUMBER_OF_LP - NUMBER_OF_REGION_CONTROLLER) / NUMBER_OF_REGION_CONTROLLER)
-#define NUMBER_OF_MEDIUM_AIRPORT ((NUMBER_OF_LP - NUMBER_OF_REGION_CONTROLLER) / NUMBER_OF_REGION_CONTROLLER)
-#define NUMBER_OF_SMALL_AIRPORT ((NUMBER_OF_LP - NUMBER_OF_REGION_CONTROLLER) / NUMBER_OF_REGION_CONTROLLER)
-
 
 using std::max;
 using namespace std;
@@ -52,17 +44,28 @@ struct airport_state
 {
     int rn;
     
-    Aircraft                *airplane;
-    LocalTrafficController  *traffic_controller;
-    RegionTrafficController *region_controller;
+    /*
+     Region Controller State Variable
+     */
+    
+    int max_capacity;
+    int airplane_in_region;
+    
+    /*
+     Traffic Controller State Variable
+     */
+    int max_runway;
+    int runway_in_use;
 };
 
 struct air_traffic_message
 {
 	air_traffic_event_t	 type;
     
-    Aircraft     *airplane;
-    int          msg_from;
+    int dest_region;
+    int dest_airport;
+    
+    int msg_from;
 };
 
 static int nlp = NUMBER_OF_LP;
@@ -70,7 +73,7 @@ static tw_lpid	 nlp_per_pe = NUMBER_OF_LP;
 
 static tw_stime	 mean_flight_time = 1;
 static int       opt_mem = 100000;
-static int       planes_per_airport = 100;
+static int       planes_per_airport = 50;
 
 static tw_stime	 wait_time_avg = 0.0;
 
