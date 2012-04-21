@@ -14,6 +14,9 @@
  David Bauer
  */
 
+/*
+ This is a simple version using a graph to run a path find algorithm!
+ */
 
 tw_peid
 mapping(tw_lpid gid)
