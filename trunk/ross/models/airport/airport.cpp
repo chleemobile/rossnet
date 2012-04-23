@@ -349,6 +349,7 @@ main(int argc, char **argv, char **env)
 	tw_init(&argc, &argv);
 
 	nlp_per_pe /= (tw_nnodes() * g_tw_npe);
+    
 	g_tw_events_per_pe =(planes_per_airport * nlp_per_pe / g_tw_npe) + opt_mem;
 	tw_define_lps(nlp_per_pe, sizeof(airport_message), 0);
 
