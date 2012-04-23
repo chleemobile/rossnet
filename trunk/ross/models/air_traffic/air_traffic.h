@@ -4,11 +4,15 @@
 #include <ross.h>
 #include "iostream"
 #include <stack>
+#include <deque>
+#include "Graph.hpp"
 
+
+#define GRAPH_CSV_FILE_PATH "adjlist_csv.csv"
 
 #define DEBUG 0
-#define NUMBER_OF_LP 220
-#define NUMBER_OF_REGION_CONTROLLER 100
+#define NUMBER_OF_LP 348
+#define NUMBER_OF_REGION_CONTROLLER 20
 
 #define MEAN_DEP_PREPARE 10.0
 #define MEAN_DEPARTURE 30.0
@@ -72,6 +76,7 @@ struct air_traffic_message
     
     int dest_region;
     int dest_airport;
+    int next_region;
     
     int msg_from;
 };
@@ -81,9 +86,9 @@ static tw_lpid	 nlp_per_pe = NUMBER_OF_LP;
 
 static tw_stime	 mean_flight_time = 1;
 static int       opt_mem = 100000;
-static int       planes_per_airport = 50;
+static int       planes_per_airport = 5;
 
 static tw_stime	 wait_time_avg = 0.0;
-
+static Graph *graph;
 
 #endif
