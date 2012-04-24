@@ -18,7 +18,9 @@ enum airport_event_t
 {
 	ARRIVAL = 1, 
 	DEPARTURE,
-	LAND
+	LAND,
+    DUMMY_REQ,
+    DUMMY_REP
 };
 
 typedef enum airport_event_t airport_event_t;
@@ -41,7 +43,7 @@ struct airport_message
 
 	tw_stime	 waiting_time;
 	tw_stime	 saved_furthest_flight_landing;
-
+    int msg_from;
 };
 
 #define NUMBER_OF_LP 1024
@@ -54,7 +56,7 @@ static int sqrt_nlp_1 =0;
 
 static tw_stime	 mean_flight_time = 1;
 static int       opt_mem = 1000;
-static int	 planes_per_airport = 1;
+static int	 planes_per_airport = 1000;
 
 static tw_stime	 wait_time_avg = 0.0;
 

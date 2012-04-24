@@ -30,7 +30,7 @@
 #define AIRCRAFT_CAPACITY_OF_MEDIUM_REGION 100
 #define AIRCRAFT_CAPACITY_OF_SMALL_REGION 500
 
-#define NUMBER_OF_PLANES_PER_AIRPORT 20
+#define NUMBER_OF_PLANES_PER_AIRPORT 190
 
 using std::max;
 using namespace std;
@@ -41,17 +41,11 @@ typedef struct air_traffic_message air_traffic_message;
 enum air_traffic_event_t
 {
     DEP_REQ,
-    TAXI_OUT,
     TAKE_OFF_REQ,
-    TAKE_OFF_REP,
     TAKE_OFF,
     ON_THE_AIR,
     TRANSIT_REQ,
-    HAND_OFF,
     LANDING_REQ,
-    LANDING,
-    ARRIVAL_REQ,
-    TAXI_IN,
     ARRIVAL
 };
 
