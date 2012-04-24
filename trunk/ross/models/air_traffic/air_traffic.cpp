@@ -673,18 +673,18 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
                 assert(source_region >=0);
                 assert(dest_region <=19);
                 
-                int next_region = bs_rand_integer2(s->rn,0, NUMBER_OF_REGION_CONTROLLER-1,lp);
-//                deque<int> p = graph->get_shortest_path(source_region, dest_region);
-//                
-//                if (p.size() == 1) 
-//                {
-//                    next_region = dest_region;
-//                }
-//                else
-//                {
-//                    p.back();
-//                    next_region = p.back();
-//                }
+                deque<int> p = graph->get_shortest_path(source_region, dest_region);
+                int next_region = 0;
+                
+                if (p.size() == 1) 
+                {
+                    next_region = dest_region;
+                }
+                else
+                {
+                    p.back();
+                    next_region = p.back();
+                }
                 
                 ts = bs_rand_exponential2(s->rn, MEAN_REQ, lp);
                 e = tw_event_new(lp->gid, ts, lp);
@@ -794,8 +794,10 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
              */
         case TAKE_OFF:
         {
+            s->runway_in_use--;
+
             ts = bs_rand_exponential2(s->rn, MEAN_FLIGHT, lp);
-            int weather_condition = bs_rand_integer(s->rn, 1, 10);
+            int weather_condition = bs_rand_integer2(s->rn, 1, 10, lp);
             float weather_delay = 0;
             
             if(weather_condition == 1 || weather_condition == 2 || weather_condition == 3 || weather_condition == 4)
@@ -819,7 +821,6 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
             
             tw_event_send(e);
             
-            s->runway_in_use--;
             //assert(s->runway_in_use >= 0);
             
             break;
@@ -831,19 +832,18 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
         case ON_THE_AIR:
         {
             
-//            int next_region = 0;
-//            deque<int> p = graph->get_shortest_path(lp->gid, msg->dest_region);
-//            if (p.size() == 1) 
-//            {
-//                next_region = msg->dest_region;
-//            }
-//            else
-//            {
-//                p.pop_back();
-//                next_region = p.back();
-//            }
+            int next_region = 0;
+            deque<int> p = graph->get_shortest_path(lp->gid, msg->dest_region);
             
-            int next_region = bs_rand_integer2(s->rn, 0, NUMBER_OF_REGION_CONTROLLER-1,lp);
+            if (p.size() == 1) 
+            {
+                next_region = msg->dest_region;
+            }
+            else
+            {
+                p.pop_back();
+                next_region = p.back();
+            }
             
             if(next_region == msg->dest_region)
             {
@@ -1072,7 +1072,6 @@ rc_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
                 s->runway_in_use--;
                 s->dep_req_accepted--;
                 bs_rand_rvs(s->rn, lp);
-                bs_rand_rvs(s->rn, lp);                
                 bs_rand_rvs(s->rn, lp);
             }
             else if (bf->c1 == 0)
@@ -1124,16 +1123,16 @@ rc_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
         }
         case TAKE_OFF:
         {
-            bs_rand_rvs(s->rn, lp);
             s->runway_in_use++;
+
+            bs_rand_rvs(s->rn, lp);
+            bs_rand_rvs(s->rn, lp);
 
             break;
         }
             
         case ON_THE_AIR:
         {
-            bs_rand_rvs(s->rn, lp);
-
             if(bf->c1==1)
             {
                 bs_rand_rvs(s->rn, lp);

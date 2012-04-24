@@ -28,7 +28,7 @@
 
 #define AIRCRAFT_CAPACITY_OF_LARGE_REGION 200
 #define AIRCRAFT_CAPACITY_OF_MEDIUM_REGION 100
-#define AIRCRAFT_CAPACITY_OF_SMALL_REGION 50
+#define AIRCRAFT_CAPACITY_OF_SMALL_REGION 500
 
 #define NUMBER_OF_PLANES_PER_AIRPORT 20
 
@@ -40,7 +40,7 @@ typedef struct air_traffic_message air_traffic_message;
 
 enum air_traffic_event_t
 {
-    DEP_REQ=1,
+    DEP_REQ,
     TAXI_OUT,
     TAKE_OFF_REQ,
     TAKE_OFF_REP,
