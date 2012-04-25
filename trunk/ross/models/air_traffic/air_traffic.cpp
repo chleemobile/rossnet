@@ -37,6 +37,9 @@ p_init(airport_state * s, tw_lp * lp)
     tw_event *e;
     air_traffic_message *m;
     
+    s->rn=0;
+    s->from=0;
+    
     if(lp->gid <NUMBER_OF_REGION_CONTROLLER)
     {
         s->max_capacity = AIRCRAFT_CAPACITY_OF_LARGE_REGION;
@@ -50,7 +53,6 @@ p_init(airport_state * s, tw_lp * lp)
     {
         s->max_runway = NUMBER_OF_RUNWAY_NH_AIRPORT;
         
-        s->rn=0;
         s->runway_in_use=0;
         
         s->landing=0;
@@ -104,7 +106,8 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 
         case B:
         {            
-            int rand = bs_rand_integer2(s->rn, 0,10,lp);
+            s->from = msg->msg_from;
+            int rand = bs_rand_integer2(s->rn, 0,NUMBER_OF_REGION_CONTROLLER-1,lp);
 
             if(lp->gid == rand)
             {
@@ -118,7 +121,7 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
             {
                 //cout<<"B-2"<<endl;
                 bf->c2=0;
-                e = tw_event_new(msg->msg_from, bs_rand_exponential2(s->rn, 5, lp), lp);
+                e = tw_event_new(s->from, bs_rand_exponential2(s->rn, 5, lp), lp);
                 m = (air_traffic_message*)tw_event_data(e);
                 m->type = A;
                 m->dest_region = msg->dest_region;
@@ -155,8 +158,9 @@ rc_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
         }
         case B:
         {
+            //msg->msg_from = s->from;
             //cout<<"R-B"<<endl;
-
+            bs_rand_rvs(s->rn, lp);
             bs_rand_rvs(s->rn, lp);
 
             break;
