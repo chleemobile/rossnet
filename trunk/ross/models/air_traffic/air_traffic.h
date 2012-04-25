@@ -30,7 +30,7 @@
 #define AIRCRAFT_CAPACITY_OF_MEDIUM_REGION 100
 #define AIRCRAFT_CAPACITY_OF_SMALL_REGION 500
 
-#define NUMBER_OF_PLANES_PER_AIRPORT 50
+#define NUMBER_OF_PLANES_PER_AIRPORT 100
 
 using std::max;
 using namespace std;
@@ -40,9 +40,13 @@ typedef struct air_traffic_message air_traffic_message;
 
 enum air_traffic_event_t
 {
-    A,
-    B,
-    C
+    TAKE_OFF_REQ,
+    TAKE_OFF_REP,
+    TAKE_OFF,
+    ON_THE_AIR,
+    HAND_OFF_REQ,
+    HAND_OFF,
+    LAND
 };
 
 typedef enum air_traffic_event_t air_traffic_event_t;
@@ -51,6 +55,9 @@ struct airport_state
 {
     int rn;
     int from;
+    int dest_airport;
+    int dest_region;
+    
     /*
      Region Controller State Variable
      */
@@ -76,11 +83,9 @@ struct air_traffic_message
 {
 	air_traffic_event_t	 type;
     
-    int dest_region;
-    int dest_airport;
-    int next_region;
-    
-    int msg_from;
+    tw_stime dest_region;
+    tw_stime dest_airport;    
+    tw_stime msg_from;
 };
 
 static int total_transit_accepted = 0;
@@ -96,7 +101,7 @@ static int nlp = NUMBER_OF_LP;
 static tw_lpid	 nlp_per_pe = NUMBER_OF_LP;
 
 static tw_stime	 mean_flight_time = 1;
-static int       opt_mem = 1000000;
+static int       opt_mem = 10000;
 static int       planes_per_airport = NUMBER_OF_PLANES_PER_AIRPORT;
 
 static tw_stime	 wait_time_avg = 0.0;

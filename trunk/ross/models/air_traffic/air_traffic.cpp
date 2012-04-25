@@ -39,7 +39,8 @@ p_init(airport_state * s, tw_lp * lp)
     
     s->rn=0;
     s->from=0;
-    
+    s->dest_airport = 0;
+    s->dest_region = 0;
     if(lp->gid <NUMBER_OF_REGION_CONTROLLER)
     {
         s->max_capacity = AIRCRAFT_CAPACITY_OF_LARGE_REGION;
@@ -64,15 +65,12 @@ p_init(airport_state * s, tw_lp * lp)
         for(i = 0; i < planes_per_airport; i++)
         {
             e = tw_event_new(lp->gid, bs_rand_exponential2(s->rn, 1, lp), lp);
-            
-            int dest_airport = bs_rand_integer2(s->rn, NUMBER_OF_REGION_CONTROLLER, NUMBER_OF_LP-1, lp); 
-            int dest_region = bs_rand_integer2(s->rn, 0, NUMBER_OF_REGION_CONTROLLER-1, lp); 
-            
             m = (air_traffic_message*)tw_event_data(e);
 
-            m->type = A;
-            m->dest_airport = dest_airport;
-            m->dest_region = dest_region;
+            m->type = TAKE_OFF_REQ;       
+            m->dest_airport = -1;
+            m->dest_region = -1;
+            m->msg_from = -1;
             
             tw_event_send(e);
         }
@@ -89,42 +87,61 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
     
     switch(msg->type)
     {
-        case A:
-        {
-            //cout<<"A"<<endl;
+        case TAKE_OFF_REQ:
+        {            
+            assert(msg->dest_region < NUMBER_OF_REGION_CONTROLLER);
             
-            e = tw_event_new(msg->dest_region, bs_rand_exponential2(s->rn, 1, lp), lp);
+            int dest_airport = bs_rand_integer2(s->rn, NUMBER_OF_REGION_CONTROLLER, NUMBER_OF_LP-1, lp); 
+            int dest_region = bs_rand_integer2(s->rn, 0, NUMBER_OF_REGION_CONTROLLER-1, lp); 
+
+            s->dest_airport = dest_airport;
+            s->dest_region = dest_region;
+            s->from = lp->gid;
+            
+            e = tw_event_new(s->dest_region, bs_rand_exponential2(s->rn, 1, lp), lp);
             m = (air_traffic_message*)tw_event_data(e);
-            m->type = B;
-            m->msg_from = lp->gid;
-            m->dest_region = msg->dest_region;
+            m->type = TAKE_OFF_REP;
             
+            m->msg_from = s->from;
+            m->dest_region = s->dest_region;
+            m->dest_airport = s->dest_airport;
+
             tw_event_send(e);
 
             break;
         }
 
-        case B:
-        {            
+        case TAKE_OFF_REP:
+        {                        
+            assert(lp->gid < NUMBER_OF_REGION_CONTROLLER);
+            
+            s->dest_region = msg->dest_region;
+            s->dest_airport = msg->dest_airport;
             s->from = msg->msg_from;
-            int rand = bs_rand_integer2(s->rn, 0,NUMBER_OF_REGION_CONTROLLER-1,lp);
+            
+            int rand = bs_rand_integer2(s->rn, 0, NUMBER_OF_REGION_CONTROLLER-1,lp);
 
             if(lp->gid == rand)
             {
-                //cout<<"B-1"<<endl;
                 bf->c1=0;
-                e = tw_event_new(lp->gid, bs_rand_exponential2(s->rn, 10, lp), lp);
+                e = tw_event_new(s->from, bs_rand_exponential2(s->rn, 10, lp), lp);
                 m = (air_traffic_message*)tw_event_data(e);
-                m->type = C;
+                m->type = TAKE_OFF;
+                
+                m->dest_region = msg->dest_region;
+                m->dest_airport = msg->dest_airport;
+                m->msg_from = lp->gid;
             }
             else
             {
-                //cout<<"B-2"<<endl;
                 bf->c2=0;
                 e = tw_event_new(s->from, bs_rand_exponential2(s->rn, 5, lp), lp);
                 m = (air_traffic_message*)tw_event_data(e);
-                m->type = A;
+                m->type = TAKE_OFF_REQ;
+                
                 m->dest_region = msg->dest_region;
+                m->dest_airport = msg->dest_airport;
+                m->msg_from = lp->gid;
             }
             
             tw_event_send(e);
@@ -132,13 +149,115 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
             break;
         }
             
-        case C:
+        case TAKE_OFF:
         {
-            //cout<<"C"<<endl;
+
+//            e = tw_event_new(msg->msg_from, bs_rand_exponential2(s->rn, 1, lp), lp);
+//            m = (air_traffic_message*)tw_event_data(e);
+//            m->type = ON_THE_AIR;
+//            m->msg_from = lp->gid;
+//            m->dest_region = msg->dest_region;
+//            m->dest_airport = msg->dest_airport;
+//
+////            tw_event_send(e);
 
             break;
         }
+            
+        case ON_THE_AIR:
+        {           
+            assert(lp->gid < NUMBER_OF_REGION_CONTROLLER);
+            int rand = bs_rand_integer2(s->rn, 0, NUMBER_OF_REGION_CONTROLLER-1,lp);
+            if(rand == msg->dest_region)
+            {
+                bf->c1=0;
+                e = tw_event_new(msg->dest_airport, bs_rand_exponential2(s->rn, 10, lp), lp);
+                m = (air_traffic_message*)tw_event_data(e);
+                m->type = LAND;
                 
+                m->dest_region = msg->dest_region;
+                m->dest_airport = msg->dest_airport;
+                m->msg_from = lp->gid;
+            }
+            else
+            {
+                bf->c2=0;
+                
+                int next = bs_rand_integer2(s->rn, 0,NUMBER_OF_REGION_CONTROLLER-1,lp);
+
+                e = tw_event_new(next, bs_rand_exponential2(s->rn, 5, lp), lp);
+                m = (air_traffic_message*)tw_event_data(e);
+                m->type = HAND_OFF_REQ;
+                
+                m->dest_region = msg->dest_region;
+                m->dest_airport = msg->dest_airport;
+                m->msg_from = lp->gid;
+            }
+            
+            tw_event_send(e);
+            
+            break;
+        }
+            
+        case HAND_OFF_REQ:
+        {
+            //cout<<"HAND_OFF_REQ"<<endl;
+            
+            assert(lp->gid < NUMBER_OF_REGION_CONTROLLER);
+            
+            int result = bs_rand_integer2(s->rn, 0,2,lp);
+            
+            if(result == 0)//accepted
+            {
+                bf->c1=0;
+                e = tw_event_new(msg->msg_from, bs_rand_exponential2(s->rn, 100, lp), lp);
+                m = (air_traffic_message*)tw_event_data(e);
+                m->type = HAND_OFF;
+                
+                m->dest_region = msg->dest_region;
+                m->dest_airport = msg->dest_airport;
+                m->msg_from = lp->gid;
+            }
+            else
+            {
+                bf->c2=0;
+                e = tw_event_new(msg->msg_from, bs_rand_exponential2(s->rn, 10, lp), lp);
+                m = (air_traffic_message*)tw_event_data(e);
+                m->type = ON_THE_AIR;
+                
+                m->dest_region = msg->dest_region;
+                m->dest_airport = msg->dest_airport;
+                m->msg_from = lp->gid;
+            }
+            
+            tw_event_send(e);
+
+            break;
+        }
+            
+        case HAND_OFF:
+        {
+            //cout<<"HAND_OFF"<<endl;
+
+            e = tw_event_new(msg->msg_from, bs_rand_exponential2(s->rn, 10, lp), lp);
+            m = (air_traffic_message*)tw_event_data(e);
+            m->type = ON_THE_AIR;
+            
+            m->dest_region = msg->dest_region;
+            m->dest_airport = msg->dest_airport;
+            m->msg_from = lp->gid;
+            
+            tw_event_send(e);
+
+            break;
+        }
+              
+        case LAND:
+        {
+           cout<<"LAND"<<endl;
+
+            break;
+        }
     }
 }
 
@@ -148,29 +267,68 @@ rc_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 {    
     switch(msg->type)
     {
-        case A:
+        case TAKE_OFF_REQ:
         {
-            //cout<<"R-A"<<endl;
+//            cout<<msg->dest_region<<endl;
+//            assert(msg->dest_region == s->dest_region);
+            
+//            msg->dest_region = s->dest_region;
+//            msg->dest_airport = s->dest_airport;
+//            msg->msg_from = s->from;
 
+            bs_rand_rvs(s->rn, lp);
+            bs_rand_rvs(s->rn, lp);
             bs_rand_rvs(s->rn, lp);
 
             break;
         }
-        case B:
+        case TAKE_OFF_REP:
         {
-            //msg->msg_from = s->from;
-            //cout<<"R-B"<<endl;
+//            assert(msg->dest_region == s->dest_region);
+//            msg->dest_region = s->dest_region;
+//            msg->dest_airport = s->dest_airport;
+//            msg->msg_from = s->from;
+            
             bs_rand_rvs(s->rn, lp);
             bs_rand_rvs(s->rn, lp);
 
             break;
         }    
-        case C:
+        case TAKE_OFF:
         {
-            //cout<<"R-C"<<endl;
+
+//            bs_rand_rvs(s->rn, lp);
 
             break;
         } 
+        case ON_THE_AIR:
+        {
+            bs_rand_rvs(s->rn, lp);
+            bs_rand_rvs(s->rn, lp);
+            
+            break;
+        }       
+            
+        case HAND_OFF_REQ:
+        {
+            assert(lp->gid < NUMBER_OF_REGION_CONTROLLER);
+            bs_rand_rvs(s->rn, lp);
+            bs_rand_rvs(s->rn, lp);
+
+            break;
+        } 
+            
+        case HAND_OFF:
+        {
+            bs_rand_rvs(s->rn, lp);
+            
+            break;
+        }      
+            
+        case LAND:
+        {
+            break;
+        }
     }
 }
 
