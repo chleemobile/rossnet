@@ -21,16 +21,16 @@
 #define MEAN_LAND 10.0
 #define MEAN_DELAY 4.0
 
-#define NUMBER_OF_RUNWAY_LARGE_AIRPORT 6
-#define NUMBER_OF_RUNWAY_MEDIUM_AIRPORT 3
-#define NUMBER_OF_RUNWAY_SMALL_AIRPORT 2
+#define NUMBER_OF_RUNWAY_LARGE_AIRPORT 1
+#define NUMBER_OF_RUNWAY_MEDIUM_AIRPORT 1
+#define NUMBER_OF_RUNWAY_SMALL_AIRPORT 1
 #define NUMBER_OF_RUNWAY_NH_AIRPORT 1
 
-#define AIRCRAFT_CAPACITY_OF_LARGE_REGION 200
+#define AIRCRAFT_CAPACITY_OF_LARGE_REGION 1
 #define AIRCRAFT_CAPACITY_OF_MEDIUM_REGION 100
 #define AIRCRAFT_CAPACITY_OF_SMALL_REGION 500
 
-#define NUMBER_OF_PLANES_PER_AIRPORT 190
+#define NUMBER_OF_PLANES_PER_AIRPORT 25
 
 using std::max;
 using namespace std;
@@ -40,13 +40,9 @@ typedef struct air_traffic_message air_traffic_message;
 
 enum air_traffic_event_t
 {
-    DEP_REQ,
-    TAKE_OFF_REQ,
-    TAKE_OFF,
-    ON_THE_AIR,
-    TRANSIT_REQ,
-    LANDING_REQ,
-    ARRIVAL
+    A,
+    B,
+    C
 };
 
 typedef enum air_traffic_event_t air_traffic_event_t;
