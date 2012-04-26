@@ -24,7 +24,7 @@
 #define NUMBER_OF_RUNWAY_LARGE_AIRPORT 1
 #define NUMBER_OF_RUNWAY_MEDIUM_AIRPORT 1
 #define NUMBER_OF_RUNWAY_SMALL_AIRPORT 1
-#define NUMBER_OF_RUNWAY_NH_AIRPORT 1
+#define NUMBER_OF_RUNWAY_NH_AIRPORT 6
 
 #define AIRCRAFT_CAPACITY_OF_LARGE_REGION 1
 #define AIRCRAFT_CAPACITY_OF_MEDIUM_REGION 100
@@ -41,9 +41,9 @@ typedef struct air_traffic_message air_traffic_message;
 enum air_traffic_event_t
 {
     DEP,
-    DEP_DELEY,
+    DEP_DELAY,
     TAKE_OFF,
-    ON_AIR
+    LAND
 };
 
 typedef enum air_traffic_event_t air_traffic_event_t;

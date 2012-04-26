@@ -87,25 +87,40 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
         {
             if (s->runway_in_use < s->max_runway) 
             {
-                bf->c1=0;
+                bf->c1=1;
                 s->runway_in_use++;
                 int dest_region = bs_rand_integer2(s->rn, 0, NUMBER_OF_REGION_CONTROLLER-1, lp);
-                e = tw_event_new(dest_region, bs_rand_exponential2(s->rn, 1, lp)+1, lp);
+                e = tw_event_new(dest_region, bs_rand_exponential2(s->rn, 5.12, lp)+1, lp);
                 m = (air_traffic_message*)tw_event_data(e);
                 m->type = TAKE_OFF;
                 m->dest_region = dest_region;
-                tw_event_send(e);
+
 
             }
             else
             {
-                bf->c1=1;
-
+                bf->c2=1;
+                //cout<<bf->c2<<endl;
+                e = tw_event_new(lp->gid, bs_rand_exponential2(s->rn, 11.12, lp)+1, lp);
+                m = (air_traffic_message*)tw_event_data(e);
+                m->type = DEP_DELAY;
             }
+
+            tw_event_send(e);
 
             break;
         }
 
+        case DEP_DELAY:
+        {
+            e = tw_event_new(lp->gid, bs_rand_exponential2(s->rn, 4.123, lp)+1, lp);
+            m = (air_traffic_message*)tw_event_data(e);
+            m->type = DEP;
+            tw_event_send(e);
+
+            break;
+        }
+            
         case TAKE_OFF:
         {            
             s->runway_in_use--;
@@ -113,22 +128,22 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
             int dest = bs_rand_integer2(s->rn, 0, NUMBER_OF_LP-1, lp);
             e = tw_event_new(dest, bs_rand_exponential2(s->rn, 10, lp)+1, lp);
             m = (air_traffic_message*)tw_event_data(e);
-            m->type = ON_AIR;
+            m->type = LAND;
             m->dest_region = msg->dest_region;
             tw_event_send(e);
 
             break;
         }
             
-        case ON_AIR:
+        case LAND:
         {
             int dest = bs_rand_integer2(s->rn, 0, NUMBER_OF_LP-1, lp);
             e = tw_event_new(dest, bs_rand_exponential2(s->rn, 10, lp)+1, lp);
             m = (air_traffic_message*)tw_event_data(e);
             m->type = DEP;
             m->dest_region = msg->dest_region;
-
             tw_event_send(e);
+            
             break;
         }
                 
@@ -143,18 +158,27 @@ rc_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
     {
         case DEP:
         {
-            if(bf->c1=0)
+            if(bf->c1==1)
             {
                 s->runway_in_use--;
                 bs_rand_rvs(s->rn, lp);
                 bs_rand_rvs(s->rn, lp);
             }
-            else
+            else if(bf->c2==1)
             {
+                bs_rand_rvs(s->rn, lp);
             }
 
             break;
         }
+            
+        case DEP_DELAY:
+        {
+            bs_rand_rvs(s->rn, lp);
+            
+            break;
+        }
+            
         case TAKE_OFF:
         {
             s->runway_in_use++;
@@ -163,8 +187,9 @@ rc_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
             bs_rand_rvs(s->rn, lp);
 
             break;
-        }    
-        case ON_AIR:
+        }  
+            
+        case LAND:
         {
             bs_rand_rvs(s->rn, lp);
             bs_rand_rvs(s->rn, lp);
