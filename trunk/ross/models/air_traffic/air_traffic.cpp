@@ -81,22 +81,35 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
     
     switch(msg->type)
     {
+        * (int *)bf = (int)0;
+            
         case DEP:
         {
-            int dest = bs_rand_integer2(s->rn, 0, NUMBER_OF_LP-1, lp);
-            e = tw_event_new(dest, bs_rand_exponential2(s->rn, 1, lp)+1, lp);
-            m = (air_traffic_message*)tw_event_data(e);
-            m->type = TAKE_OFF;
-            m->dest_region = 123;
-            
-            tw_event_send(e);
+            if (s->runway_in_use < s->max_runway) 
+            {
+                bf->c1=0;
+                s->runway_in_use++;
+                int dest_region = bs_rand_integer2(s->rn, 0, NUMBER_OF_REGION_CONTROLLER-1, lp);
+                e = tw_event_new(dest_region, bs_rand_exponential2(s->rn, 1, lp)+1, lp);
+                m = (air_traffic_message*)tw_event_data(e);
+                m->type = TAKE_OFF;
+                m->dest_region = dest_region;
+                tw_event_send(e);
+
+            }
+            else
+            {
+                bf->c1=1;
+
+            }
 
             break;
         }
 
         case TAKE_OFF:
         {            
-            assert(msg->dest_region == 123);
+            s->runway_in_use--;
+
             int dest = bs_rand_integer2(s->rn, 0, NUMBER_OF_LP-1, lp);
             e = tw_event_new(dest, bs_rand_exponential2(s->rn, 10, lp)+1, lp);
             m = (air_traffic_message*)tw_event_data(e);
@@ -109,8 +122,6 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
             
         case ON_AIR:
         {
-            assert(msg->dest_region == 123);
-
             int dest = bs_rand_integer2(s->rn, 0, NUMBER_OF_LP-1, lp);
             e = tw_event_new(dest, bs_rand_exponential2(s->rn, 10, lp)+1, lp);
             m = (air_traffic_message*)tw_event_data(e);
@@ -132,13 +143,22 @@ rc_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
     {
         case DEP:
         {
-            bs_rand_rvs(s->rn, lp);
-            bs_rand_rvs(s->rn, lp);
+            if(bf->c1=0)
+            {
+                s->runway_in_use--;
+                bs_rand_rvs(s->rn, lp);
+                bs_rand_rvs(s->rn, lp);
+            }
+            else
+            {
+            }
 
             break;
         }
         case TAKE_OFF:
         {
+            s->runway_in_use++;
+
             bs_rand_rvs(s->rn, lp);
             bs_rand_rvs(s->rn, lp);
 

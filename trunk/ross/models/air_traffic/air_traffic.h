@@ -30,7 +30,7 @@
 #define AIRCRAFT_CAPACITY_OF_MEDIUM_REGION 100
 #define AIRCRAFT_CAPACITY_OF_SMALL_REGION 500
 
-#define NUMBER_OF_PLANES_PER_AIRPORT 1
+#define NUMBER_OF_PLANES_PER_AIRPORT 10
 
 using std::max;
 using namespace std;
@@ -41,6 +41,7 @@ typedef struct air_traffic_message air_traffic_message;
 enum air_traffic_event_t
 {
     DEP,
+    DEP_DELEY,
     TAKE_OFF,
     ON_AIR
 };
