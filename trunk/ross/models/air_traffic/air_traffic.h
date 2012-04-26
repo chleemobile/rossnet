@@ -30,7 +30,7 @@
 #define AIRCRAFT_CAPACITY_OF_MEDIUM_REGION 100
 #define AIRCRAFT_CAPACITY_OF_SMALL_REGION 500
 
-#define NUMBER_OF_PLANES_PER_AIRPORT 100
+#define NUMBER_OF_PLANES_PER_AIRPORT 3
 
 using std::max;
 using namespace std;
@@ -100,8 +100,8 @@ static int total_arrival_req_rejected = 0;
 static int nlp = NUMBER_OF_LP;
 static tw_lpid	 nlp_per_pe = NUMBER_OF_LP;
 
-static tw_stime	 mean_flight_time = 1;
-static int       opt_mem = 10000;
+static tw_stime	 mean_flight_time = 5;
+static int       opt_mem = 500000;
 static int       planes_per_airport = NUMBER_OF_PLANES_PER_AIRPORT;
 
 static tw_stime	 wait_time_avg = 0.0;
