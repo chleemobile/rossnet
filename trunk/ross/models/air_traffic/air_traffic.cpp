@@ -63,17 +63,9 @@ p_init(airport_state * s, tw_lp * lp)
         
         for(i = 0; i < planes_per_airport; i++)
         {
-            e = tw_event_new(lp->gid, bs_rand_exponential2(s->rn, 1, lp), lp);
-            
-            int dest_airport = bs_rand_integer2(s->rn, NUMBER_OF_REGION_CONTROLLER, NUMBER_OF_LP-1, lp); 
-            int dest_region = bs_rand_integer2(s->rn, 0, NUMBER_OF_REGION_CONTROLLER-1, lp); 
-            
+            e = tw_event_new(lp->gid, bs_rand_exponential2(s->rn, 1, lp), lp);            
             m = (air_traffic_message*)tw_event_data(e);
-
-            m->type = A;
-            m->dest_airport = dest_airport;
-            m->dest_region = dest_region;
-            
+            m->type = DEP;            
             tw_event_send(e);
         }
         
@@ -89,53 +81,43 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
     
     switch(msg->type)
     {
-        case A:
+        case DEP:
         {
-            //cout<<"A"<<endl;
-            
-            e = tw_event_new(msg->dest_region, bs_rand_exponential2(s->rn, 1, lp), lp);
+            int dest = bs_rand_integer2(s->rn, 0, NUMBER_OF_LP-1, lp);
+            e = tw_event_new(dest, bs_rand_exponential2(s->rn, 1, lp)+1, lp);
             m = (air_traffic_message*)tw_event_data(e);
-            m->type = B;
-            m->msg_from = lp->gid;
-            m->dest_region = msg->dest_region;
+            m->type = TAKE_OFF;
+            m->dest_region = 123;
             
             tw_event_send(e);
 
             break;
         }
 
-        case B:
+        case TAKE_OFF:
         {            
-            s->from = msg->msg_from;
-            int rand = bs_rand_integer2(s->rn, 0,NUMBER_OF_REGION_CONTROLLER-1,lp);
-
-            if(lp->gid == rand)
-            {
-                //cout<<"B-1"<<endl;
-                bf->c1=0;
-                e = tw_event_new(lp->gid, bs_rand_exponential2(s->rn, 10, lp), lp);
-                m = (air_traffic_message*)tw_event_data(e);
-                m->type = C;
-            }
-            else
-            {
-                //cout<<"B-2"<<endl;
-                bf->c2=0;
-                e = tw_event_new(s->from, bs_rand_exponential2(s->rn, 5, lp), lp);
-                m = (air_traffic_message*)tw_event_data(e);
-                m->type = A;
-                m->dest_region = msg->dest_region;
-            }
-            
+            assert(msg->dest_region == 123);
+            int dest = bs_rand_integer2(s->rn, 0, NUMBER_OF_LP-1, lp);
+            e = tw_event_new(dest, bs_rand_exponential2(s->rn, 10, lp)+1, lp);
+            m = (air_traffic_message*)tw_event_data(e);
+            m->type = ON_AIR;
+            m->dest_region = msg->dest_region;
             tw_event_send(e);
 
             break;
         }
             
-        case C:
+        case ON_AIR:
         {
-            //cout<<"C"<<endl;
+            assert(msg->dest_region == 123);
 
+            int dest = bs_rand_integer2(s->rn, 0, NUMBER_OF_LP-1, lp);
+            e = tw_event_new(dest, bs_rand_exponential2(s->rn, 10, lp)+1, lp);
+            m = (air_traffic_message*)tw_event_data(e);
+            m->type = DEP;
+            m->dest_region = msg->dest_region;
+
+            tw_event_send(e);
             break;
         }
                 
@@ -148,27 +130,25 @@ rc_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 {    
     switch(msg->type)
     {
-        case A:
+        case DEP:
         {
-            //cout<<"R-A"<<endl;
-
+            bs_rand_rvs(s->rn, lp);
             bs_rand_rvs(s->rn, lp);
 
             break;
         }
-        case B:
+        case TAKE_OFF:
         {
-            //msg->msg_from = s->from;
-            //cout<<"R-B"<<endl;
             bs_rand_rvs(s->rn, lp);
             bs_rand_rvs(s->rn, lp);
 
             break;
         }    
-        case C:
+        case ON_AIR:
         {
-            //cout<<"R-C"<<endl;
-
+            bs_rand_rvs(s->rn, lp);
+            bs_rand_rvs(s->rn, lp);
+            
             break;
         } 
     }
@@ -255,8 +235,8 @@ main(int argc, char **argv, char **env)
      init graph
      */
     
-    graph = new Graph(20);
-    graph->create_graph(GRAPH_CSV_FILE_PATH);
+    //graph = new Graph(20);
+    //graph->create_graph(GRAPH_CSV_FILE_PATH);
     /*
      We have two different LPs
      One represents an airport
@@ -299,92 +279,3 @@ main(int argc, char **argv, char **env)
 	return 0;
 }
 
-int get_region(int airport)
-{
-    if(airport >=20 && airport <= 38)
-    {
-        return 0;
-    }
-    else if(airport >=39 && airport <= 53)
-    {
-        return 1;
-    }
-    else if(airport >=54 && airport <= 72)
-    {
-        return 2;
-    }
-    else if(airport >=73 && airport <= 92)
-    {
-        return 3;
-    }
-    else if(airport >=93 && airport <= 109)
-    {
-        return 4;
-    }    
-    else if(airport >=110 && airport <= 114)
-    {
-        return 5;
-    }
-    else if(airport >=115 && airport <= 148)
-    {
-        return 6;
-    }    
-    else if(airport >=149 && airport <= 166)
-    {
-        return 7;
-    }    
-    else if(airport >=167 && airport <= 180)
-    {
-        return 8;
-    }
-    else if(airport >=181 && airport <= 201)
-    {
-        return 9;
-    }
-    else if(airport >=202 && airport <= 214)
-    {
-        return 10;
-    }
-    else if(airport >=215 && airport <= 226)
-    {
-        return 11;
-    }
-    else if(airport >=227 && airport <= 243)
-    {
-        return 12;
-    }    
-    else if(airport >=244 && airport <= 254)
-    {
-        return 13;
-    }    
-    else if(airport >=255 && airport <= 269)
-    {
-        return 14;
-    }    
-    else if(airport >=270 && airport <= 294)
-    {
-        return 15;
-    }    
-    else if(airport >=295 && airport <= 302)
-    {
-        return 16;
-    }    
-    else if(airport >=303 && airport <= 318)
-    {
-        return 17;
-    }        
-    else if(airport >=319 && airport <= 337)
-    {
-        return 18;
-    }    
-    else if(airport >=338 && airport <= 347)
-    {
-        return 19;
-    }   
-    else
-    {
-        cout<<"airport region failed"<<endl;
-        assert(false);
-    }
-    
-}
