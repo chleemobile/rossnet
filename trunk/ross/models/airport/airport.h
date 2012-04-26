@@ -56,7 +56,7 @@ static int sqrt_nlp_1 =0;
 
 static tw_stime	 mean_flight_time = 1;
 static int       opt_mem = 1000;
-static int	 planes_per_airport = 1000;
+static int	 planes_per_airport = 5;
 
 static tw_stime	 wait_time_avg = 0.0;
 
