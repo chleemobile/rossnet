@@ -89,7 +89,9 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
             {
                 bf->c1=1;
                 s->runway_in_use++;
-                int dest_region = bs_rand_integer2(s->rn, 0, NUMBER_OF_REGION_CONTROLLER-1, lp);
+                s->dep_req_accepted++;
+
+                int dest_region = bs_rand_integer2(s->rn, 0, NUMBER_OF_LP-1, lp);
                 e = tw_event_new(dest_region, bs_rand_exponential2(s->rn, 5.12, lp)+1, lp);
                 m = (air_traffic_message*)tw_event_data(e);
                 m->type = TAKE_OFF;
@@ -100,8 +102,8 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
             else
             {
                 bf->c2=1;
-                //cout<<bf->c2<<endl;
-                e = tw_event_new(lp->gid, bs_rand_exponential2(s->rn, 11.12, lp)+1, lp);
+                s->dep_req_rejected++;
+                e = tw_event_new(lp->gid, bs_rand_exponential2(s->rn, 111.12, lp)+1, lp);
                 m = (air_traffic_message*)tw_event_data(e);
                 m->type = DEP_DELAY;
             }
@@ -113,6 +115,7 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 
         case DEP_DELAY:
         {
+            
             e = tw_event_new(lp->gid, bs_rand_exponential2(s->rn, 4.123, lp)+1, lp);
             m = (air_traffic_message*)tw_event_data(e);
             m->type = DEP;
@@ -161,11 +164,14 @@ rc_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
             if(bf->c1==1)
             {
                 s->runway_in_use--;
+                s->dep_req_accepted--;
+
                 bs_rand_rvs(s->rn, lp);
                 bs_rand_rvs(s->rn, lp);
             }
             else if(bf->c2==1)
             {
+                s->dep_req_rejected--;
                 bs_rand_rvs(s->rn, lp);
             }
 
