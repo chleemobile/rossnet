@@ -297,25 +297,25 @@ final(airport_state * s, tw_lp * lp)
  */
 
 
-tw_lptype airport_lps[] =
-{
-	{
-		(init_f) init,
-		(event_f) event_handler,
-		(revent_f) rc_event_handler,
-		(final_f) final,
-		(map_f) mapping,
-		sizeof(airport_state),
-	},
-	{0},
-};
+//tw_lptype airport_lps[] =
+//{
+//	{
+//		(init_f) init,
+//		(event_f) fw_event_handler,
+//		(revent_f) rc_event_handler,
+//		(final_f) final,
+//		(map_f) mapping,
+//		sizeof(airport_state),
+//	},
+//	{0},
+//};
 
 
 /*
  Parallel Running
  */
 
-/*
+
 tw_lptype airport_lps[] =
 {
 	{
@@ -328,7 +328,7 @@ tw_lptype airport_lps[] =
 	},
 	{0},
 };
-*/
+
 
 const tw_optdef app_opt [] =
 {

@@ -2,15 +2,6 @@
 #include "rctypes.h"
 #include <backstroke/rand.h>
 #include <math.h>
-/*
-  airport.c
-  Airport simulator
-  20011003
-  Justin M. LaPre
-  2008/2/16
-  Modified for ROSS 4.0
-  David Bauer
-*/
 #include "rctypes.h" 
 
 tw_peid mapping(tw_lpid gid)
@@ -166,12 +157,7 @@ void event_handler(airport_state *s,tw_bf *bf,airport_message *msg,tw_lp *lp)
         break; ;
       };
     };
-  }
-  s -> airport_state::furthest_flight_landing;
-  s -> airport_state::planes_in_the_sky;
-  s -> airport_state::waiting_time;
-  s -> airport_state::landings;
-  s -> airport_state::planes_on_the_ground;;
+  };
 }
 
 void event_handler_forward(airport_state *s,tw_bf *bf,airport_message *msg,tw_lp *lp)
@@ -188,6 +174,7 @@ void event_handler_forward(airport_state *s,tw_bf *bf,airport_message *msg,tw_lp
 {
 // Schedule a landing in the future	
 //constructive operation
+        __store__< int  > (s -> airport_state::planes_in_the_sky,lp);
         s -> airport_state::planes_in_the_sky++;
 //msg->saved_furthest_flight_landing = s->furthest_flight_landing;
         tw_stime __temp0__;
@@ -211,6 +198,7 @@ void event_handler_forward(airport_state *s,tw_bf *bf,airport_message *msg,tw_lp
     case DEPARTURE:
 {
       __num0 += 16;
+      __store__< int  > (s -> airport_state::planes_on_the_ground,lp);
       s -> airport_state::planes_on_the_ground--;
       __store__< int  > (s -> airport_state::rn,lp);
       ts = bs_rand_exponential(s -> airport_state::rn,mean_flight_time);
@@ -289,9 +277,13 @@ void event_handler_forward(airport_state *s,tw_bf *bf,airport_message *msg,tw_lp
 {
       __num0 += 32;
 {
+        __store__< int  > (s -> airport_state::planes_on_the_ground,lp);
         s -> airport_state::planes_on_the_ground++;
+        __store__< int  > (s -> airport_state::planes_in_the_sky,lp);
         s -> airport_state::planes_in_the_sky--;
+        __store__< int  > (s -> airport_state::landings,lp);
         s -> airport_state::landings++;
+        __store__(s -> airport_state::waiting_time,lp);
         s -> airport_state::waiting_time += (msg -> airport_message::waiting_time);
         double __temp2__;
         __store__< int  > (s -> airport_state::rn,lp);
@@ -305,12 +297,7 @@ void event_handler_forward(airport_state *s,tw_bf *bf,airport_message *msg,tw_lp
     };
     default:
     __num0 += 48;
-  }
-  s -> airport_state::furthest_flight_landing;
-  s -> airport_state::planes_in_the_sky;
-  s -> airport_state::waiting_time;
-  s -> airport_state::landings;
-  s -> airport_state::planes_on_the_ground;;
+  };
   __store__(__num0,lp);
 }
 
@@ -320,21 +307,21 @@ void event_handler_reverse(airport_state *s,tw_bf *bf,airport_message *msg,tw_lp
   __restore__(__num0,lp);
   if ((__num0 & 32) == 32) {
     __restore__(s -> airport_state::rn,lp);
-    s_waiting_time = s_waiting_time - msg_waiting_time;
-    --s_landings;
-    ++s_planes_in_the_sky;
-    --s_planes_on_the_ground;
+    __restore__(s -> airport_state::waiting_time,lp);
+    __restore__(s -> airport_state::landings,lp);
+    __restore__(s -> airport_state::planes_in_the_sky,lp);
+    __restore__(s -> airport_state::planes_on_the_ground,lp);
   }
   else {
     if ((__num0 & 16) == 16) {
       __restore__(s -> airport_state::rn,lp);
-      ++s_planes_on_the_ground;
+      __restore__(s -> airport_state::planes_on_the_ground,lp);
     }
     else {
       if ((__num0 & 16) == 0) {
         __restore__(s -> airport_state::rn,lp);
         __restore__(s -> airport_state::furthest_flight_landing,lp);
-        --s_planes_in_the_sky;
+        __restore__(s -> airport_state::planes_in_the_sky,lp);
       }
       else {
       }
@@ -493,11 +480,6 @@ void fw_event_handler(airport_state *s,tw_bf *bf,airport_message *msg,tw_lp *lp)
         msg -> airport_message::saved_furthest_flight_landing = (s -> airport_state::furthest_flight_landing);
         s -> airport_state::furthest_flight_landing = std::max< tw_stime  > (s -> airport_state::furthest_flight_landing,tw_now(lp));
         ts = bs_rand_exponential2(s -> airport_state::rn,10.0,lp);
-        if (ts > 1000) {
-          std::cout << tw_rand_exponential((lp -> tw_lp::rng),10.0)<<' ';
-          ( *(&std::cout)<<">>>>>>>>>>>> ") << ts<<'\n';
-        }
-//ts = tw_rand_exponential(lp->rng, MEAN_LAND);
         e = tw_event_new((lp -> tw_lp::gid),((ts + (s -> airport_state::furthest_flight_landing)) - tw_now(lp)),lp);
         m = ((airport_message *)(tw_event_data(e)));
         m -> airport_message::type = LAND;
@@ -512,9 +494,7 @@ void fw_event_handler(airport_state *s,tw_bf *bf,airport_message *msg,tw_lp *lp)
 {
         s -> airport_state::planes_on_the_ground--;
         ts = bs_rand_exponential2(s -> airport_state::rn,mean_flight_time,lp);
-//            ts = tw_rand_exponential(lp->rng, mean_flight_time);
         rand_result = (bs_rand_integer2(s -> airport_state::rn,0,3,lp));
-//            rand_result = tw_rand_integer(lp->rng, 0, 3);
         dst_lp = 0;
         switch(rand_result){
           case 0:
@@ -572,13 +552,7 @@ void fw_event_handler(airport_state *s,tw_bf *bf,airport_message *msg,tw_lp *lp)
         s -> airport_state::planes_in_the_sky--;
         s -> airport_state::landings++;
         s -> airport_state::waiting_time += (msg -> airport_message::waiting_time);
-        double d = bs_rand_exponential2(s -> airport_state::rn,30.0,lp);
-        if (d > 1000) {
-          std::cout << tw_rand_exponential((lp -> tw_lp::rng),30.0)<<' ';
-          ( *(&std::cout)<<">>>>>>>>>>>> ") << d<<'\n';
-        }
-        e = tw_event_new((lp -> tw_lp::gid),d,lp);
-//e = tw_event_new(lp->gid, tw_rand_exponential(lp->rng, MEAN_DEPARTURE), lp);
+        e = tw_event_new((lp -> tw_lp::gid),bs_rand_exponential2(s -> airport_state::rn,30.0,lp),lp);
         m = ((airport_message *)(tw_event_data(e)));
         m -> airport_message::type = DEPARTURE;
         tw_event_send(e);
@@ -596,7 +570,6 @@ void rc_event_handler(airport_state *s,tw_bf *bf,airport_message *msg,tw_lp *lp)
       s -> airport_state::planes_in_the_sky--;
       s -> airport_state::furthest_flight_landing = (msg -> airport_message::saved_furthest_flight_landing);
       bs_rand_rvs(s -> airport_state::rn,lp);
-// tw_rand_reverse_unif(lp->rng);
       break; 
     }
     case DEPARTURE:
@@ -604,8 +577,6 @@ void rc_event_handler(airport_state *s,tw_bf *bf,airport_message *msg,tw_lp *lp)
       s -> airport_state::planes_on_the_ground++;
       bs_rand_rvs(s -> airport_state::rn,lp);
       bs_rand_rvs(s -> airport_state::rn,lp);
-//          tw_rand_reverse_unif(lp->rng);
-//          tw_rand_reverse_unif(lp->rng);
       break; 
     }
     case LAND:
@@ -616,7 +587,6 @@ void rc_event_handler(airport_state *s,tw_bf *bf,airport_message *msg,tw_lp *lp)
       s -> airport_state::waiting_time -= (msg -> airport_message::waiting_time);
       bs_rand_rvs(s -> airport_state::rn,lp);
     }
-//tw_rand_reverse_unif(lp->rng);
   }
 }
 
@@ -667,7 +637,6 @@ int main(int argc,char **argv,char **env)
     printf("\t%-50s %11lld\n","Number of planes",(((planes_per_airport * nlp_per_pe) * g_tw_npe) * (tw_nnodes())));
   }
   tw_end();
-//	cout<<"Original mem usage : "<<memusage<<endl;
-//    cout<<"departure : "<<num_departure<<" arrival : "<<num_arrival<<" landing : "<<num_landing<<endl;
+  cout<<memusage<<","<<endl;
   return 0;
 }
