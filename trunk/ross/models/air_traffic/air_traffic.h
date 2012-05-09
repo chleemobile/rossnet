@@ -11,7 +11,7 @@
 #define GRAPH_CSV_FILE_PATH "adjlist_csv.csv"
 
 #define DEBUG 0
-#define NUMBER_OF_LP 348
+#define NUMBER_OF_LP 1024
 #define NUMBER_OF_REGION_CONTROLLER 20
 
 #define MEAN_REQ 5.0

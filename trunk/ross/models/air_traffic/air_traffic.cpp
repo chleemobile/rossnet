@@ -96,19 +96,19 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
                 m = (air_traffic_message*)tw_event_data(e);
                 m->type = TAKE_OFF;
                 m->dest_region = dest_region;
+				tw_event_send(e);
 
 
             }
             else
             {
                 bf->c2=1;
-                s->dep_req_rejected++;
-                e = tw_event_new(lp->gid, bs_rand_exponential2(s->rn, 111.12, lp)+1, lp);
-                m = (air_traffic_message*)tw_event_data(e);
-                m->type = DEP_DELAY;
+				s->dep_req_rejected++;
+//                e = tw_event_new(lp->gid, bs_rand_exponential2(s->rn, 111.12, lp)+1, lp);
+//                m = (air_traffic_message*)tw_event_data(e);
+//                m->type = DEP_DELAY;
             }
 
-            tw_event_send(e);
 
             break;
         }
@@ -172,7 +172,7 @@ rc_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
             else if(bf->c2==1)
             {
                 s->dep_req_rejected--;
-                bs_rand_rvs(s->rn, lp);
+//                bs_rand_rvs(s->rn, lp);
             }
 
             break;

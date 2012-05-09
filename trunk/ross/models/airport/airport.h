@@ -18,9 +18,7 @@ enum airport_event_t
 {
 	ARRIVAL = 1, 
 	DEPARTURE,
-	LAND,
-    DUMMY_REQ,
-    DUMMY_REP
+	LAND
 };
 
 typedef enum airport_event_t airport_event_t;
@@ -55,8 +53,8 @@ static int sqrt_nlp = 0;
 static int sqrt_nlp_1 =0;
 
 static tw_stime	 mean_flight_time = 1;
-static int       opt_mem = 1000;
-static int	 planes_per_airport = 1000;
+static int       opt_mem = 10000;
+static int	 planes_per_airport = 1;
 
 static tw_stime	 wait_time_avg = 0.0;
 

@@ -238,72 +238,10 @@ fw_event_handler(airport_state * s, tw_bf * bf, airport_message * msg, tw_lp * l
             
             e = tw_event_new(dst_lp, ts, lp);
             m = (airport_message*)tw_event_data(e);
-            m->type = DUMMY_REQ;
-            m->msg_from = lp->gid;
-            
-            tw_event_send(e);
-            break;
-        }
-            
-        case DUMMY_REQ:
-        {
-            ts = bs_rand_exponential2(s->rn, mean_flight_time, lp);
-            e = tw_event_new(msg->msg_from, ts, lp);
-            
-            m = (airport_message*)tw_event_data(e);
-            m->type = DUMMY_REP;
-            m->msg_from = lp->gid;
-            break;
-        }
-            
-        case DUMMY_REP:
-        {
-            rand_result = bs_rand_integer2(s->rn, 0, 100, lp);
-            dst_lp = 0;
-            
-            switch(rand_result)
-            {
-                case 0:
-                    // Fly north
-                    if(lp->gid < sqrt_nlp)
-                        // Wrap around
-                        dst_lp = lp->gid + sqrt_nlp_1 * sqrt_nlp;
-                    else
-                        dst_lp = lp->gid - sqrt_nlp_1;
-                    break;
-                case 1:
-                    // Fly south
-                    if(lp->gid >= sqrt_nlp_1 * sqrt_nlp)
-                        // Wrap around
-                        dst_lp = lp->gid - sqrt_nlp_1 * sqrt_nlp;
-                    else
-                        dst_lp = lp->gid + sqrt_nlp_1;
-                    break;
-                case 2:
-                    // Fly east
-                    if((lp->gid % sqrt_nlp) == sqrt_nlp_1)
-                        // Wrap around
-                        dst_lp = lp->gid - sqrt_nlp_1;
-                    else
-                        dst_lp = lp->gid + 1;
-                    break;
-                case 3:
-                    // Fly west
-                    if((lp->gid % sqrt_nlp) == 0)
-                        // Wrap around
-                        dst_lp = lp->gid + sqrt_nlp_1;
-                    else
-                        dst_lp = lp->gid - 1;
-                    break;
-            }
-            
-            ts = bs_rand_exponential2(s->rn, mean_flight_time, lp);
-            e = tw_event_new(dst_lp, ts, lp);
-            
-            m = (airport_message*)tw_event_data(e);
             m->type = LAND;
             m->msg_from = lp->gid;
             
+            tw_event_send(e);
             break;
         }
             
@@ -347,15 +285,6 @@ rc_event_handler(airport_state * s, tw_bf * bf, airport_message * msg, tw_lp * l
             s->landings--;
             s->waiting_time -= msg->waiting_time;
             bs_rand_rvs(s->rn, lp);
-            break;
-        case DUMMY_REQ:
-            bs_rand_rvs(s->rn, lp);
-
-            break;
-        case DUMMY_REP:
-            bs_rand_rvs(s->rn, lp);
-            bs_rand_rvs(s->rn, lp);
-
             break;
     }
 }
