@@ -200,49 +200,66 @@ fw_event_handler(airport_state * s, tw_bf * bf, airport_message * msg, tw_lp * l
             rand_result = bs_rand_integer2(s->rn, 0, 3, lp);
             dst_lp = 0;
             
-            switch(rand_result)
-            {
-                case 0:
-                    // Fly north
-                    if(lp->gid < sqrt_nlp)
-                        // Wrap around
-                        dst_lp = lp->gid + sqrt_nlp_1 * sqrt_nlp;
-                    else
-                        dst_lp = lp->gid - sqrt_nlp_1;
-                    break;
-                case 1:
-                    // Fly south
-                    if(lp->gid >= sqrt_nlp_1 * sqrt_nlp)
-                        // Wrap around
-                        dst_lp = lp->gid - sqrt_nlp_1 * sqrt_nlp;
-                    else
-                        dst_lp = lp->gid + sqrt_nlp_1;
-                    break;
-                case 2:
-                    // Fly east
-                    if((lp->gid % sqrt_nlp) == sqrt_nlp_1)
-                        // Wrap around
-                        dst_lp = lp->gid - sqrt_nlp_1;
-                    else
-                        dst_lp = lp->gid + 1;
-                    break;
-                case 3:
-                    // Fly west
-                    if((lp->gid % sqrt_nlp) == 0)
-                        // Wrap around
-                        dst_lp = lp->gid + sqrt_nlp_1;
-                    else
-                        dst_lp = lp->gid - 1;
-                    break;
-            }
-            
-            e = tw_event_new(dst_lp, ts, lp);
-            m = (airport_message*)tw_event_data(e);
-            m->type = LAND;
-            m->msg_from = lp->gid;
-            
-            tw_event_send(e);
-            break;
+			int approved = bs_rand_integer2(s->rn, 0, 3, lp);
+
+			if (approved == 1) 
+			{
+				switch(rand_result)
+				{
+					case 0:
+						// Fly north
+						if(lp->gid < sqrt_nlp)
+							// Wrap around
+							dst_lp = lp->gid + sqrt_nlp_1 * sqrt_nlp;
+						else
+							dst_lp = lp->gid - sqrt_nlp_1;
+						break;
+					case 1:
+						// Fly south
+						if(lp->gid >= sqrt_nlp_1 * sqrt_nlp)
+							// Wrap around
+							dst_lp = lp->gid - sqrt_nlp_1 * sqrt_nlp;
+						else
+							dst_lp = lp->gid + sqrt_nlp_1;
+						break;
+					case 2:
+						// Fly east
+						if((lp->gid % sqrt_nlp) == sqrt_nlp_1)
+							// Wrap around
+							dst_lp = lp->gid - sqrt_nlp_1;
+						else
+							dst_lp = lp->gid + 1;
+						break;
+					case 3:
+						// Fly west
+						if((lp->gid % sqrt_nlp) == 0)
+							// Wrap around
+							dst_lp = lp->gid + sqrt_nlp_1;
+						else
+							dst_lp = lp->gid - 1;
+						break;
+				}
+				
+				e = tw_event_new(dst_lp, ts, lp);
+				m = (airport_message*)tw_event_data(e);
+				m->type = LAND;
+				m->msg_from = lp->gid;
+				
+				tw_event_send(e);
+				
+			}
+			else
+			{
+				e = tw_event_new(lp->gid, ts, lp);
+				m = (airport_message*)tw_event_data(e);
+				m->type = DEPARTURE;
+				m->msg_from = lp->gid;
+				
+				tw_event_send(e);	
+			}
+
+			
+             break;
         }
             
         case LAND:
@@ -277,6 +294,8 @@ rc_event_handler(airport_state * s, tw_bf * bf, airport_message * msg, tw_lp * l
             s->planes_on_the_ground++;
             bs_rand_rvs(s->rn, lp);
             bs_rand_rvs(s->rn, lp);
+			bs_rand_rvs(s->rn, lp);
+
             break;
             
         case LAND:

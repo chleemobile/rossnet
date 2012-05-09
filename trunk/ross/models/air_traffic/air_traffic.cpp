@@ -40,17 +40,17 @@ p_init(airport_state * s, tw_lp * lp)
     s->rn=0;
     s->from=0;
     
-    if(lp->gid <NUMBER_OF_REGION_CONTROLLER)
-    {
-        s->max_capacity = AIRCRAFT_CAPACITY_OF_LARGE_REGION;
-        s->airplane_in_region = 0;
-        
-        s->transit_req_accepted = 0;
-        s->transit_req_rejected = 0;
-
-    }
-    else
-    {
+//    if(lp->gid <NUMBER_OF_REGION_CONTROLLER)
+//    {
+//        s->max_capacity = AIRCRAFT_CAPACITY_OF_LARGE_REGION;
+//        s->airplane_in_region = 0;
+//        
+//        s->transit_req_accepted = 0;
+//        s->transit_req_rejected = 0;
+//
+//    }
+//    else
+//    {
         s->max_runway = NUMBER_OF_RUNWAY_NH_AIRPORT;
         
         s->runway_in_use=0;
@@ -69,7 +69,7 @@ p_init(airport_state * s, tw_lp * lp)
             tw_event_send(e);
         }
         
-    }
+    //}
 }
 
 void
@@ -81,18 +81,20 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
     
     switch(msg->type)
     {
-        * (int *)bf = (int)0;
+        *(int *)bf = (int)0;
             
         case DEP:
         {
-            if (s->runway_in_use < s->max_runway) 
+			int approved = bs_rand_integer2(s->rn, 0, 3, lp);
+			ts = bs_rand_exponential2(s->rn, 5.12, lp)+1;
+			
+            if ((bf->c1 = (s->runway_in_use < s->max_runway))) 
             {
-                bf->c1=1;
                 s->runway_in_use++;
                 s->dep_req_accepted++;
+				int dest_region = bs_rand_integer2(s->rn, 0, NUMBER_OF_LP-1, lp);
 
-                int dest_region = bs_rand_integer2(s->rn, 0, NUMBER_OF_LP-1, lp);
-                e = tw_event_new(dest_region, bs_rand_exponential2(s->rn, 5.12, lp)+1, lp);
+                e = tw_event_new(dest_region, ts, lp);
                 m = (air_traffic_message*)tw_event_data(e);
                 m->type = TAKE_OFF;
                 m->dest_region = dest_region;
@@ -102,11 +104,12 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
             }
             else
             {
-                bf->c2=1;
 				s->dep_req_rejected++;
-//                e = tw_event_new(lp->gid, bs_rand_exponential2(s->rn, 111.12, lp)+1, lp);
-//                m = (air_traffic_message*)tw_event_data(e);
-//                m->type = DEP_DELAY;
+                e = tw_event_new(lp->gid, ts, lp);
+                m = (air_traffic_message*)tw_event_data(e);
+                m->type = DEP_DELAY;
+				tw_event_send(e);
+
             }
 
 
@@ -161,20 +164,20 @@ rc_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
     {
         case DEP:
         {
-            if(bf->c1==1)
-            {
-                s->runway_in_use--;
+            bs_rand_rvs(s->rn, lp);
+            bs_rand_rvs(s->rn, lp);
+
+			if (bf->c1) {
+				bs_rand_rvs(s->rn, lp);
+
+				s->runway_in_use--;
                 s->dep_req_accepted--;
+			}
+			else {
+				s->dep_req_rejected--;
+			}
 
-                bs_rand_rvs(s->rn, lp);
-                bs_rand_rvs(s->rn, lp);
-            }
-            else if(bf->c2==1)
-            {
-                s->dep_req_rejected--;
-//                bs_rand_rvs(s->rn, lp);
-            }
-
+			
             break;
         }
             
