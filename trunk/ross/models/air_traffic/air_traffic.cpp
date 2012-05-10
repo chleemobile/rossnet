@@ -85,15 +85,20 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
             
         case DEP:
         {
-			int approved = bs_rand_integer2(s->rn, 0, 3, lp);
-			ts = bs_rand_exponential2(s->rn, 5.12, lp)+1;
+			int weather = bs_rand_integer2(s->rn, 0, 3, lp);
 			
-            if ((bf->c1 = (s->runway_in_use < s->max_runway))) 
+			int path = 0;
+			
+            if ((path = (s->runway_in_use < s->max_runway))) 
             {
                 s->runway_in_use++;
                 s->dep_req_accepted++;
+				
 				int dest_region = bs_rand_integer2(s->rn, 0, NUMBER_OF_LP-1, lp);
 
+				ts = bs_rand_exponential2(s->rn, MEAN_DEQ, lp);
+				ts += weather;
+				
                 e = tw_event_new(dest_region, ts, lp);
                 m = (air_traffic_message*)tw_event_data(e);
                 m->type = TAKE_OFF;
@@ -105,6 +110,10 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
             else
             {
 				s->dep_req_rejected++;
+
+				ts = bs_rand_exponential2(s->rn, MEAN_DELAY, lp);
+				ts += weather;
+
                 e = tw_event_new(lp->gid, ts, lp);
                 m = (air_traffic_message*)tw_event_data(e);
                 m->type = DEP_DELAY;
@@ -112,7 +121,8 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 
             }
 
-
+			__store__(path,lp);
+			
             break;
         }
 
@@ -164,20 +174,26 @@ rc_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
     {
         case DEP:
         {
-            bs_rand_rvs(s->rn, lp);
-            bs_rand_rvs(s->rn, lp);
+			int path = -1;
+			__restore__(path, lp);
+			assert(path >= 0);
 
-			if (bf->c1) {
+			if (path) {
+				bs_rand_rvs(s->rn, lp);
 				bs_rand_rvs(s->rn, lp);
 
-				s->runway_in_use--;
                 s->dep_req_accepted--;
+				s->runway_in_use--;
 			}
 			else {
+				
+				bs_rand_rvs(s->rn, lp);
+
 				s->dep_req_rejected--;
 			}
 
-			
+			bs_rand_rvs(s->rn, lp);
+
             break;
         }
             

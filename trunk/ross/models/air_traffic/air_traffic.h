@@ -14,6 +14,7 @@
 #define NUMBER_OF_LP 1024
 #define NUMBER_OF_REGION_CONTROLLER 20
 
+#define MEAN_DEQ 5.0
 #define MEAN_REQ 5.0
 #define MEAN_TAXI 3.0
 #define MEAN_FLIGHT 30.0
