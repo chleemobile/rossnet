@@ -25,7 +25,7 @@
 #define NUMBER_OF_RUNWAY_LARGE_AIRPORT 1
 #define NUMBER_OF_RUNWAY_MEDIUM_AIRPORT 1
 #define NUMBER_OF_RUNWAY_SMALL_AIRPORT 1
-#define NUMBER_OF_RUNWAY_NH_AIRPORT 10
+#define NUMBER_OF_RUNWAY_NH_AIRPORT 100
 
 #define AIRCRAFT_CAPACITY_OF_LARGE_REGION 10
 #define AIRCRAFT_CAPACITY_OF_MEDIUM_REGION 100
@@ -98,7 +98,7 @@ static int nlp = NUMBER_OF_LP;
 static tw_lpid	 nlp_per_pe = NUMBER_OF_LP;
 
 static tw_stime	 mean_flight_time = 1;
-static int       opt_mem = 1000000;
+static int       opt_mem = 2000000;
 static int       planes_per_airport = NUMBER_OF_PLANES_PER_AIRPORT;
 
 static tw_stime	 wait_time_avg = 0.0;

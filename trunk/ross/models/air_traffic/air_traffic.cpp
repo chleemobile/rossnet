@@ -100,9 +100,12 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 				ts += weather;
 				
                 e = tw_event_new(dest_region, ts, lp);
+				
                 m = (air_traffic_message*)tw_event_data(e);
                 m->type = TAKE_OFF;
                 m->dest_region = dest_region;
+				m->msg_from = lp->gid;
+				
 				tw_event_send(e);
 
 
@@ -111,12 +114,16 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
             {
 				s->dep_req_rejected++;
 
+				int dest_region = bs_rand_integer2(s->rn, 0, NUMBER_OF_LP-1, lp);
+				
 				ts = bs_rand_exponential2(s->rn, MEAN_DELAY, lp);
 				ts += weather;
 
-                e = tw_event_new(lp->gid, ts, lp);
+                e = tw_event_new(dest_region, ts, lp);
+				
                 m = (air_traffic_message*)tw_event_data(e);
                 m->type = DEP_DELAY;
+				m->msg_from = lp->gid;
 				tw_event_send(e);
 
             }
@@ -129,7 +136,7 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
         case DEP_DELAY:
         {
             
-            e = tw_event_new(lp->gid, bs_rand_exponential2(s->rn, 4.123, lp)+1, lp);
+            e = tw_event_new(msg->msg_from, bs_rand_exponential2(s->rn, 4.123, lp)+1, lp);
             m = (air_traffic_message*)tw_event_data(e);
             m->type = DEP;
             tw_event_send(e);
@@ -186,7 +193,8 @@ rc_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 				s->runway_in_use--;
 			}
 			else {
-				
+
+				bs_rand_rvs(s->rn, lp);
 				bs_rand_rvs(s->rn, lp);
 
 				s->dep_req_rejected--;
