@@ -42,12 +42,9 @@ p_init(airport_state * s, tw_lp * lp)
         s->max_capacity = AIRCRAFT_CAPACITY_OF_LARGE_REGION;
         s->airplane_in_region = 0;
         
-		s->take_off_req_accepted = 0;
-		s->take_off_req_rejected = 0;
-		
         s->transit_req_accepted = 0;
         s->transit_req_rejected = 0;
-		
+
     }
     else
     {
@@ -59,7 +56,6 @@ p_init(airport_state * s, tw_lp * lp)
 		
         s->arrival_req_accepted=0;
         s->arrival_req_rejected=0;
-		
         s->dep_req_accepted=0;
         s->dep_req_rejected=0;
         
@@ -84,7 +80,7 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
     
     switch(msg->type)
     {
-			//        *(int *)bf = (int)0;
+//        *(int *)bf = (int)0;
             
         case DEP_REQ:
         {
@@ -100,7 +96,7 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
                 s->dep_req_accepted++;
 				
 				int dest_region = bs_rand_integer2(s->rn, 0, NUMBER_OF_REGION_CONTROLLER-1, lp);
-				
+
 				ts = bs_rand_exponential2(s->rn, MEAN_DEQ, lp);
 				ts += weather;
 				
@@ -111,8 +107,8 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
                 m->dest_region = dest_region;
 				
 				tw_event_send(e);
-				
-				
+
+
             }
             else
             {
@@ -120,22 +116,22 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 				
 				ts = bs_rand_exponential2(s->rn, MEAN_DELAY, lp);
 				ts += weather;
-				
+
                 e = tw_event_new(lp->gid, ts, lp);
 				
                 m = (air_traffic_message*)tw_event_data(e);
                 m->type = DEP_DELAY;
 				m->msg_from = lp->gid;
-				
+
 				tw_event_send(e);
-				
+
             }
-			
+
 			__store__(path,lp);
 			
             break;
         }
-			
+
         case DEP_DELAY:
         {
             
@@ -146,7 +142,7 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
             m = (air_traffic_message*)tw_event_data(e);
             m->type = DEP_REQ;
             tw_event_send(e);
-			
+
             break;
         }
             
@@ -159,111 +155,38 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
             e = tw_event_new(msg->dest_region, ts, lp);
 			
             m = (air_traffic_message*)tw_event_data(e);
-            m->type = TAKE_OFF_REQ;
+            m->type = TAKE_OFF;
 			m->dest_region = msg->dest_region;
-			m->msg_from = lp->gid;
-			
             tw_event_send(e);
 			break;
 		}
 			
 		case TAKE_OFF_REQ:
 		{
-			assert(lp->gid < NUMBER_OF_REGION_CONTROLLER);
 			
-			int path = 0;
-			
-//            if ((path = (s->airplane_in_region < s->max_capacity))) 
-            if (1) 				
-            {
-                s->airplane_in_region++;
-                s->take_off_req_accepted++;
-				
-				ts = bs_rand_exponential2(s->rn, MEAN_REQ, lp);
-				
-                e = tw_event_new(msg->msg_from, ts, lp);
-				
-                m = (air_traffic_message*)tw_event_data(e);
-                m->type = TAKE_OFF;
-                m->dest_region = msg->dest_region;
-				m->msg_from = lp->gid;
-				
-				tw_event_send(e);
-				
-				
-            }
-            else
-            {
-				s->take_off_req_rejected++;
-				
-				ts = bs_rand_exponential2(s->rn, MEAN_DELAY, lp);
-				
-                e = tw_event_new(lp->gid, ts, lp);
-				
-                m = (air_traffic_message*)tw_event_data(e);
-                m->type = TAKE_OFF_DELAY;
-				m->dest_region = msg->dest_region;
-				m->msg_from = msg->msg_from;
-				
-				tw_event_send(e);
-				
-            }
-			
-			__store__(path,lp);
 			
 			break;
 		}
-			
-        case TAKE_OFF_DELAY:
-        {
-            
-			ts = bs_rand_exponential2(s->rn, MEAN_DELAY, lp);
-			
-            e = tw_event_new(lp->gid, ts, lp);
-			
-            m = (air_traffic_message*)tw_event_data(e);
-            m->type = TAKE_OFF_REQ;
-			m->dest_region = msg->dest_region;
-			m->msg_from = msg->msg_from;
-			
-            tw_event_send(e);
-			
-            break;
-        }
-			
+
         case TAKE_OFF:
         {            
             s->runway_in_use--;
 			
+			int dest = bs_rand_integer2(s->rn, 0, NUMBER_OF_LP-1, lp);
+			
 			ts = bs_rand_exponential2(s->rn, MEAN_TAKE_OFF, lp);
+			
             
-            e = tw_event_new(msg->msg_from, ts, lp);
-			
-            m = (air_traffic_message*)tw_event_data(e);
-            m->type = ON_THE_AIR;
-            m->dest_region = msg->dest_region;
-			
-            tw_event_send(e);
-			
-            break;
-        }
-			
-		case ON_THE_AIR:
-		{			
-			s->airplane_in_region--;
-			
-			ts = bs_rand_exponential2(s->rn, MEAN_TAKE_OFF, lp);
-			
-            e = tw_event_new(msg->dest_region, ts, lp);
+            e = tw_event_new(dest, ts, lp);
 			
             m = (air_traffic_message*)tw_event_data(e);
             m->type = LAND;
             m->dest_region = msg->dest_region;
 			
             tw_event_send(e);
-			
-			break;
-		}
+
+            break;
+        }
             
         case LAND:
         {
@@ -281,7 +204,7 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
             
             break;
         }
-			
+                
     }
 }
 
@@ -296,23 +219,23 @@ rc_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 			int path = -1;
 			__restore__(path, lp);
 			assert(path >= 0);
-			
+
 			if (path) {
 				bs_rand_rvs(s->rn, lp);
 				bs_rand_rvs(s->rn, lp);
-				
+
                 s->dep_req_accepted--;
 				s->runway_in_use--;
 			}
 			else {
-				
+
 				bs_rand_rvs(s->rn, lp);
-				
+
 				s->dep_req_rejected--;
 			}
-			
+
 			bs_rand_rvs(s->rn, lp);
-			
+
             break;
         }
             
@@ -322,7 +245,7 @@ rc_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
             
             break;
         }
-			
+
         case TAXI_OUT:
         {
             bs_rand_rvs(s->rn, lp);
@@ -330,49 +253,16 @@ rc_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
             break;
         }
             
-		case TAKE_OFF_REQ:
-		{
-			int path = -1;
-			__restore__(path, lp);
-			assert(path >= 0);
-			
-			if (path) {
-				bs_rand_rvs(s->rn, lp);
-				
-                s->airplane_in_region--;
-                s->take_off_req_accepted--;
-			}
-			else {
-				
-				bs_rand_rvs(s->rn, lp);
-				
-				s->take_off_req_rejected--;
-			}
-			
-			break;
-		}
-		
-		case TAKE_OFF_DELAY:
-		{
-			bs_rand_rvs(s->rn, lp);
-			break;
-		}
-			
         case TAKE_OFF:
         {
-            bs_rand_rvs(s->rn, lp);
             s->runway_in_use++;
-		
+
+            bs_rand_rvs(s->rn, lp);
+            bs_rand_rvs(s->rn, lp);
+
             break;
         }  
-
-		case ON_THE_AIR:
-		{
-			bs_rand_rvs(s->rn, lp);
-			s->airplane_in_region++;
-			
-			break;
-		}
+            
         case LAND:
         {
             bs_rand_rvs(s->rn, lp);
@@ -388,10 +278,6 @@ final(airport_state * s, tw_lp * lp)
 
 {
 	//wait_time_avg += ((s->waiting_time / (double) s->landings) / nlp_per_pe);
-	
-	total_take_off_req_accepted += s->take_off_req_accepted;
-	total_take_off_req_rejected += s->take_off_req_rejected;
-	
     total_transit_accepted += s->transit_req_accepted;
     total_transit_rejected += s->transit_req_rejected;
     
@@ -401,7 +287,7 @@ final(airport_state * s, tw_lp * lp)
     total_arrival_req_accepted += s->arrival_req_accepted;
     total_arrival_req_rejected += s->arrival_req_rejected;
     
-	//    cout<<lp->gid<<","<<s->arrival_req_accepted<<endl;
+//    cout<<lp->gid<<","<<s->arrival_req_accepted<<endl;
 }
 
 /*
@@ -488,10 +374,7 @@ main(int argc, char **argv, char **env)
                nlp_per_pe * g_tw_npe * tw_nnodes());
 		printf("\t%-50s %11lld\n", "Number of planes", 
                planes_per_airport * nlp_per_pe * g_tw_npe * tw_nnodes());
-		
-		cout<<"\tTotal Take-Off Req Accepted : "<<total_take_off_req_accepted<<endl;
-        cout<<"\tTotal Take-Off Req Rejected : "<<total_take_off_req_rejected<<endl;
-		
+        
         cout<<"\tTotal Transit Accepted : "<<total_transit_accepted<<endl;
         cout<<"\tTotal Transit Rejected : "<<total_transit_rejected<<endl;
         
