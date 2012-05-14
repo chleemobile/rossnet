@@ -64,7 +64,7 @@ p_init(airport_state * s, tw_lp * lp)
 			tw_stime ts = bs_rand_exponential2(s->rn, MEAN_DEQ, lp);
             e = tw_event_new(lp->gid, ts, lp);            
             m = (air_traffic_message*)tw_event_data(e);
-            m->type = DEP;            
+            m->type = DEP_REQ;            
             tw_event_send(e);
         }
         
@@ -82,7 +82,7 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
     {
 //        *(int *)bf = (int)0;
             
-        case DEP:
+        case DEP_REQ:
         {
 			assert(lp->gid > NUMBER_OF_REGION_CONTROLLER-1);
 			
@@ -103,9 +103,8 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
                 e = tw_event_new(dest_region, ts, lp);
 				
                 m = (air_traffic_message*)tw_event_data(e);
-                m->type = TAKE_OFF;
+                m->type = TAXI_OUT;
                 m->dest_region = dest_region;
-				m->msg_from = lp->gid;
 				
 				tw_event_send(e);
 
@@ -141,12 +140,32 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
             e = tw_event_new(msg->msg_from, ts, lp);
 			
             m = (air_traffic_message*)tw_event_data(e);
-            m->type = DEP;
+            m->type = DEP_REQ;
             tw_event_send(e);
 
             break;
         }
             
+		case TAXI_OUT:
+		{
+			ts = bs_rand_exponential2(s->rn, MEAN_TAXI, lp);
+			
+            e = tw_event_new(lp->gid, ts, lp);
+			
+            m = (air_traffic_message*)tw_event_data(e);
+            m->type = TAKE_OFF;
+			m->dest_region = msg->dest_region;
+            tw_event_send(e);
+			break;
+		}
+			
+		case TAKE_OFF_REQ:
+		{
+			
+			
+			break;
+		}
+
         case TAKE_OFF:
         {            
             s->runway_in_use--;
@@ -176,7 +195,7 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
             e = tw_event_new(dest, ts, lp);
 			
             m = (air_traffic_message*)tw_event_data(e);
-            m->type = DEP;
+            m->type = DEP_REQ;
             m->dest_region = msg->dest_region;
 			
             tw_event_send(e);
@@ -193,7 +212,7 @@ rc_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 {    
     switch(msg->type)
     {
-        case DEP:
+        case DEP_REQ:
         {
 			int path = -1;
 			__restore__(path, lp);
@@ -219,6 +238,13 @@ rc_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
         }
             
         case DEP_DELAY:
+        {
+            bs_rand_rvs(s->rn, lp);
+            
+            break;
+        }
+
+        case TAXI_OUT:
         {
             bs_rand_rvs(s->rn, lp);
             
