@@ -100,7 +100,7 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 				ts = bs_rand_exponential2(s->rn, MEAN_DEQ, lp);
 				ts += weather;
 				
-                e = tw_event_new(dest_region, ts, lp);
+                e = tw_event_new(lp->gid, ts, lp);
 				
                 m = (air_traffic_message*)tw_event_data(e);
                 m->type = TAXI_OUT;
@@ -137,7 +137,7 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
             
 			ts = bs_rand_exponential2(s->rn, MEAN_DELAY, lp);
 			
-            e = tw_event_new(msg->msg_from, ts, lp);
+            e = tw_event_new(lp->gid, ts, lp);
 			
             m = (air_traffic_message*)tw_event_data(e);
             m->type = DEP_REQ;
@@ -148,9 +148,11 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
             
 		case TAXI_OUT:
 		{
+			assert(msg->dest_region < NUMBER_OF_REGION_CONTROLLER);
+			
 			ts = bs_rand_exponential2(s->rn, MEAN_TAXI, lp);
 			
-            e = tw_event_new(lp->gid, ts, lp);
+            e = tw_event_new(msg->dest_region, ts, lp);
 			
             m = (air_traffic_message*)tw_event_data(e);
             m->type = TAKE_OFF;

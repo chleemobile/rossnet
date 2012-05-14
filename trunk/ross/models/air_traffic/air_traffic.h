@@ -82,7 +82,6 @@ struct air_traffic_message
     
     int dest_region;
     int dest_airport;
-    int next_region;
     
     int msg_from;
 };
