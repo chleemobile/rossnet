@@ -11,16 +11,17 @@
 #define GRAPH_CSV_FILE_PATH "adjlist_csv.csv"
 
 #define DEBUG 0
-#define NUMBER_OF_LP 1024
+#define NUMBER_OF_LP 328
 #define NUMBER_OF_REGION_CONTROLLER 20
 
 #define MEAN_DEQ 5.0
-#define MEAN_REQ 5.0
+#define MEAN_REQ 4.8
 #define MEAN_TAXI 3.0
 #define MEAN_FLIGHT 30.0
 #define MEAN_REP 2.0
 #define MEAN_LAND 10.0
 #define MEAN_DELAY 4.0
+#define MEAN_TAKE_OFF 5.5
 
 #define NUMBER_OF_RUNWAY_LARGE_AIRPORT 1
 #define NUMBER_OF_RUNWAY_MEDIUM_AIRPORT 1

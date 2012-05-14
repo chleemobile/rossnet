@@ -113,13 +113,11 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
             else
             {
 				s->dep_req_rejected++;
-
-				int dest_region = bs_rand_integer2(s->rn, 0, NUMBER_OF_LP-1, lp);
 				
 				ts = bs_rand_exponential2(s->rn, MEAN_DELAY, lp);
 				ts += weather;
 
-                e = tw_event_new(dest_region, ts, lp);
+                e = tw_event_new(lp->gid, ts, lp);
 				
                 m = (air_traffic_message*)tw_event_data(e);
                 m->type = DEP_DELAY;
@@ -136,7 +134,10 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
         case DEP_DELAY:
         {
             
-            e = tw_event_new(msg->msg_from, bs_rand_exponential2(s->rn, 4.123, lp)+1, lp);
+			ts = bs_rand_exponential2(s->rn, MEAN_DELAY, lp);
+			
+            e = tw_event_new(msg->msg_from, ts, lp);
+			
             m = (air_traffic_message*)tw_event_data(e);
             m->type = DEP;
             tw_event_send(e);
@@ -147,12 +148,18 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
         case TAKE_OFF:
         {            
             s->runway_in_use--;
-
-            int dest = bs_rand_integer2(s->rn, 0, NUMBER_OF_LP-1, lp);
-            e = tw_event_new(dest, bs_rand_exponential2(s->rn, 10, lp)+1, lp);
+			
+			int dest = bs_rand_integer2(s->rn, 0, NUMBER_OF_LP-1, lp);
+			
+			ts = bs_rand_exponential2(s->rn, MEAN_TAKE_OFF, lp);
+			
+            
+            e = tw_event_new(dest, ts, lp);
+			
             m = (air_traffic_message*)tw_event_data(e);
             m->type = LAND;
             m->dest_region = msg->dest_region;
+			
             tw_event_send(e);
 
             break;
@@ -160,11 +167,16 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
             
         case LAND:
         {
-            int dest = bs_rand_integer2(s->rn, 0, NUMBER_OF_LP-1, lp);
-            e = tw_event_new(dest, bs_rand_exponential2(s->rn, 10, lp)+1, lp);
+			int dest = bs_rand_integer2(s->rn, 0, NUMBER_OF_LP-1, lp);
+			
+			ts = bs_rand_exponential2(s->rn, MEAN_LAND, lp);
+			
+            e = tw_event_new(dest, ts, lp);
+			
             m = (air_traffic_message*)tw_event_data(e);
             m->type = DEP;
             m->dest_region = msg->dest_region;
+			
             tw_event_send(e);
             
             break;
@@ -194,7 +206,6 @@ rc_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 			}
 			else {
 
-				bs_rand_rvs(s->rn, lp);
 				bs_rand_rvs(s->rn, lp);
 
 				s->dep_req_rejected--;
