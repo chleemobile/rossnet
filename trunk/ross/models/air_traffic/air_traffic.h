@@ -6,33 +6,8 @@
 #include <stack>
 #include <deque>
 #include "Graph.hpp"
+#include "Constants.hpp"
 
-
-#define GRAPH_CSV_FILE_PATH "adjlist_csv.csv"
-
-#define DEBUG 0
-#define NUMBER_OF_LP 1024
-#define NUMBER_OF_REGION_CONTROLLER 20
-
-#define MEAN_DEQ 5.0
-#define MEAN_REQ 4.8
-#define MEAN_TAXI 3.0
-#define MEAN_FLIGHT 30.0
-#define MEAN_REP 2.0
-#define MEAN_LAND 10.0
-#define MEAN_DELAY 4.0
-#define MEAN_TAKE_OFF 5.5
-
-#define NUMBER_OF_RUNWAY_LARGE_AIRPORT 1
-#define NUMBER_OF_RUNWAY_MEDIUM_AIRPORT 1
-#define NUMBER_OF_RUNWAY_SMALL_AIRPORT 1
-#define NUMBER_OF_RUNWAY_NH_AIRPORT 5
-
-#define AIRCRAFT_CAPACITY_OF_LARGE_REGION 10
-#define AIRCRAFT_CAPACITY_OF_MEDIUM_REGION 100
-#define AIRCRAFT_CAPACITY_OF_SMALL_REGION 500
-
-#define NUMBER_OF_PLANES_PER_AIRPORT 5
 
 using std::max;
 using namespace std;
@@ -49,7 +24,11 @@ enum air_traffic_event_t
 	TRANSIT_REQ,
 	ON_THE_AIR,
 	TRANSIT_DELAY,
-    LAND
+    LANDING_REQ,
+	LANDING_DELAY,
+	LANDING,
+	TAXI_IN,
+	ARRIVAL
 };
 
 typedef enum air_traffic_event_t air_traffic_event_t;
@@ -63,7 +42,8 @@ struct airport_state
     
     int max_capacity;
     int airplane_in_region;
-    int transit_req_accepted;
+    
+	int transit_req_accepted;
     int transit_req_rejected;
     
     /*
@@ -71,9 +51,11 @@ struct airport_state
      */
     int max_runway;
     int runway_in_use;
-    int landing;
-    int arrival_req_accepted;
-    int arrival_req_rejected;
+    
+	int landing;
+    int landing_req_accepted;
+    int landing_req_rejected;
+
     int dep_req_accepted;
     int dep_req_rejected;
 };
@@ -94,8 +76,8 @@ static int total_transit_rejected = 0;
 static int total_dep_req_accepted = 0;
 static int total_dep_req_rejected = 0;
 
-static int total_arrival_req_accepted = 0;
-static int total_arrival_req_rejected = 0;
+static int total_landing_req_accepted = 0;
+static int total_landing_req_rejected = 0;
 
 static int nlp = NUMBER_OF_LP;
 static tw_lpid	 nlp_per_pe = NUMBER_OF_LP;

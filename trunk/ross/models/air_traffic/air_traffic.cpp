@@ -54,8 +54,8 @@ p_init(airport_state * s, tw_lp * lp)
         
         s->landing=0;
 		
-        s->arrival_req_accepted=0;
-        s->arrival_req_rejected=0;
+        s->landing_req_accepted=0;
+        s->landing_req_rejected=0;
         s->dep_req_accepted=0;
         s->dep_req_rejected=0;
         
@@ -96,7 +96,7 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
                 s->dep_req_accepted++;
 				
 				int dest_region = bs_rand_integer2(s->rn, 0, NUMBER_OF_REGION_CONTROLLER-1, lp);
-				
+				int dest_airport = bs_rand_integer2(s->rn, NUMBER_OF_REGION_CONTROLLER, NUMBER_OF_LP-1, lp);
 				ts = bs_rand_exponential2(s->rn, MEAN_DEQ, lp);
 				ts += weather;
 				
@@ -105,6 +105,7 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
                 m = (air_traffic_message*)tw_event_data(e);
                 m->type = TAXI_OUT;
                 m->dest_region = dest_region;
+				m->dest_airport = dest_airport;
 				
 				tw_event_send(e);
 				
@@ -157,7 +158,8 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
             m = (air_traffic_message*)tw_event_data(e);
             m->type = TAKE_OFF;
 			m->dest_region = msg->dest_region;
-			
+			m->dest_airport = msg->dest_airport;
+
             tw_event_send(e);
 			
 			break;
@@ -174,6 +176,7 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
             m = (air_traffic_message*)tw_event_data(e);
             m->type = TRANSIT_REQ;
             m->dest_region = msg->dest_region;
+			m->dest_airport = msg->dest_airport;
 			
             tw_event_send(e);
 			
@@ -196,6 +199,7 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 				m = (air_traffic_message*)tw_event_data(e);
 				m->type = ON_THE_AIR;
 				m->dest_region = msg->dest_region;
+				m->dest_airport = msg->dest_airport;
 				m->msg_from = lp->gid;
 				
 				
@@ -211,6 +215,7 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
                 m = (air_traffic_message*)tw_event_data(e);
                 m->type = TRANSIT_DELAY;
 				m->dest_region = msg->dest_region;
+				m->dest_airport = msg->dest_airport;
 				m->msg_from = lp->gid;
 				
 			}
@@ -224,20 +229,21 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 			
 		case ON_THE_AIR:
 		{
+			assert(lp->gid < NUMBER_OF_REGION_CONTROLLER);
+			
 			int path = 0;
-
 			int next_region = bs_rand_integer2(s->rn, 0, NUMBER_OF_REGION_CONTROLLER-1, lp);
 			s->airplane_in_region--;
 
             if ((path = (next_region == msg->dest_region)))
 			{
 				ts = bs_rand_exponential2(s->rn, MEAN_LAND, lp);
-
-				e = tw_event_new(lp->gid, ts, lp);
+				e = tw_event_new(msg->dest_airport, ts, lp);
 				
 				m = (air_traffic_message*)tw_event_data(e);
-				m->type = LAND;
+				m->type = LANDING_REQ;
 				m->dest_region = msg->dest_region;
+				m->dest_airport = msg->dest_airport;
 				m->msg_from = lp->gid;
 			}
 			else
@@ -249,6 +255,7 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 				m = (air_traffic_message*)tw_event_data(e);
 				m->type = TRANSIT_REQ;
 				m->dest_region = msg->dest_region;
+				m->dest_airport = msg->dest_airport;
 				m->msg_from = lp->gid;
 			}
 			
@@ -268,6 +275,7 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
             m = (air_traffic_message*)tw_event_data(e);
             m->type = TRANSIT_REQ;
 			m->dest_region = msg->dest_region;
+			m->dest_airport = msg->dest_airport;
 			m->msg_from = lp->gid;
 			
             tw_event_send(e);
@@ -275,8 +283,109 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 			break;
 		}
 			
-        case LAND:
+        case LANDING_REQ:
         {
+			int weather = bs_rand_integer2(s->rn, 0, 3, lp);
+			
+			int path = 0;
+			
+            if ((path = (s->runway_in_use < s->max_runway))) 
+            {
+                s->runway_in_use++;
+                s->landing_req_accepted++;
+								
+				ts = bs_rand_exponential2(s->rn, MEAN_LAND, lp);
+				ts += weather;
+				
+                e = tw_event_new(lp->gid, ts, lp);
+				
+                m = (air_traffic_message*)tw_event_data(e);
+                m->type = LANDING;
+				m->dest_region = msg->dest_region;
+				m->dest_airport = msg->dest_airport;
+				m->msg_from = lp->gid;
+								
+            }
+            else
+            {
+				s->landing_req_rejected++;
+				
+				ts = bs_rand_exponential2(s->rn, MEAN_DELAY, lp);
+				ts += weather;
+				
+                e = tw_event_new(lp->gid, ts, lp);
+				
+                m = (air_traffic_message*)tw_event_data(e);
+                m->type = LANDING_DELAY;
+				m->dest_region = msg->dest_region;
+				m->dest_airport = msg->dest_airport;
+				m->msg_from = lp->gid;
+				
+				
+            }
+			
+			tw_event_send(e);
+
+			__store__(path,lp);
+			
+            break;
+        }
+			
+		case LANDING_DELAY:
+		{	
+			ts = bs_rand_exponential2(s->rn, MEAN_DELAY, lp);
+			
+            e = tw_event_new(lp->gid, ts, lp);
+			
+            m = (air_traffic_message*)tw_event_data(e);
+            m->type = LANDING_REQ;
+			m->dest_region = msg->dest_region;
+			m->dest_airport = msg->dest_airport;
+			m->msg_from = lp->gid;
+			
+            tw_event_send(e);
+			
+			break;
+		}
+			
+		case LANDING:
+		{
+			ts = bs_rand_exponential2(s->rn, MEAN_TAXI, lp);
+			
+            e = tw_event_new(lp->gid, ts, lp);
+			
+            m = (air_traffic_message*)tw_event_data(e);
+            m->type = TAXI_IN;
+			m->dest_region = msg->dest_region;
+			m->dest_airport = msg->dest_airport;
+			m->msg_from = lp->gid;
+			
+            tw_event_send(e);
+			
+			break;
+		}	
+			
+		case TAXI_IN:
+		{
+			ts = bs_rand_exponential2(s->rn, MEAN_ARRIVAL, lp);
+			
+            e = tw_event_new(lp->gid, ts, lp);
+			
+            m = (air_traffic_message*)tw_event_data(e);
+            m->type = ARRIVAL;
+			m->dest_region = msg->dest_region;
+			m->dest_airport = msg->dest_airport;
+			m->msg_from = lp->gid;
+			
+            tw_event_send(e);
+			
+			break;
+		}
+			
+		case ARRIVAL:
+		{
+			s->runway_in_use--;
+
 			int dest = bs_rand_integer2(s->rn, NUMBER_OF_REGION_CONTROLLER, NUMBER_OF_LP-1, lp);
 			
 			ts = bs_rand_exponential2(s->rn, MEAN_LAND, lp);
@@ -285,13 +394,13 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 			
             m = (air_traffic_message*)tw_event_data(e);
             m->type = DEP_REQ;
-            m->dest_region = msg->dest_region;
 			
             tw_event_send(e);
             
             break;
-        }
-			
+		}
+		
+
     }
 }
 
@@ -303,11 +412,14 @@ rc_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
     {
         case DEP_REQ:
         {
+			//cout<<"RE-DEP_REQ"<<endl;
+			
 			int path = -1;
 			__restore__(path, lp);
 			assert(path >= 0);
 			
 			if (path) {
+				bs_rand_rvs(s->rn, lp);
 				bs_rand_rvs(s->rn, lp);
 				bs_rand_rvs(s->rn, lp);
 				
@@ -328,6 +440,8 @@ rc_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
             
         case DEP_DELAY:
         {
+			//cout<<"RE-DEP_DELAY"<<endl;
+
             bs_rand_rvs(s->rn, lp);
             
             break;
@@ -335,6 +449,8 @@ rc_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 			
         case TAXI_OUT:
         {
+			//cout<<"RE-TAXI_OUT"<<endl;
+
             bs_rand_rvs(s->rn, lp);
             
             break;
@@ -342,15 +458,19 @@ rc_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
             
         case TAKE_OFF:
         {
+			//cout<<"RE-TAKE_OFF"<<endl;
+
+			bs_rand_rvs(s->rn, lp);
+
             s->runway_in_use++;
-			
-            bs_rand_rvs(s->rn, lp);
-			
+					
             break;
         }  
             
         case TRANSIT_REQ:
         {
+			//cout<<"RE-TRANSIT_REQ"<<endl;
+
 			int path = -1;
 			__restore__(path, lp);
 			assert(path >= 0);
@@ -401,13 +521,61 @@ rc_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
             break;
         } 
 			
-        case LAND:
-        {
+		case LANDING_REQ:
+		{
+			int path = -1;
+			__restore__(path, lp);
+			assert(path >= 0);
+			
+			if (path)
+			{
+				bs_rand_rvs(s->rn, lp);
+				s->runway_in_use--;
+                s->landing_req_accepted--;
+				
+			}
+			else
+			{
+				bs_rand_rvs(s->rn, lp);
+				s->landing_req_rejected--;
+
+			}
+			
+			bs_rand_rvs(s->rn, lp);
+			
+            break;
+		}
+		
+		case LANDING_DELAY:
+        {			
             bs_rand_rvs(s->rn, lp);
-            bs_rand_rvs(s->rn, lp);
-            
+			
             break;
         } 
+		
+		case LANDING:
+        {			
+            bs_rand_rvs(s->rn, lp);
+			
+            break;
+        } 
+
+		case TAXI_IN:
+        {			
+            bs_rand_rvs(s->rn, lp);
+			
+            break;
+        }
+		
+		case ARRIVAL:
+        {			
+            bs_rand_rvs(s->rn, lp);
+            bs_rand_rvs(s->rn, lp);
+			
+			s->runway_in_use++;
+
+            break;
+        }
     }
 }
 
@@ -422,8 +590,8 @@ final(airport_state * s, tw_lp * lp)
     total_dep_req_accepted += s->dep_req_accepted;
     total_dep_req_rejected += s->dep_req_rejected;
     
-    total_arrival_req_accepted += s->arrival_req_accepted;
-    total_arrival_req_rejected += s->arrival_req_rejected;
+    total_landing_req_accepted += s->landing_req_accepted;
+    total_landing_req_rejected += s->landing_req_rejected;
     
 	//    cout<<lp->gid<<","<<s->arrival_req_accepted<<endl;
 }
@@ -519,8 +687,8 @@ main(int argc, char **argv, char **env)
         cout<<"\tTotal Departure Req Accepted : "<<total_dep_req_accepted<<endl;
         cout<<"\tTotal Departure Req Rejected : "<<total_dep_req_rejected<<endl;
         
-        cout<<"\tTotal Arrival Req Accepted : "<<total_arrival_req_accepted<<endl;
-        cout<<"\tTotal Arrival Req Rejected : "<<total_arrival_req_rejected<<endl;
+        cout<<"\tTotal Arrival Req Accepted : "<<total_landing_req_accepted<<endl;
+        cout<<"\tTotal Arrival Req Rejected : "<<total_landing_req_rejected<<endl;
         
         
 	}
