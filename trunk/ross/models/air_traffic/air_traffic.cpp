@@ -29,7 +29,7 @@ mapping(tw_lpid gid)
 void
 p_init(airport_state * s, tw_lp * lp)
 {
-    static int init_seed = 1;
+    static int init_seed = lp->gid;
     BSStack* stack = new BSStack();
     lp->stack_pointer = stack;
     
@@ -37,25 +37,23 @@ p_init(airport_state * s, tw_lp * lp)
     tw_event *e;
     air_traffic_message *m;
     
-    s->rn=0;
-    s->from=0;
-    
-//    if(lp->gid <NUMBER_OF_REGION_CONTROLLER)
-//    {
-//        s->max_capacity = AIRCRAFT_CAPACITY_OF_LARGE_REGION;
-//        s->airplane_in_region = 0;
-//        
-//        s->transit_req_accepted = 0;
-//        s->transit_req_rejected = 0;
-//
-//    }
-//    else
-//    {
+    if(lp->gid <NUMBER_OF_REGION_CONTROLLER)
+    {
+        s->max_capacity = AIRCRAFT_CAPACITY_OF_LARGE_REGION;
+        s->airplane_in_region = 0;
+        
+        s->transit_req_accepted = 0;
+        s->transit_req_rejected = 0;
+
+    }
+    else
+    {
         s->max_runway = NUMBER_OF_RUNWAY_NH_AIRPORT;
         
         s->runway_in_use=0;
         
         s->landing=0;
+		
         s->arrival_req_accepted=0;
         s->arrival_req_rejected=0;
         s->dep_req_accepted=0;
@@ -63,13 +61,14 @@ p_init(airport_state * s, tw_lp * lp)
         
         for(i = 0; i < planes_per_airport; i++)
         {
-            e = tw_event_new(lp->gid, bs_rand_exponential2(s->rn, 1, lp), lp);            
+			tw_stime ts = bs_rand_exponential2(s->rn, MEAN_DEQ, lp);
+            e = tw_event_new(lp->gid, ts, lp);            
             m = (air_traffic_message*)tw_event_data(e);
             m->type = DEP;            
             tw_event_send(e);
         }
         
-    //}
+    }
 }
 
 void
@@ -81,10 +80,12 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
     
     switch(msg->type)
     {
-        *(int *)bf = (int)0;
+//        *(int *)bf = (int)0;
             
         case DEP:
         {
+			assert(lp->gid > NUMBER_OF_REGION_CONTROLLER-1);
+			
 			int weather = bs_rand_integer2(s->rn, 0, 3, lp);
 			
 			int path = 0;
@@ -94,7 +95,7 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
                 s->runway_in_use++;
                 s->dep_req_accepted++;
 				
-				int dest_region = bs_rand_integer2(s->rn, 0, NUMBER_OF_LP-1, lp);
+				int dest_region = bs_rand_integer2(s->rn, 0, NUMBER_OF_REGION_CONTROLLER-1, lp);
 
 				ts = bs_rand_exponential2(s->rn, MEAN_DEQ, lp);
 				ts += weather;
@@ -122,6 +123,7 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
                 m = (air_traffic_message*)tw_event_data(e);
                 m->type = DEP_DELAY;
 				m->msg_from = lp->gid;
+
 				tw_event_send(e);
 
             }
@@ -167,7 +169,7 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
             
         case LAND:
         {
-			int dest = bs_rand_integer2(s->rn, 0, NUMBER_OF_LP-1, lp);
+			int dest = bs_rand_integer2(s->rn, NUMBER_OF_REGION_CONTROLLER, NUMBER_OF_LP-1, lp);
 			
 			ts = bs_rand_exponential2(s->rn, MEAN_LAND, lp);
 			

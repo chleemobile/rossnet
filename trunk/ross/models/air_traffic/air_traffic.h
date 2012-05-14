@@ -53,7 +53,6 @@ typedef enum air_traffic_event_t air_traffic_event_t;
 struct airport_state
 {
     int rn;
-    int from;
     /*
      Region Controller State Variable
      */
