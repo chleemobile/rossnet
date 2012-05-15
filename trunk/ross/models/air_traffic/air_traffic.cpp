@@ -92,6 +92,9 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 			
             if ((path = (s->runway_in_use < s->max_runway))) 
             {
+				__store__(s->runway_in_use, lp);
+				__store__(s->dep_req_accepted, lp);
+				
                 s->runway_in_use++;
                 s->dep_req_accepted++;
 				
@@ -113,6 +116,7 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
             }
             else
             {
+				__store__(s->dep_req_rejected, lp);
 				s->dep_req_rejected++;
 				
 				ts = bs_rand_exponential2(s->rn, MEAN_DELAY, lp);
@@ -167,6 +171,7 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 			
         case TAKE_OFF:
         {            
+			__store__(s->runway_in_use, lp);
             s->runway_in_use--;
 			
 			ts = bs_rand_exponential2(s->rn, MEAN_TAKE_OFF, lp);
@@ -189,6 +194,10 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 			
             if ((path = (s->airplane_in_region < s->max_capacity)))
 			{
+			
+				__store__(s->airplane_in_region, lp);
+				__store__(s->transit_req_accepted, lp);
+				
 				s->airplane_in_region++;
 				s->transit_req_accepted++;
 				
@@ -206,6 +215,7 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 			}
 			else
 			{
+				__store__(s->transit_req_rejected, lp);
 				s->transit_req_rejected++;
 				
 				ts = bs_rand_exponential2(s->rn, MEAN_DELAY, lp);
@@ -231,10 +241,12 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 		{
 			assert(lp->gid < NUMBER_OF_REGION_CONTROLLER);
 			
-			int path = 0;
 			int next_region = bs_rand_integer2(s->rn, 0, NUMBER_OF_REGION_CONTROLLER-1, lp);
+			
+			__store__(s->airplane_in_region, lp);
 			s->airplane_in_region--;
 
+			int path = 0;
             if ((path = (next_region == msg->dest_region)))
 			{
 				ts = bs_rand_exponential2(s->rn, MEAN_LAND, lp);
@@ -291,6 +303,9 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 			
             if ((path = (s->runway_in_use < s->max_runway))) 
             {
+				__store__(s->runway_in_use, lp);
+				__store__(s->landing_req_accepted, lp);
+				
                 s->runway_in_use++;
                 s->landing_req_accepted++;
 								
@@ -308,6 +323,8 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
             }
             else
             {
+				__store__(s->landing_req_rejected, lp);
+				
 				s->landing_req_rejected++;
 				
 				ts = bs_rand_exponential2(s->rn, MEAN_DELAY, lp);
@@ -384,6 +401,7 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 			
 		case ARRIVAL:
 		{
+			__store__(s->runway_in_use, lp);
 			s->runway_in_use--;
 
 			int dest = bs_rand_integer2(s->rn, NUMBER_OF_REGION_CONTROLLER, NUMBER_OF_LP-1, lp);
@@ -419,18 +437,19 @@ rc_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 			assert(path >= 0);
 			
 			if (path) {
+				
 				bs_rand_rvs(s->rn, lp);
 				bs_rand_rvs(s->rn, lp);
 				bs_rand_rvs(s->rn, lp);
 				
-                s->dep_req_accepted--;
-				s->runway_in_use--;
+				__restore__(s->dep_req_accepted, lp);
+				__restore__(s->runway_in_use, lp);
+				
 			}
 			else {
 				
 				bs_rand_rvs(s->rn, lp);
-				
-				s->dep_req_rejected--;
+				__restore__(s->dep_req_rejected, lp);
 			}
 			
 			bs_rand_rvs(s->rn, lp);
@@ -461,9 +480,8 @@ rc_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 			//cout<<"RE-TAKE_OFF"<<endl;
 
 			bs_rand_rvs(s->rn, lp);
-
-            s->runway_in_use++;
-					
+			__restore__(s->runway_in_use, lp);
+			
             break;
         }  
             
@@ -475,17 +493,17 @@ rc_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 			__restore__(path, lp);
 			assert(path >= 0);
 			
-			if (path) {
+			if (path) 
+			{
 				bs_rand_rvs(s->rn, lp);
-				
-				s->airplane_in_region--;
-				s->transit_req_accepted--;
+				__restore__(s->transit_req_accepted, lp);
+				__restore__(s->airplane_in_region, lp);
 			}
-			else {
-				
+			else 
+			{
 				bs_rand_rvs(s->rn, lp);
 				
-				s->transit_req_rejected--;
+				__restore__(s->transit_req_rejected, lp);
 			}
 			
             break;
@@ -508,7 +526,7 @@ rc_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 				
 			}
 			
-			s->airplane_in_region++;
+			__restore__(s->airplane_in_region, lp);
 			bs_rand_rvs(s->rn, lp);
 
             break;
@@ -530,14 +548,14 @@ rc_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 			if (path)
 			{
 				bs_rand_rvs(s->rn, lp);
-				s->runway_in_use--;
-                s->landing_req_accepted--;
+				__restore__(s->landing_req_accepted, lp);
+				__restore__(s->runway_in_use, lp);
 				
 			}
 			else
 			{
 				bs_rand_rvs(s->rn, lp);
-				s->landing_req_rejected--;
+				__restore__(s->landing_req_rejected, lp);
 
 			}
 			
@@ -572,7 +590,7 @@ rc_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
             bs_rand_rvs(s->rn, lp);
             bs_rand_rvs(s->rn, lp);
 			
-			s->runway_in_use++;
+			__restore__(s->runway_in_use, lp);
 
             break;
         }
@@ -660,8 +678,9 @@ main(int argc, char **argv, char **env)
      init graph
      */
     
-    //graph = new Graph(20);
-    //graph->create_graph(GRAPH_CSV_FILE_PATH);
+    graph = new Graph(20);
+    graph->create_graph(GRAPH_CSV_FILE_PATH);
+	
     /*
      We have two different LPs
      One represents an airport
