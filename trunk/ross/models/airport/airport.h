@@ -41,7 +41,7 @@ struct airport_message
 
 	tw_stime	 waiting_time;
 	tw_stime	 saved_furthest_flight_landing;
-
+    int msg_from;
 };
 
 #define NUMBER_OF_LP 1024
@@ -53,8 +53,8 @@ static int sqrt_nlp = 0;
 static int sqrt_nlp_1 =0;
 
 static tw_stime	 mean_flight_time = 1;
-static int       opt_mem = 1000;
-static int	 planes_per_airport = 1;
+static int       opt_mem = 10000;
+static int	 planes_per_airport = 10;
 
 static tw_stime	 wait_time_avg = 0.0;
 
