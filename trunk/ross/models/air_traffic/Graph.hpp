@@ -9,6 +9,7 @@ public:
     
     void create_graph(const char *path);
     std::deque<int> get_shortest_path(int from, int to);
+	void print_adjmatrix();
     
 private:
     float** adjMatrix;

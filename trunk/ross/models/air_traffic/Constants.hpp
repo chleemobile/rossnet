@@ -1,11 +1,11 @@
 
-const char *GRAPH_CSV_FILE_PATH = "adjlist_csv.csv";
+const char *GRAPH_CSV_FILE_PATH = "adjlist.csv";
 
 const int DEBUG = 0;
 
-const int NUMBER_OF_LP = 16384;
-const int NUMBER_OF_REGION_CONTROLLER = 50;
-const int NUMBER_OF_PLANES_PER_AIRPORT = 1;
+const int NUMBER_OF_LP = 348;
+const int NUMBER_OF_REGION_CONTROLLER = 20;
+const int NUMBER_OF_PLANES_PER_AIRPORT = 10;
 
 const float MEAN_DEQ = 5.0;
 const float MEAN_ARRIVAL = 6.2;

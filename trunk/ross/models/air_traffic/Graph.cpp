@@ -24,12 +24,20 @@ void Graph::create_graph(const char *path)
 	ifstream infile;
 	string line;
 	infile.open(path, ifstream::in);
-    
+		
+	//allocate 
     adjMatrix = new float*[num_node];
 
     for (int i=0; i<num_node; i++) {
         adjMatrix[i] = new float[num_node];
     }
+	
+	//reset
+	for(int i=0; i < num_node; i++){
+		for (int j=0; j<num_node; j++) {
+			adjMatrix[i][j] = -1;
+		}
+	}
     
 	if(infile.is_open())
 	{
@@ -45,6 +53,7 @@ void Graph::create_graph(const char *path)
                 if(item !="")
                 {
                     weight = atoi(item.c_str());
+					//cout <<i<<","<<weight<<endl;
                 }
 				adjMatrix[i][j] = weight;
 				j++;
@@ -129,3 +138,14 @@ int Graph::closest_node(float* dist, bool* marked, int source)
 	}
 	return closest_node;
 }
+
+void Graph::print_adjmatrix()
+{
+	for(int i=0; i < num_node; i++){
+		for (int j=0; j<num_node; j++) {
+			cout<<adjMatrix[i][j]<<",";
+		}
+		cout << ""<<endl;;
+	}
+}
+

@@ -98,8 +98,21 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
                 s->runway_in_use++;
                 s->dep_req_accepted++;
 				
-				int dest_region = bs_rand_integer2(s->rn, 0, NUMBER_OF_REGION_CONTROLLER-1, lp);
+				
 				int dest_airport = bs_rand_integer2(s->rn, NUMBER_OF_REGION_CONTROLLER, NUMBER_OF_LP-1, lp);
+				int source_region = get_region(lp->gid);
+				int dest_region = get_region(dest_airport);
+				
+				deque<int> p = graph->get_shortest_path(0, 19);
+                int next_region = 0;
+                
+                if (p.size() != 1) 
+				{
+					p.back();
+                    dest_region = p.back();
+                }
+				
+				
 				ts = bs_rand_exponential2(s->rn, MEAN_DEQ, lp);
 				ts += weather;
 				
@@ -440,7 +453,6 @@ rc_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 				
 				bs_rand_rvs(s->rn, lp);
 				bs_rand_rvs(s->rn, lp);
-				bs_rand_rvs(s->rn, lp);
 				
 				__restore__(s->dep_req_accepted, lp);
 				__restore__(s->runway_in_use, lp);
@@ -677,10 +689,13 @@ main(int argc, char **argv, char **env)
     /*
      init graph
      */
-    
+
+	cout<<"buillding a graph"<<endl;
+
     graph = new Graph(20);
     graph->create_graph(GRAPH_CSV_FILE_PATH);
-	
+	//graph->print_adjmatrix();
+	cout<<"done"<<endl;
     /*
      We have two different LPs
      One represents an airport
@@ -723,3 +738,92 @@ main(int argc, char **argv, char **env)
 	return 0;
 }
 
+int get_region(int airport)
+{
+    if(airport >=20 && airport <= 38)
+    {
+        return 0;
+    }
+    else if(airport >=39 && airport <= 53)
+    {
+        return 1;
+    }
+    else if(airport >=54 && airport <= 72)
+    {
+        return 2;
+    }
+    else if(airport >=73 && airport <= 92)
+    {
+        return 3;
+    }
+    else if(airport >=93 && airport <= 109)
+    {
+        return 4;
+    }    
+    else if(airport >=110 && airport <= 114)
+    {
+        return 5;
+    }
+    else if(airport >=115 && airport <= 148)
+    {
+        return 6;
+    }    
+    else if(airport >=149 && airport <= 166)
+    {
+        return 7;
+    }    
+    else if(airport >=167 && airport <= 180)
+    {
+        return 8;
+    }
+    else if(airport >=181 && airport <= 201)
+    {
+        return 9;
+    }
+    else if(airport >=202 && airport <= 214)
+    {
+        return 10;
+    }
+    else if(airport >=215 && airport <= 226)
+    {
+        return 11;
+    }
+    else if(airport >=227 && airport <= 243)
+    {
+        return 12;
+    }    
+    else if(airport >=244 && airport <= 254)
+    {
+        return 13;
+    }    
+    else if(airport >=255 && airport <= 269)
+    {
+        return 14;
+    }    
+    else if(airport >=270 && airport <= 294)
+    {
+        return 15;
+    }    
+    else if(airport >=295 && airport <= 302)
+    {
+        return 16;
+    }    
+    else if(airport >=303 && airport <= 318)
+    {
+        return 17;
+    }        
+    else if(airport >=319 && airport <= 337)
+    {
+        return 18;
+    }    
+    else if(airport >=338 && airport <= 347)
+    {
+        return 19;
+    }   
+    else
+    {
+        cout<<"airport region failed"<<endl;
+        assert(false);
+    }
+    
+}
