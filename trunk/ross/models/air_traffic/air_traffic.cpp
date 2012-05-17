@@ -406,7 +406,7 @@ event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * 
 			
 			int dest = bs_rand_integer(s->rn, NUMBER_OF_REGION_CONTROLLER, NUMBER_OF_LP-1);
 			
-			ts = bs_rand_exponential2(s->rn, MEAN_LAND, lp);
+			ts = bs_rand_exponential(s->rn, MEAN_LAND);
 			
             e = tw_event_new(dest, ts, lp);
 			
