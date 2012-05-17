@@ -102,31 +102,6 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 				int dest_airport = bs_rand_integer2(s->rn, NUMBER_OF_REGION_CONTROLLER, NUMBER_OF_LP-1, lp);
 				int dest_region = get_region(dest_airport);
 				
-				
-				//indecies are one off in the dijkstra alogirthm
-				//but will print the path after adding 1 to the value
-				
-				//				deque<int> p = graph->get_shortest_path(source_region, dest_region);
-				//                
-				//                if (p.size() != 1) 
-				//				{
-				//					p.pop_front();
-				//                    dest_region = p.front();
-				//					//cout << dest_region<<endl;
-				//                }
-				//				else {
-				//					assert(source_region == dest_region);
-				//				}
-				
-				
-				//				while (!p.empty()) {
-				//					cout << p.front()<<",";
-				//					p.pop_front( );
-				//				}
-				//				cout <<""<<endl;
-				
-				//assert(false);
-				
 				ts = bs_rand_exponential2(s->rn, MEAN_DEQ, lp);
 				ts += weather;
 				
