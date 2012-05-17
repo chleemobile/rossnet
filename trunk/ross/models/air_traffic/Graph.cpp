@@ -49,12 +49,9 @@ void Graph::create_graph(const char *path)
 			int j=0;
 			while (getline (linestream, item, ','))
 			{
-                int weight = -1;
-                if(item !="")
-                {
-                    weight = atoi(item.c_str());
-					//cout <<i<<","<<weight<<endl;
-                }
+				int weight = atoi(item.c_str());
+				//cout <<i<<","<<weight<<endl;
+                
 				adjMatrix[i][j] = weight;
 				j++;
 			}
@@ -115,13 +112,11 @@ deque<int> Graph::get_shortest_path(int source, int dest)
     while(1){
 		if(prev[v] == -1){break;}
         //cout<<prev[v]+1<<endl;
-        ret.push_back(prev[v]);
+        ret.push_front(prev[v]);
         v=prev[v];
 	}
-    ret.push_front(dest);
+    ret.push_back(dest);
     
-//    cout<<""<<endl;
-
     return ret;
 }
 

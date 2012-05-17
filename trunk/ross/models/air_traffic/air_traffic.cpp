@@ -103,15 +103,30 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 				int source_region = get_region(lp->gid);
 				int dest_region = get_region(dest_airport);
 				
-				deque<int> p = graph->get_shortest_path(0, 19);
-                int next_region = 0;
+				
+				//indecies are one off in the dijkstra alogirthm
+				//but will print the path after adding 1 to the value
+				
+				deque<int> p = graph->get_shortest_path(source_region, dest_region);
                 
                 if (p.size() != 1) 
 				{
-					p.back();
-                    dest_region = p.back();
+					p.pop_front();
+                    dest_region = p.front();
+					//cout << dest_region<<endl;
                 }
+				else {
+					assert(source_region == dest_region);
+				}
+
 				
+//				while (!p.empty()) {
+//					cout << p.front()<<",";
+//					p.pop_front( );
+//				}
+//				cout <<""<<endl;
+				
+				//assert(false);
 				
 				ts = bs_rand_exponential2(s->rn, MEAN_DEQ, lp);
 				ts += weather;
@@ -170,7 +185,7 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 			
 			ts = bs_rand_exponential2(s->rn, MEAN_TAXI, lp);
 			
-            e = tw_event_new(msg->dest_region, ts, lp);
+            e = tw_event_new(lp->gid, ts, lp);
 			
             m = (air_traffic_message*)tw_event_data(e);
             m->type = TAKE_OFF;
@@ -255,6 +270,28 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 			assert(lp->gid < NUMBER_OF_REGION_CONTROLLER);
 			
 			int next_region = bs_rand_integer2(s->rn, 0, NUMBER_OF_REGION_CONTROLLER-1, lp);
+	
+			cout << lp->gid<<" to "<<msg->dest_region<<endl;
+			deque<int> p = graph->get_shortest_path(lp->gid, msg->dest_region);
+			
+			if (p.size() == 1) 
+			{
+				assert(lp->gid == msg->dest_region);
+				next_region = msg->dest_region;
+				//cout << "dest"<<endl;
+			}
+			else 
+			{
+				p.pop_front();
+				next_region = p.front();
+				cout << "arrived"<<endl;
+			}
+			
+			while (!p.empty()) {
+				cout << p.front()<<",";
+				p.pop_front( );
+			}
+			cout <<""<<endl;
 			
 			__store__(s->airplane_in_region, lp);
 			s->airplane_in_region--;
