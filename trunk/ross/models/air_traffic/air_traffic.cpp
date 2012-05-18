@@ -38,7 +38,16 @@ init(airport_state * s, tw_lp * lp)
     
     if(lp->gid <NUMBER_OF_REGION_CONTROLLER)
     {
-        s->max_capacity = AIRCRAFT_CAPACITY_OF_LARGE_REGION;
+		if (lp->gid == 4 || lp->gid == 5 || lp->gid == 8 || lp->gid == 11 || lp->gid == 13 || lp->gid == 16 ) {
+			s->max_capacity = AIRCRAFT_CAPACITY_OF_SMALL_REGION;			
+		}
+		else if(lp->gid == 0 || lp->gid == 1 || lp->gid == 3 || lp->gid == 7 || lp->gid == 10 || lp->gid == 12 || lp->gid == 14 || lp->gid == 18 || lp->gid == 19 ) {
+			s->max_capacity = AIRCRAFT_CAPACITY_OF_MEDIUM_REGION;			
+		}
+		else {
+			s->max_capacity = AIRCRAFT_CAPACITY_OF_LARGE_REGION;			
+		}
+
         s->airplane_in_region = 0;
         
         s->transit_req_accepted = 0;
@@ -47,7 +56,76 @@ init(airport_state * s, tw_lp * lp)
     }
     else
     {
-        s->max_runway = NUMBER_OF_RUNWAY_NH_AIRPORT;
+		if (lp->gid == 20 ||
+            lp->gid == 39 ||
+            lp->gid == 73 ||
+            lp->gid == 93 ||            
+            lp->gid == 115||
+            lp->gid == 149||            
+            lp->gid == 167||
+            lp->gid == 181||            
+            lp->gid == 227||            
+            lp->gid == 244||                        
+            lp->gid == 319||                        
+            (lp->gid >= 54 && lp->gid <= 56)   ||
+            (lp->gid >= 202 && lp->gid <= 203) ||            
+            (lp->gid >= 255 && lp->gid <= 256) ||                        
+            (lp->gid >= 270 && lp->gid <= 272) ||    
+            (lp->gid >= 295 && lp->gid <= 296) ||                
+            (lp->gid >= 303 && lp->gid <= 305) ||                
+            (lp->gid >= 338 && lp->gid <= 340) )
+        {
+            s->max_runway = NUMBER_OF_RUNWAY_LARGE_AIRPORT;
+        }
+        else if (lp->gid == 21 ||
+                 lp->gid == 39 ||
+                 lp->gid == 110 ||
+                 lp->gid == 116 ||
+                 lp->gid == 168 ||
+                 lp->gid == 204 ||
+                 lp->gid == 320 ||                 
+                 (lp->gid >= 40 && lp->gid <= 43)   ||
+                 (lp->gid >= 57 && lp->gid <= 59)   ||                 
+                 (lp->gid >= 150 && lp->gid <= 152) ||
+                 (lp->gid >= 182 && lp->gid <= 185) ||
+                 (lp->gid >= 215 && lp->gid <= 216) ||                 
+                 (lp->gid >= 228 && lp->gid <= 230) ||                                  
+                 (lp->gid >= 245 && lp->gid <= 246) ||                 
+                 (lp->gid >= 273 && lp->gid <= 275) ||                                  
+                 (lp->gid >= 306 && lp->gid <= 307) ||                                                   
+                 (lp->gid >= 341 && lp->gid <= 342))                                                                       
+        {
+            s->max_runway = NUMBER_OF_RUNWAY_MEDIUM_AIRPORT;
+        }
+        else if (lp->gid == 22 ||
+                 lp->gid == 44 ||
+                 lp->gid == 94 ||
+                 lp->gid == 343||            
+                 (lp->gid >= 60 && lp->gid <= 62)   ||
+                 (lp->gid >= 74 && lp->gid <= 75) ||
+                 (lp->gid >= 111 && lp->gid <= 112) ||
+                 (lp->gid >= 117 && lp->gid <= 120) ||                                  
+                 (lp->gid >= 153 && lp->gid <= 155) ||                                  
+                 (lp->gid >= 169 && lp->gid <= 171) ||                 
+                 (lp->gid >= 186 && lp->gid <= 188) ||                 
+                 (lp->gid >= 205 && lp->gid <= 207) ||
+                 (lp->gid >= 217 && lp->gid <= 219) ||                 
+                 (lp->gid >= 231 && lp->gid <= 234) ||                 
+                 (lp->gid >= 247 && lp->gid <= 250) ||                                  
+                 (lp->gid >= 257 && lp->gid <= 261) ||                                  
+                 (lp->gid >= 276 && lp->gid <= 281) ||                                                   
+                 (lp->gid >= 297 && lp->gid <= 298) ||                                                   
+                 (lp->gid >= 308 && lp->gid <= 310) ||                                                   
+                 (lp->gid >= 321 && lp->gid <= 327))
+        {
+            s->max_runway = NUMBER_OF_RUNWAY_SMALL_AIRPORT;
+        }
+        else
+        {
+            s->max_runway = NUMBER_OF_RUNWAY_NH_AIRPORT;
+            
+        }
+		
         
         s->runway_in_use=0;
         
@@ -417,7 +495,6 @@ event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * 
             
             break;
 		}
-			
 			
     }
 }
@@ -1049,7 +1126,7 @@ final(airport_state * s, tw_lp * lp)
 /*
  Parallel Running
  */
-/*
+
 tw_lptype airport_lps[] =
 {
 	{
@@ -1062,11 +1139,12 @@ tw_lptype airport_lps[] =
 	},
 	{0},
 };
-*/
+
 
 /*
  Sequential Running
  */
+/*
 tw_lptype airport_lps[] =
 {
 	{
@@ -1079,7 +1157,7 @@ tw_lptype airport_lps[] =
 	},
 	{0},
 };
-
+*/
 
 const tw_optdef app_opt [] =
 {
@@ -1094,6 +1172,10 @@ const tw_optdef app_opt [] =
 int
 main(int argc, char **argv, char **env)
 {
+	cout << "################# "<<endl;
+	cout << "ROSE" << endl;;
+	cout << "################# "<<endl;
+	
 	int i;
     
 	tw_opt_add(app_opt);
@@ -1101,8 +1183,8 @@ main(int argc, char **argv, char **env)
     
 	nlp_per_pe /= (tw_nnodes() * g_tw_npe);
     
-    cout<<"tw_nnode "<<tw_nnodes()<<endl;
-    cout<<"g_tw "<<g_tw_npe<<endl;
+    //cout<<"tw_nnode "<<tw_nnodes()<<endl;
+    //cout<<"g_tw "<<g_tw_npe<<endl;
     
 	g_tw_events_per_pe =(planes_per_airport * nlp_per_pe / g_tw_npe) + opt_mem;
 	tw_define_lps(nlp_per_pe, sizeof(air_traffic_message), 0);
