@@ -23,72 +23,23 @@ int get_region(int airport);
 tw_peid
 mapping(tw_lpid gid)
 {
-	int n_cores = tw_nnodes();
-	if (n_cores == 1) 
-	{
-		//no mapping is required
-		return (tw_peid) gid / g_tw_nlp;		
-	}
-	else if(n_cores == 2)
-	{
-		return (tw_peid) gid / g_tw_nlp;		
-
-		//cout << gid <<"/"<<g_tw_nlp<<"="<<gid / g_tw_nlp<<endl;
-		static int temp =0;
-		int ret = 0;
-		if(temp%2)
-			ret=1;
-		else {
-			ret=0;
-		}
-		temp++;
-		cout<<ret<<" for "<<gid<<endl;
-		return (tw_peid)ret;
-
-//		int temp = gid;
-//		int ret=0;
-//		if (temp >= NUMBER_OF_REGION_CONTROLLER) 
-//			temp = get_region(gid);
-//		
-//		if(temp == 0 || temp == 1 || temp == 3 || temp == 4 || temp == 6 || temp == 10 || temp == 12 || temp == 15 || temp == 16 || temp == 17 ) 
-//			ret = (tw_peid) 0;
-//		else if (temp == 2 || temp == 5 || temp == 7 || temp == 8 || temp == 9 || temp == 11 || temp == 13 || temp == 14 || temp == 18 || temp == 19)
-//			ret= (tw_peid) 1;
-//		else
-//		{
-//			cout << "invalid mapping number" <<endl;
-//			assert(false);
-//		}
-//		cout << gid <<" mapped to "<<ret<<endl;
-		
-	}
-	else if(n_cores == 4)
-	{
-		return (tw_peid) gid / g_tw_nlp;		
-		
-		if (gid >= NUMBER_OF_REGION_CONTROLLER) 
-			gid = get_region(gid);
-		
-		if(gid == 0 || gid == 1 || gid == 3 || gid == 4 || gid == 6)
-			return 0;
-		else if (gid == 10 || gid == 12 || gid == 15 || gid == 16 || gid == 17 )
-			return 1;
-		else if (gid == 2 || gid == 5 || gid == 7 || gid == 8 || gid == 9 )
-			return 2;
-		else if (gid == 11 || gid == 13 || gid == 14 || gid == 18 || gid == 19 )
-			return 3;
-		else 
-		{
-			cout << "invalid mapping number" <<endl;
-			assert(false);
-		}
-
-	}
-	else 
-	{
-		cout<<"Can handle only upto 4 cores"<<endl;
-		assert(false);
-	}
+    
+    if (gid == 0) {
+        return 0;
+    }
+    else if (gid == 1)
+    {
+        return 0;
+    }
+    else if(gid ==100)
+        return 0;
+    else if(gid ==101)
+        return 0;
+    
+    if(gid < 174)
+        return 0;
+    else 
+        return 1;
 }
 
 void
@@ -102,7 +53,7 @@ init(airport_state * s, tw_lp * lp)
     tw_event *e;
     air_traffic_message *m;
 	s->rn=lp->gid;
-
+    
     if(lp->gid <NUMBER_OF_REGION_CONTROLLER)
     {
 		if (lp->gid == 4 || lp->gid == 5 || lp->gid == 8 || lp->gid == 11 || lp->gid == 13 || lp->gid == 16 ) {
@@ -114,7 +65,7 @@ init(airport_state * s, tw_lp * lp)
 		else {
 			s->max_capacity = AIRCRAFT_CAPACITY_OF_LARGE_REGION;			
 		}
-
+        
         s->airplane_in_region = 0;
         
         s->transit_req_accepted = 0;
@@ -347,7 +298,7 @@ event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * 
 			
             if (s->airplane_in_region < s->max_capacity)
 			{
-							
+                
 				s->airplane_in_region++;
 				s->transit_req_accepted++;
 				
@@ -380,7 +331,7 @@ event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * 
 			}
 			
             tw_event_send(e);
-						
+            
 			break;
 		}
 			
@@ -429,7 +380,7 @@ event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * 
 			}
 			
 			tw_event_send(e);
-						
+            
 			break;
 		}
 			
@@ -453,7 +404,7 @@ event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * 
         case LANDING_REQ:
         {
 			int weather = bs_rand_integer(s->rn, 0, 3);
-						
+            
             if (s->runway_in_use < s->max_runway)
             {
                 s->runway_in_use++;
@@ -490,7 +441,7 @@ event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * 
             }
 			
 			tw_event_send(e);
-						
+            
             break;
         }
 			
@@ -585,7 +536,7 @@ p_init(airport_state * s, tw_lp * lp)
     air_traffic_message *m;
     
 	s->rn=lp->gid;
-
+    
     if(lp->gid <NUMBER_OF_REGION_CONTROLLER)
     {
 		if (lp->gid == 4 || lp->gid == 5 || lp->gid == 8 || lp->gid == 11 || lp->gid == 13 || lp->gid == 16 ) {
@@ -1290,19 +1241,19 @@ tw_lptype airport_lps[] =
  Sequential Running
  */
 /*
-tw_lptype airport_lps[] =
-{
-	{
-		(init_f) init,
-		(event_f) event_handler,
-		(revent_f) rc_event_handler,
-		(final_f) final,
-		(map_f) mapping,
-		sizeof(airport_state),
-	},
-	{0},
-};
-*/
+ tw_lptype airport_lps[] =
+ {
+ {
+ (init_f) init,
+ (event_f) event_handler,
+ (revent_f) rc_event_handler,
+ (final_f) final,
+ (map_f) mapping,
+ sizeof(airport_state),
+ },
+ {0},
+ };
+ */
 
 const tw_optdef app_opt [] =
 {
@@ -1314,12 +1265,116 @@ const tw_optdef app_opt [] =
 	TWOPT_END()
 };
 
+static unsigned int nkp_per_pe = 16;
+
+void air_traffic_mapping()
+{
+    cout<<"air_traffic_mapping"<<endl;
+    
+    tw_pe	*pe;
+    
+	int	 nlp_per_kp;
+	int	 lpid;
+	int	 kpid;
+	int	 i;
+	int	 j;
+    
+    nlp_per_kp = ceil((double) g_tw_nlp / (double) g_tw_nkp);
+    
+    //    printf("nlp_per_kp : %d (g_tw_nlp, %d / g_tw_nkp, %d) \n", nlp_per_kp, g_tw_nlp, g_tw_nkp);
+    
+	if(!nlp_per_kp)
+		tw_error(TW_LOC, "Not enough KPs defined: %d", g_tw_nkp);
+    
+	g_tw_lp_offset = g_tw_mynode * g_tw_nlp;
+    
+    //    printf("g_tw_lp_offset = %d (g_tw_mynode,%d * g_tw_nlp, %d)\n", g_tw_lp_offset, g_tw_mynode, g_tw_nlp);
+    
+    kpid = 0;
+    lpid = 0;
+    
+    if(g_tw_mynode == 0)
+    {
+        printf("\tPE %d\n", tw_getpe(0)->id);
+        
+        for(i = 0; i < nkp_per_pe; i++, kpid++)
+        {
+            tw_kp_onpe(kpid, tw_getpe(0));
+            
+            printf("\t\tKP %d", kpid);
+            
+            for(j = 0; j < nlp_per_kp && lpid < g_tw_nlp; j++, lpid++)
+            {
+                
+                tw_lp_onpe(lpid, tw_getpe(0), g_tw_lp_offset+lpid);
+                tw_lp_onkp(g_tw_lp[lpid], g_tw_kp[kpid]); 
+                
+                if(0 == j % 20)
+                    printf("\n\t\t\t");
+                printf("%lld ", lpid+g_tw_lp_offset);
+            }
+            
+            printf("\n");
+        }
+    }
+    else
+    {
+        printf("\tPE %d\n", tw_getpe(0)->id);
+        
+        for(i = 0; i < nkp_per_pe; i++, kpid++)
+        {
+            tw_kp_onpe(kpid, tw_getpe(0));
+            
+            printf("\t\tKP %d", kpid);
+            
+            for(j = 0; j < nlp_per_kp && lpid < g_tw_nlp; j++, lpid++)
+            {
+                
+                tw_lp_onpe(lpid, tw_getpe(0), g_tw_lp_offset+lpid);
+                tw_lp_onkp(g_tw_lp[lpid], g_tw_kp[kpid]); 
+                
+                if(0 == j % 20)
+                    printf("\n\t\t\t");
+                printf("%lld ", lpid+g_tw_lp_offset);
+            }
+            
+            printf("\n");
+        }
+    }
+    
+    
+    //    for(kpid = 0, lpid = 0, pe = NULL; (pe = tw_pe_next(pe)); )
+    //	{
+    //		printf("\tPE %d\n", pe->id);
+    //        
+    //		for(i = 0; i < nkp_per_pe; i++, kpid++)
+    //		{
+    //			tw_kp_onpe(kpid, pe);
+    //            
+    //			printf("\t\tKP %d", kpid);
+    //            
+    //			for(j = 0; j < nlp_per_kp && lpid < g_tw_nlp; j++, lpid++)
+    //			{
+    //                
+    //                tw_lp_onpe(lpid, pe, g_tw_lp_offset+lpid);
+    //                tw_lp_onkp(g_tw_lp[lpid], g_tw_kp[kpid]); 
+    //                
+    //                if(0 == j % 20)
+    //                    printf("\n\t\t\t");
+    //                printf("%lld ", lpid+g_tw_lp_offset);
+    //			}
+    //            
+    //			printf("\n");
+    //		}
+    //	}
+}
+
 int
 main(int argc, char **argv, char **env)
 {
-	cout << "################# "<<endl;
+	cout << "####"<<endl;
 	cout << "ROSE" << endl;;
-	cout << "################# "<<endl;
+	cout << "####"<<endl;
 	
 	int i;
     
@@ -1328,31 +1383,21 @@ main(int argc, char **argv, char **env)
     
 	nlp_per_pe /= (tw_nnodes() * g_tw_npe);
     
-    //cout<<"tw_nnode "<<tw_nnodes()<<endl;
-    //cout<<"g_tw "<<g_tw_npe<<endl;
+    g_tw_mapping = CUSTOM;
+    g_tw_custom_initial_mapping = &air_traffic_mapping;
+    
     
 	g_tw_events_per_pe =(planes_per_airport * nlp_per_pe / g_tw_npe) + opt_mem;
 	tw_define_lps(nlp_per_pe, sizeof(air_traffic_message), 0);
     
-    /*
-     init graph
-     */
-	
-	cout<<"buillding a graph"<<endl;
-	
+    
     graph = new Graph(20);
     graph->create_graph(GRAPH_CSV_FILE_PATH);
 	//graph->print_adjmatrix();
-	cout<<"done"<<endl;
-    /*
-     We have two different LPs
-     One represents an airport
-     The other one represents Region Controller
-     */
+    
 	for(i = 0; i < g_tw_nlp; i++)
 		tw_lp_settype(i, &airport_lps[0]);
-
-    cout << "before tw_run"<<endl;
+    
 	tw_run();
     
 	if(tw_ismaster())
@@ -1397,25 +1442,25 @@ int get_region(int airport)
     {
         return 1;
     }
-    else if(airport >=54 && airport <= 72)
-    {
-        return 2;
-    }
-    else if(airport >=73 && airport <= 92)
+    else if(airport >=54 && airport <= 73)
     {
         return 3;
     }
-    else if(airport >=93 && airport <= 109)
+    else if(airport >=74 && airport <= 90)
     {
         return 4;
-    }    
-    else if(airport >=110 && airport <= 114)
-    {
-        return 5;
     }
-    else if(airport >=115 && airport <= 148)
+    else if(airport >=91 && airport <= 124)
     {
         return 6;
+    }    
+    else if(airport >=125 && airport <= 143)
+    {
+        return 2;
+    }
+    else if(airport >=144 && airport <= 148)
+    {
+        return 5;
     }    
     else if(airport >=149 && airport <= 166)
     {
@@ -1433,33 +1478,33 @@ int get_region(int airport)
     {
         return 10;
     }
-    else if(airport >=215 && airport <= 226)
-    {
-        return 11;
-    }
-    else if(airport >=227 && airport <= 243)
+    else if(airport >=215 && airport <= 231)
     {
         return 12;
-    }    
-    else if(airport >=244 && airport <= 254)
-    {
-        return 13;
-    }    
-    else if(airport >=255 && airport <= 269)
-    {
-        return 14;
-    }    
-    else if(airport >=270 && airport <= 294)
+    }
+    else if(airport >=232 && airport <= 256)
     {
         return 15;
     }    
-    else if(airport >=295 && airport <= 302)
+    else if(airport >=257 && airport <= 264)
     {
         return 16;
     }    
-    else if(airport >=303 && airport <= 318)
+    else if(airport >=265 && airport <= 280)
     {
         return 17;
+    }    
+    else if(airport >=281 && airport <= 292)
+    {
+        return 11;
+    }    
+    else if(airport >=293 && airport <= 303)
+    {
+        return 13;
+    }    
+    else if(airport >=304 && airport <= 318)
+    {
+        return 14;
     }        
     else if(airport >=319 && airport <= 337)
     {
