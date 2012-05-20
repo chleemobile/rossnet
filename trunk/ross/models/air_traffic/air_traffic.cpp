@@ -23,23 +23,16 @@ int get_region(int airport);
 tw_peid
 mapping(tw_lpid gid)
 {
-    
-    if (gid == 0) {
-        return 0;
-    }
-    else if (gid == 1)
+    if(gid < 10 || (gid >= 20 && gid <= 183))
     {
+        cout<<gid<<" return 0"<<endl;
         return 0;
     }
-    else if(gid ==100)
-        return 0;
-    else if(gid ==101)
-        return 0;
-    
-    if(gid < 174)
-        return 0;
-    else 
+    else
+    {
+        cout<<gid<<" return 1"<<endl;
         return 1;
+    }
 }
 
 void
@@ -1296,7 +1289,7 @@ void air_traffic_mapping()
     if(g_tw_mynode == 0)
     {
         printf("\tPE %d\n", tw_getpe(0)->id);
-        
+                
         for(i = 0; i < nkp_per_pe; i++, kpid++)
         {
             tw_kp_onpe(kpid, tw_getpe(0));
@@ -1306,12 +1299,16 @@ void air_traffic_mapping()
             for(j = 0; j < nlp_per_kp && lpid < g_tw_nlp; j++, lpid++)
             {
                 
-                tw_lp_onpe(lpid, tw_getpe(0), g_tw_lp_offset+lpid);
+                int t_lpid = 0;
+                if(lpid >= 10)
+                    t_lpid += 10;
+                
+                tw_lp_onpe(lpid, tw_getpe(0), g_tw_lp_offset+lpid+t_lpid);
                 tw_lp_onkp(g_tw_lp[lpid], g_tw_kp[kpid]); 
                 
                 if(0 == j % 20)
                     printf("\n\t\t\t");
-                printf("%lld ", lpid+g_tw_lp_offset);
+                printf("%lld ", lpid+g_tw_lp_offset+t_lpid);
             }
             
             printf("\n");
@@ -1330,12 +1327,16 @@ void air_traffic_mapping()
             for(j = 0; j < nlp_per_kp && lpid < g_tw_nlp; j++, lpid++)
             {
                 
-                tw_lp_onpe(lpid, tw_getpe(0), g_tw_lp_offset+lpid);
+                int t_lpid = 0;
+                if((lpid >= 0 && lpid <= 9))
+                    t_lpid = -164;
+                
+                tw_lp_onpe(lpid, tw_getpe(0), g_tw_lp_offset+lpid+t_lpid);
                 tw_lp_onkp(g_tw_lp[lpid], g_tw_kp[kpid]); 
                 
                 if(0 == j % 20)
                     printf("\n\t\t\t");
-                printf("%lld ", lpid+g_tw_lp_offset);
+                printf("%lld ", lpid+g_tw_lp_offset+t_lpid);
             }
             
             printf("\n");
