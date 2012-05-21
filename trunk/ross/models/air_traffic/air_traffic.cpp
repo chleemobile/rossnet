@@ -20,21 +20,56 @@
 int get_region(int airport);
 int mapping_to_local_index(int lpid);
 
+static int path_cal=0;
+
+
 tw_peid
 mapping(tw_lpid gid)
 {    
-    //return gid/nlp_per_pe;
     
-    if(gid < 10 || (gid >= 20 && gid <= 183))
-    {
-        //cout<<gid<<" return 0"<<endl;
-        return 0;
-    }
-    else
-    {
-        //cout<<gid<<" return 1"<<endl;
-        return 1;
-    }
+	if(tw_nnodes() == 1)
+	{
+		return gid/nlp_per_pe;
+	}
+	else if(tw_nnodes() == 2)
+	{
+		if(gid < 10 || (gid >= 20 && gid <= 183))
+		{
+			//cout<<gid<<" return 0"<<endl;
+			return 0;
+		}
+		else
+		{
+			//cout<<gid<<" return 1"<<endl;
+			return 1;
+		}
+		
+	}
+	else if(tw_nnodes() == 4)
+	{
+		if((gid >= 0 && gid <= 4) || (gid >= 20 && gid <= 101))
+		{
+			return 0;
+		}
+		else if((gid >= 5 && gid <= 9) || (gid >= 102 && gid <= 183))
+		{
+			return 1;
+		}
+		else if((gid >= 10 && gid <= 14) || (gid >= 184 && gid <= 265))
+		{
+			return 2;
+		}
+		else 
+		{
+			return 3;
+		}
+	}
+	else 
+	{
+		cout << "support upto 4 cores"<<endl;
+		assert(false);
+	}
+	
 }
 
 void
@@ -748,6 +783,7 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 			__store__(s->runway_in_use, lp);
             s->runway_in_use--;
 			
+			path_cal++;
 			
 			int src_region = get_region(lp->gid);
 			int next_region =-1;
@@ -800,7 +836,8 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 				m->dest_airport = msg->dest_airport;
 				m->msg_from = lp->gid;
 				
-				
+				tw_event_send(e);
+
 			}
 			else
 			{
@@ -817,9 +854,10 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 				m->dest_airport = msg->dest_airport;
 				m->msg_from = lp->gid;
 				
+				tw_event_send(e);
+
 			}
 			
-            tw_event_send(e);
 			
 			__store__(path,lp);
 			
@@ -829,6 +867,8 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 		case ON_THE_AIR:
 		{
 			assert(lp->gid < NUMBER_OF_REGION_CONTROLLER);
+
+			path_cal++;
 			
 			int next_region = bs_rand_integer2(s->rn, 0, NUMBER_OF_REGION_CONTROLLER-1, lp);
 			
@@ -921,6 +961,8 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 				m->dest_airport = msg->dest_airport;
 				m->msg_from = lp->gid;
 				
+				tw_event_send(e);
+
             }
             else
             {
@@ -939,10 +981,10 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 				m->dest_airport = msg->dest_airport;
 				m->msg_from = lp->gid;
 				
-				
+				tw_event_send(e);
+
             }
 			
-			tw_event_send(e);
 			
 			__store__(path,lp);
 			
@@ -1262,48 +1304,134 @@ const tw_optdef app_opt [] =
 
 tw_lp* mapping_to_lp(tw_lpid lpid) 
 {
-    int index = lpid;
-    
-    if(g_tw_mynode ==0)
-    {
-        if(lpid >= 20)
-        {
-            assert(lpid < 184);
-            index = index - 10;
-        }
-    }
-    else
-    {
-        if(lpid >= 10 && lpid <= 19)
-            index = index + 164;
-        index = index - 174;
-    }
-    
-    //printf("%d -> %d \n", lpid, ret);
-    return g_tw_lp[index];
+    int ret = lpid;
+	
+	if(tw_nnodes() == 2)
+	{
+		if(g_tw_mynode == 0)
+		{
+			if(lpid >= 20)
+			{
+				assert(lpid < 184);
+				ret = ret - 10;
+			}
+		}
+		else
+		{
+			if(lpid >= 10 && lpid <= 19)
+				ret = ret + 164;
+			ret = ret - 174;
+		}
+		
+	}
+	else if (tw_nnodes() == 4) 
+	{
+		if(g_tw_mynode == 0)
+		{
+			if(lpid >= 20 && lpid <= 101)
+			{
+				ret = ret - 15;
+			}
+		}
+		else if (g_tw_mynode == 1)
+		{
+			if(lpid >= 5 && lpid <= 9)
+				ret = ret + 82;
+			if(lpid >= 102 && lpid <= 183)
+				ret = ret - 10;
+			
+			ret = ret - 87;
+		}
+		else if (g_tw_mynode == 2)
+		{
+			if(lpid >= 10 && lpid <= 14)
+				ret = ret + 164;
+			if(lpid >= 184 && lpid <= 265)
+				ret = ret - 5;
+			
+			ret = ret - 174;
+		}
+		else 
+		{
+			if(lpid >= 15 && lpid <= 19)
+				ret = ret + 246;
+			
+			ret = ret - 261;
+		}
+	}
+	else 
+	{
+		cout << "Only support upto 4 cores "<<endl;;
+		assert(false);
+	}
+	
+    return g_tw_lp[ret];
 }
 
 int mapping_to_local_index(int lpid)
 {
     //    return lpid;
-    
+	
     int ret = lpid;
-    
-    if(g_tw_mynode ==0)
-    {
-        if(lpid >= 20)
-        {
-            assert(lpid < 184);
-            ret = ret - 10;
-        }
-    }
-    else
-    {
-        if(lpid >= 10 && lpid <= 19)
-            ret = ret + 164;
-        ret = ret - 174;
-    }
-    
+	if(tw_nnodes() == 2)
+	{
+		if(g_tw_mynode == 0)
+		{
+			if(lpid >= 20)
+			{
+				assert(lpid < 184);
+				ret = ret - 10;
+			}
+		}
+		else
+		{
+			if(lpid >= 10 && lpid <= 19)
+				ret = ret + 164;
+			ret = ret - 174;
+		}
+		
+	}
+	else if (tw_nnodes() == 4) 
+	{
+		if(g_tw_mynode == 0)
+		{
+			if(lpid >= 20 && lpid <= 101)
+			{
+				ret = ret - 15;
+			}
+		}
+		else if (g_tw_mynode == 1)
+		{
+			if(lpid >= 5 && lpid <= 9)
+				ret = ret + 82;
+			if(lpid >= 102 && lpid <= 183)
+				ret = ret - 10;
+			
+			ret = ret - 87;
+		}
+		else if (g_tw_mynode == 2)
+		{
+			if(lpid >= 10 && lpid <= 14)
+				ret = ret + 164;
+			if(lpid >= 184 && lpid <= 265)
+				ret = ret - 5;
+			
+			ret = ret - 174;
+		}
+		else 
+		{
+			if(lpid >= 15 && lpid <= 19)
+				ret = ret + 246;
+			
+			ret = ret - 261;
+		}
+	}
+	else 
+	{
+		cout << "Only support upto 4 cores "<<endl;;
+		assert(false);
+	}
+	
     //printf("%d -> %d \n", lpid, ret);
     
     return ret;
@@ -1314,11 +1442,8 @@ void air_traffic_mapping()
     int kpid = 0;
     int	 nlp_per_kp;
 	nlp_per_kp = ceil((double) g_tw_nlp / (double) g_tw_nkp);
-    
-    //	num_cells_per_kp = (NUM_CELLS_X * NUM_CELLS_Y) / (NUM_VP_X * NUM_VP_Y);
-    //	vp_per_proc = (NUM_VP_X * NUM_VP_Y) / ((tw_nnodes() * g_tw_npe)) ;
-    //	g_tw_nlp = nlp_per_pe;
-    //	g_tw_nkp = vp_per_proc;
+	
+    cout <<"nlp_per_kp"<<nlp_per_kp<<endl;
     
 	int local_lp_count=0;
     
@@ -1342,7 +1467,7 @@ void air_traffic_mapping()
             }
             tw_lp_onkp(g_tw_lp[mapping_to_local_index(lpid)], g_tw_kp[kpid]);
             //printf("tw_kp_onpe(%d, %d)\n", mapping_to_local_index(lpid), kpid);
-
+			
             tw_lp_settype( mapping_to_local_index(lpid), &airport_lps[0]);
         }
     }
@@ -1361,10 +1486,13 @@ main(int argc, char **argv, char **env)
 	tw_init(&argc, &argv);
     
 	nlp_per_pe /= (tw_nnodes() * g_tw_npe);
-    
-    g_tw_mapping = CUSTOM;
-    g_tw_custom_initial_mapping = &air_traffic_mapping;
-    g_tw_custom_lp_global_to_local_map =&mapping_to_lp;
+
+    if (tw_nnodes() != 1) 
+	{
+		g_tw_mapping = CUSTOM;
+		g_tw_custom_initial_mapping = &air_traffic_mapping;
+		g_tw_custom_lp_global_to_local_map =&mapping_to_lp;
+	}
     
 	g_tw_events_per_pe =(planes_per_airport * nlp_per_pe / g_tw_npe) + opt_mem;
 	tw_define_lps(nlp_per_pe, sizeof(air_traffic_message), 0);
@@ -1374,8 +1502,12 @@ main(int argc, char **argv, char **env)
     graph->create_graph(GRAPH_CSV_FILE_PATH);
 	//graph->print_adjmatrix();
     
-	//for(i = 0; i < g_tw_nlp; i++)
-        //tw_lp_settype(i, &airport_lps[0]);
+	if (tw_nnodes() == 1) 
+	{
+		for(i = 0; i < g_tw_nlp; i++)
+			tw_lp_settype(i, &airport_lps[0]);
+		
+	}
     
 	tw_run();
     
@@ -1402,7 +1534,9 @@ main(int argc, char **argv, char **env)
     
 	tw_end();
 	
-	if(MEM_USAGE)
+	cout<<path_cal<<endl;
+	
+	if(0)
 	{
         //	cout<<"Memory usage : "<<memusage<<" bytes,"<<" Store operations "<<store_operation<<" Restore operation "<<restore_operation<<endl;
 		cout<<memusage<<","<<endl;
