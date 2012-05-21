@@ -18,19 +18,21 @@
  This is a simple version using a graph to run a path find algorithm!
  */
 int get_region(int airport);
-
+int mapping_to_local_index(int lpid);
 
 tw_peid
 mapping(tw_lpid gid)
-{
+{    
+    //return gid/nlp_per_pe;
+    
     if(gid < 10 || (gid >= 20 && gid <= 183))
     {
-        cout<<gid<<" return 0"<<endl;
+        //cout<<gid<<" return 0"<<endl;
         return 0;
     }
     else
     {
-        cout<<gid<<" return 1"<<endl;
+        //cout<<gid<<" return 1"<<endl;
         return 1;
     }
 }
@@ -1258,116 +1260,92 @@ const tw_optdef app_opt [] =
 	TWOPT_END()
 };
 
-static unsigned int nkp_per_pe = 16;
-
-void air_traffic_mapping()
+tw_lp* mapping_to_lp(tw_lpid lpid) 
 {
-    cout<<"air_traffic_mapping"<<endl;
+    int index = lpid;
     
-    tw_pe	*pe;
-    
-	int	 nlp_per_kp;
-	int	 lpid;
-	int	 kpid;
-	int	 i;
-	int	 j;
-    
-    nlp_per_kp = ceil((double) g_tw_nlp / (double) g_tw_nkp);
-    
-    //    printf("nlp_per_kp : %d (g_tw_nlp, %d / g_tw_nkp, %d) \n", nlp_per_kp, g_tw_nlp, g_tw_nkp);
-    
-	if(!nlp_per_kp)
-		tw_error(TW_LOC, "Not enough KPs defined: %d", g_tw_nkp);
-    
-	g_tw_lp_offset = g_tw_mynode * g_tw_nlp;
-    
-    //    printf("g_tw_lp_offset = %d (g_tw_mynode,%d * g_tw_nlp, %d)\n", g_tw_lp_offset, g_tw_mynode, g_tw_nlp);
-    
-    kpid = 0;
-    lpid = 0;
-    
-    if(g_tw_mynode == 0)
+    if(g_tw_mynode ==0)
     {
-        printf("\tPE %d\n", tw_getpe(0)->id);
-                
-        for(i = 0; i < nkp_per_pe; i++, kpid++)
+        if(lpid >= 20)
         {
-            tw_kp_onpe(kpid, tw_getpe(0));
-            
-            printf("\t\tKP %d", kpid);
-            
-            for(j = 0; j < nlp_per_kp && lpid < g_tw_nlp; j++, lpid++)
-            {
-                
-                int t_lpid = 0;
-                if(lpid >= 10)
-                    t_lpid += 10;
-                
-                tw_lp_onpe(lpid, tw_getpe(0), g_tw_lp_offset+lpid+t_lpid);
-                tw_lp_onkp(g_tw_lp[lpid], g_tw_kp[kpid]); 
-                
-                if(0 == j % 20)
-                    printf("\n\t\t\t");
-                printf("%lld ", lpid+g_tw_lp_offset+t_lpid);
-            }
-            
-            printf("\n");
+            assert(lpid < 184);
+            index = index - 10;
         }
     }
     else
     {
-        printf("\tPE %d\n", tw_getpe(0)->id);
-        
-        for(i = 0; i < nkp_per_pe; i++, kpid++)
-        {
-            tw_kp_onpe(kpid, tw_getpe(0));
-            
-            printf("\t\tKP %d", kpid);
-            
-            for(j = 0; j < nlp_per_kp && lpid < g_tw_nlp; j++, lpid++)
-            {
-                
-                int t_lpid = 0;
-                if((lpid >= 0 && lpid <= 9))
-                    t_lpid = -164;
-                
-                tw_lp_onpe(lpid, tw_getpe(0), g_tw_lp_offset+lpid+t_lpid);
-                tw_lp_onkp(g_tw_lp[lpid], g_tw_kp[kpid]); 
-                
-                if(0 == j % 20)
-                    printf("\n\t\t\t");
-                printf("%lld ", lpid+g_tw_lp_offset+t_lpid);
-            }
-            
-            printf("\n");
-        }
+        if(lpid >= 10 && lpid <= 19)
+            index = index + 164;
+        index = index - 174;
     }
     
+    //printf("%d -> %d \n", lpid, ret);
+    return g_tw_lp[index];
+}
+
+int mapping_to_local_index(int lpid)
+{
+    //    return lpid;
     
-    //    for(kpid = 0, lpid = 0, pe = NULL; (pe = tw_pe_next(pe)); )
-    //	{
-    //		printf("\tPE %d\n", pe->id);
-    //        
-    //		for(i = 0; i < nkp_per_pe; i++, kpid++)
-    //		{
-    //			tw_kp_onpe(kpid, pe);
-    //            
-    //			printf("\t\tKP %d", kpid);
-    //            
-    //			for(j = 0; j < nlp_per_kp && lpid < g_tw_nlp; j++, lpid++)
-    //			{
-    //                
-    //                tw_lp_onpe(lpid, pe, g_tw_lp_offset+lpid);
-    //                tw_lp_onkp(g_tw_lp[lpid], g_tw_kp[kpid]); 
-    //                
-    //                if(0 == j % 20)
-    //                    printf("\n\t\t\t");
-    //                printf("%lld ", lpid+g_tw_lp_offset);
-    //			}
-    //            
-    //			printf("\n");
-    //		}
-    //	}
+    int ret = lpid;
+    
+    if(g_tw_mynode ==0)
+    {
+        if(lpid >= 20)
+        {
+            assert(lpid < 184);
+            ret = ret - 10;
+        }
+    }
+    else
+    {
+        if(lpid >= 10 && lpid <= 19)
+            ret = ret + 164;
+        ret = ret - 174;
+    }
+    
+    //printf("%d -> %d \n", lpid, ret);
+    
+    return ret;
+}
+
+void air_traffic_mapping()
+{
+    int kpid = 0;
+    int	 nlp_per_kp;
+	nlp_per_kp = ceil((double) g_tw_nlp / (double) g_tw_nkp);
+    
+    //	num_cells_per_kp = (NUM_CELLS_X * NUM_CELLS_Y) / (NUM_VP_X * NUM_VP_Y);
+    //	vp_per_proc = (NUM_VP_X * NUM_VP_Y) / ((tw_nnodes() * g_tw_npe)) ;
+    //	g_tw_nlp = nlp_per_pe;
+    //	g_tw_nkp = vp_per_proc;
+    
+	int local_lp_count=0;
+    
+    for (int lpid = 0; lpid < NUMBER_OF_LP; lpid++)
+    {
+        if( g_tw_mynode == mapping(lpid) )
+        {
+            kpid = local_lp_count/nlp_per_kp;
+            local_lp_count++; // MUST COME AFTER!! DO NOT PRE-INCREMENT ELSE KPID is WRONG!!
+            
+            if( kpid >= g_tw_nkp )
+                tw_error(TW_LOC, "Attempting to mapping a KPid (%llu) for Global LPid %llu that is beyond g_tw_nkp (%llu)\n",
+                         kpid, lpid, g_tw_nkp );
+            
+            tw_lp_onpe(mapping_to_local_index(lpid), g_tw_pe[0], lpid);
+            //printf("tw_lp_onpe(%d, %d, %d)\n", mapping_to_local_index(lpid), g_tw_mynode, lpid);
+            
+            if( g_tw_kp[kpid] == NULL ){
+                tw_kp_onpe(kpid, g_tw_pe[0]);
+                //printf("tw_kp_onpe(%d, %d)\n", kpid, g_tw_mynode);
+            }
+            tw_lp_onkp(g_tw_lp[mapping_to_local_index(lpid)], g_tw_kp[kpid]);
+            //printf("tw_kp_onpe(%d, %d)\n", mapping_to_local_index(lpid), kpid);
+
+            tw_lp_settype( mapping_to_local_index(lpid), &airport_lps[0]);
+        }
+    }
 }
 
 int
@@ -1386,7 +1364,7 @@ main(int argc, char **argv, char **env)
     
     g_tw_mapping = CUSTOM;
     g_tw_custom_initial_mapping = &air_traffic_mapping;
-    
+    g_tw_custom_lp_global_to_local_map =&mapping_to_lp;
     
 	g_tw_events_per_pe =(planes_per_airport * nlp_per_pe / g_tw_npe) + opt_mem;
 	tw_define_lps(nlp_per_pe, sizeof(air_traffic_message), 0);
@@ -1396,8 +1374,8 @@ main(int argc, char **argv, char **env)
     graph->create_graph(GRAPH_CSV_FILE_PATH);
 	//graph->print_adjmatrix();
     
-	for(i = 0; i < g_tw_nlp; i++)
-		tw_lp_settype(i, &airport_lps[0]);
+	//for(i = 0; i < g_tw_nlp; i++)
+        //tw_lp_settype(i, &airport_lps[0]);
     
 	tw_run();
     
