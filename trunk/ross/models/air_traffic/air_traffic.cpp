@@ -19,6 +19,8 @@
  */
 int get_region(int airport);
 int mapping_to_local_index(int lpid);
+int increase_counter(int lipd, int event_type);
+void print_map();
 
 static int path_cal=0;
 
@@ -211,7 +213,6 @@ event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * 
         case DEP_REQ:
         {
 			assert(lp->gid > NUMBER_OF_REGION_CONTROLLER-1);
-			
 			int weather = bs_rand_integer(s->rn, 0, 3);
 			
             if (s->runway_in_use < s->max_runway) 
@@ -685,6 +686,8 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
     tw_event *e;
     air_traffic_message *m;
     
+    increase_counter(lp->gid, msg->type);
+
     switch(msg->type)
     {
 			//        *(int *)bf = (int)0;
@@ -692,7 +695,7 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
         case DEP_REQ:
         {
 			assert(lp->gid > NUMBER_OF_REGION_CONTROLLER-1);
-			
+            
 			int weather = bs_rand_integer2(s->rn, 0, 3, lp);
 			
 			int path = 0;
@@ -762,6 +765,7 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
             
 		case TAXI_OUT:
 		{
+
 			assert(msg->dest_region < NUMBER_OF_REGION_CONTROLLER);
 			
 			ts = bs_rand_exponential2(s->rn, MEAN_TAXI, lp);
@@ -780,6 +784,7 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 			
         case TAKE_OFF:
         {            
+
 			__store__(s->runway_in_use, lp);
             s->runway_in_use--;
 			
@@ -815,6 +820,7 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
             
 		case TRANSIT_REQ:
 		{
+
 			int path = 0;
 			
             if ((path = (s->airplane_in_region < s->max_capacity)))
@@ -866,6 +872,7 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 			
 		case ON_THE_AIR:
 		{
+
 			assert(lp->gid < NUMBER_OF_REGION_CONTROLLER);
 
 			path_cal++;
@@ -921,6 +928,7 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 			
 		case TRANSIT_DELAY:
 		{
+
 			ts = bs_rand_exponential2(s->rn, MEAN_DELAY, lp);
 			
             e = tw_event_new(lp->gid, ts, lp);
@@ -938,6 +946,7 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 			
         case LANDING_REQ:
         {
+
 			int weather = bs_rand_integer2(s->rn, 0, 3, lp);
 			
 			int path = 0;
@@ -993,6 +1002,7 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 			
 		case LANDING_DELAY:
 		{	
+
 			ts = bs_rand_exponential2(s->rn, MEAN_DELAY, lp);
 			
             e = tw_event_new(lp->gid, ts, lp);
@@ -1010,6 +1020,7 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 			
 		case LANDING:
 		{
+
 			ts = bs_rand_exponential2(s->rn, MEAN_TAXI, lp);
 			
             e = tw_event_new(lp->gid, ts, lp);
@@ -1027,6 +1038,7 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 			
 		case TAXI_IN:
 		{
+
 			ts = bs_rand_exponential2(s->rn, MEAN_ARRIVAL, lp);
 			
             e = tw_event_new(lp->gid, ts, lp);
@@ -1044,6 +1056,7 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 			
 		case ARRIVAL:
 		{
+
 			__store__(s->runway_in_use, lp);
 			s->runway_in_use--;
 			
@@ -1537,6 +1550,18 @@ main(int argc, char **argv, char **env)
 		
 	}
     
+    //init map to count how many events are executed by each lp
+    //key lpid, value map<event type, counter>
+    
+    for (i=0; i<348; i++) 
+    {
+        m.insert(make_pair(i, inner_map()));
+        for(int j=0; i< ARRIVAL+1; i++)
+        {
+            m[i].insert(make_pair(j,0));
+        }
+    }
+    
 	tw_run();
     
 	if(tw_ismaster())
@@ -1562,8 +1587,9 @@ main(int argc, char **argv, char **env)
     
 	tw_end();
 	
-	cout<<path_cal<<endl;
-	
+	//cout<<path_cal<<endl;
+	print_map();
+    
 	if(0)
 	{
         //	cout<<"Memory usage : "<<memusage<<" bytes,"<<" Store operations "<<store_operation<<" Restore operation "<<restore_operation<<endl;
@@ -1571,6 +1597,24 @@ main(int argc, char **argv, char **env)
 	}	
     
 	return 0;
+}
+
+int increase_counter(int lpid, int event_type)
+{
+    m[lpid][event_type]++;
+}
+
+void print_map()
+{
+    map<int, inner_map>::iterator it;
+	map<int, int>::iterator inner_it;
+    
+	for ( it=m.begin() ; it != m.end(); it++ ) 
+    {
+		cout << "\n\nNew element\n" << (*it).first << endl;
+		for( inner_it=(*it).second.begin(); inner_it != (*it).second.end(); inner_it++)
+        cout << (*inner_it).first << " => " << (*inner_it).second << endl;
+    }
 }
 
 int get_region(int airport)

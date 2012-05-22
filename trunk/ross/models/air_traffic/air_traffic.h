@@ -7,13 +7,18 @@
 #include <deque>
 #include "Graph.hpp"
 #include "Constants.hpp"
-
+#include <map>
 
 using std::max;
 using namespace std;
 
 typedef struct airport_state airport_state;
 typedef struct air_traffic_message air_traffic_message;
+
+typedef map<int, int> inner_map;
+typedef map<int, inner_map> outer_map;
+
+static outer_map m;
 
 enum air_traffic_event_t
 {
