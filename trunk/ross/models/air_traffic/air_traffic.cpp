@@ -47,15 +47,15 @@ mapping(tw_lpid gid)
 	}
 	else if(tw_nnodes() == 4)
 	{
-		if((gid >= 0 && gid <= 4) || (gid >= 20 && gid <= 101))
+		if(gid == 0|| gid == 1 || gid == 3 || gid == 4 || gid == 6 || (gid >= 20 && gid <= 101))
 		{
 			return 0;
 		}
-		else if((gid >= 5 && gid <= 9) || (gid >= 102 && gid <= 183))
+		else if(gid == 2|| gid == 5 || gid == 7 || gid == 8 || gid == 9 || (gid >= 102 && gid <= 183))
 		{
 			return 1;
 		}
-		else if((gid >= 10 && gid <= 14) || (gid >= 184 && gid <= 265))
+		else if(gid == 10|| gid == 12 || gid == 15 || gid == 16 || gid == 17 || (gid >= 184 && gid <= 265))
 		{
 			return 2;
 		}
@@ -1328,15 +1328,21 @@ tw_lp* mapping_to_lp(tw_lpid lpid)
 	{
 		if(g_tw_mynode == 0)
 		{
+            if (lpid == 3 || lpid == 4 ) 
+                ret = ret - 1;
+            if(lpid == 6)
+                ret = ret - 2;
 			if(lpid >= 20 && lpid <= 101)
-			{
 				ret = ret - 15;
-			}
 		}
 		else if (g_tw_mynode == 1)
 		{
-			if(lpid >= 5 && lpid <= 9)
-				ret = ret + 82;
+			if(lpid == 2)
+				ret = ret + 85;
+            if(lpid == 5)
+                ret = ret + 83;
+            if(lpid >= 7 && lpid <= 9)
+                ret = ret + 82;
 			if(lpid >= 102 && lpid <= 183)
 				ret = ret - 10;
 			
@@ -1344,8 +1350,12 @@ tw_lp* mapping_to_lp(tw_lpid lpid)
 		}
 		else if (g_tw_mynode == 2)
 		{
-			if(lpid >= 10 && lpid <= 14)
-				ret = ret + 164;
+            if(lpid == 10)
+                ret = ret + 164;
+            if(lpid == 12)
+                ret = ret + 163;          
+			if(lpid >= 15 && lpid <= 17)
+                ret = ret + 161;                
 			if(lpid >= 184 && lpid <= 265)
 				ret = ret - 5;
 			
@@ -1353,7 +1363,11 @@ tw_lp* mapping_to_lp(tw_lpid lpid)
 		}
 		else 
 		{
-			if(lpid >= 15 && lpid <= 19)
+            if(lpid == 11)
+                ret = ret + 250;
+            if(lpid == 13 || lpid == 14)
+                ret = ret + 249;
+			if(lpid >= 18 && lpid <= 19)
 				ret = ret + 246;
 			
 			ret = ret - 261;
@@ -1395,15 +1409,21 @@ int mapping_to_local_index(int lpid)
 	{
 		if(g_tw_mynode == 0)
 		{
+            if (lpid == 3 || lpid == 4 ) 
+                ret = ret - 1;
+            if(lpid == 6)
+                ret = ret - 2;
 			if(lpid >= 20 && lpid <= 101)
-			{
 				ret = ret - 15;
-			}
 		}
 		else if (g_tw_mynode == 1)
 		{
-			if(lpid >= 5 && lpid <= 9)
-				ret = ret + 82;
+			if(lpid == 2)
+				ret = ret + 85;
+            if(lpid == 5)
+                ret = ret + 83;
+            if(lpid >= 7 && lpid <= 9)
+                ret = ret + 82;
 			if(lpid >= 102 && lpid <= 183)
 				ret = ret - 10;
 			
@@ -1411,8 +1431,12 @@ int mapping_to_local_index(int lpid)
 		}
 		else if (g_tw_mynode == 2)
 		{
-			if(lpid >= 10 && lpid <= 14)
-				ret = ret + 164;
+            if(lpid == 10)
+                ret = ret + 164;
+            if(lpid == 12)
+                ret = ret + 163;          
+			if(lpid >= 15 && lpid <= 17)
+                ret = ret + 161;                
 			if(lpid >= 184 && lpid <= 265)
 				ret = ret - 5;
 			
@@ -1420,7 +1444,11 @@ int mapping_to_local_index(int lpid)
 		}
 		else 
 		{
-			if(lpid >= 15 && lpid <= 19)
+            if(lpid == 11)
+                ret = ret + 250;
+            if(lpid == 13 || lpid == 14)
+                ret = ret + 249;
+			if(lpid >= 18 && lpid <= 19)
 				ret = ret + 246;
 			
 			ret = ret - 261;
