@@ -14,15 +14,12 @@
  David Bauer
  */
 
-#define TOTAL_EVENT_COUNT 0
 
 int get_region(int airport);
 int mapping_to_local_index(int lpid);
 int increase_counter(int lipd, int event_type);
 int decrease_counter(int lipd, int event_type);
-void print_map();
-void write_lp_map();
-void write_core_map();
+void write_map();
 
 static int path_cal=0;
 
@@ -1083,9 +1080,9 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 
 void
 rc_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * lp)
-{    
-	if(!TOTAL_EVENT_COUNT) decrease_counter(lp->gid, msg->type);
-	
+{    	
+    decrease_counter(lp->gid, msg->type);
+    
     switch(msg->type)
     {
         case DEP_REQ:
@@ -1558,13 +1555,12 @@ main(int argc, char **argv, char **env)
     //key lpid, value map<event type, counter>
     
     for (i=0; i<NUMBER_OF_LP; i++) 
-    {
-        total_event_map.insert(make_pair(i, inner_map()));
+        counters.insert(make_pair(i, inner_map()));
         for(int j=0; i< ARRIVAL+1; i++)
         {
-            total_event_map[i].insert(make_pair(j,0));
+            counter_container c = {0,0};
+            counters[i].insert(make_pair(j,c));
         }
-    }
 	
 	tw_run();
     
@@ -1597,7 +1593,7 @@ main(int argc, char **argv, char **env)
 	
 	//cout<<path_cal<<endl;
 	//print_map();
-    write_lp_map();
+    write_map();
 
 	if(0)
 	{
@@ -1610,38 +1606,23 @@ main(int argc, char **argv, char **env)
 
 int increase_counter(int lpid, int event_type)
 {
-    total_event_map[lpid][event_type]++;
+    counters[lpid][event_type].total_event_count++;
+    counters[lpid][event_type].net_event_count++;
 }
 
 int decrease_counter(int lpid, int event_type)
 {
-    total_event_map[lpid][event_type]--;
+    counters[lpid][event_type].net_event_count--;
 }
 
-void print_map()
-{
-    map<int, inner_map>::iterator it;
-	map<int, int>::iterator inner_it;
-    
-	for ( it=total_event_map.begin() ; it != total_event_map.end(); it++ ) 
-    {
-		cout << "\n\nNew element\n" << (*it).first << endl;
-		for( inner_it=(*it).second.begin(); inner_it != (*it).second.end(); inner_it++)
-        cout << (*inner_it).first << " => " << (*inner_it).second << endl;
-    }
-}
-
-void write_lp_map()
+void write_map()
 {
 	FILE *fp;
 	stringstream sstm;
 	string name = "lpmap";
 	int mynode = g_tw_mynode;
 
-	if (TOTAL_EVENT_COUNT)
-		sstm<<"t_"<<tw_nnodes()<<"_"<<name<<"_"<<mynode<<".txt";
-	else
-		sstm<<"c_"<<tw_nnodes()<<"_"<<name<<"_"<<mynode<<".txt";		
+    sstm<<tw_nnodes()<<"_"<<name<<"_"<<mynode<<".txt";
 	
 
 	string file_name = sstm.str();
@@ -1651,9 +1632,9 @@ void write_lp_map()
 	if (file.is_open()) 
 	{
 		map<int, inner_map>::iterator it;
-		map<int, int>::iterator inner_it;
-		
-		for ( it=total_event_map.begin() ; it != total_event_map.end(); it++ ) 
+		map<int, counter_container>::iterator inner_it;
+		        
+		for ( it=counters.begin() ; it != counters.end(); it++ ) 
 		{
 			for( inner_it=(*it).second.begin(); inner_it != (*it).second.end(); inner_it++)
 			{
@@ -1704,7 +1685,7 @@ void write_lp_map()
 					lp_name = "Airport";
 				}
 
-				file<<mynode<<","<<lp_name<<","<<(*it).first<<","<<event_name<<","<<(*inner_it).second<<"\n";
+				file<<mynode<<","<<lp_name<<","<<(*it).first<<","<<event_name<<","<<(*inner_it).second.total_event_count<<","<<(*inner_it).second.net_event_count<<"\n";
 			}
 		}
 	}

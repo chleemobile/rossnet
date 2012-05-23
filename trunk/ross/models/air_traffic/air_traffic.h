@@ -23,12 +23,6 @@ using namespace std;
 typedef struct airport_state airport_state;
 typedef struct air_traffic_message air_traffic_message;
 
-typedef map<int, int> inner_map;
-typedef map<int, inner_map> outer_map;
-
-static outer_map total_event_map;
-static outer_map net_event_map;
-
 enum air_traffic_event_t
 {
     DEP_REQ, //0
@@ -83,6 +77,20 @@ struct air_traffic_message
     
     int msg_from;
 };
+
+
+typedef struct counter_container counter_container;
+
+struct counter_container
+{
+    int total_event_count;
+    int net_event_count;
+};
+
+typedef map<int, counter_container> inner_map;
+typedef map<int, inner_map> outer_map;
+
+static outer_map counters;
 
 static int total_transit_accepted = 0;
 static int total_transit_rejected = 0;
