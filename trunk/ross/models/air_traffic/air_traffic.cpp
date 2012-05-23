@@ -1559,10 +1559,10 @@ main(int argc, char **argv, char **env)
     
     for (i=0; i<NUMBER_OF_LP; i++) 
     {
-        lp_map.insert(make_pair(i, inner_map()));
+        total_event_map.insert(make_pair(i, inner_map()));
         for(int j=0; i< ARRIVAL+1; i++)
         {
-            lp_map[i].insert(make_pair(j,0));
+            total_event_map[i].insert(make_pair(j,0));
         }
     }
 	
@@ -1610,12 +1610,12 @@ main(int argc, char **argv, char **env)
 
 int increase_counter(int lpid, int event_type)
 {
-    lp_map[lpid][event_type]++;
+    total_event_map[lpid][event_type]++;
 }
 
 int decrease_counter(int lpid, int event_type)
 {
-    lp_map[lpid][event_type]--;
+    total_event_map[lpid][event_type]--;
 }
 
 void print_map()
@@ -1623,7 +1623,7 @@ void print_map()
     map<int, inner_map>::iterator it;
 	map<int, int>::iterator inner_it;
     
-	for ( it=lp_map.begin() ; it != lp_map.end(); it++ ) 
+	for ( it=total_event_map.begin() ; it != total_event_map.end(); it++ ) 
     {
 		cout << "\n\nNew element\n" << (*it).first << endl;
 		for( inner_it=(*it).second.begin(); inner_it != (*it).second.end(); inner_it++)
@@ -1653,7 +1653,7 @@ void write_lp_map()
 		map<int, inner_map>::iterator it;
 		map<int, int>::iterator inner_it;
 		
-		for ( it=lp_map.begin() ; it != lp_map.end(); it++ ) 
+		for ( it=total_event_map.begin() ; it != total_event_map.end(); it++ ) 
 		{
 			for( inner_it=(*it).second.begin(); inner_it != (*it).second.end(); inner_it++)
 			{

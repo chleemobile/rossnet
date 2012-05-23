@@ -26,8 +26,9 @@ typedef struct air_traffic_message air_traffic_message;
 typedef map<int, int> inner_map;
 typedef map<int, inner_map> outer_map;
 
-static outer_map lp_map;
-static inner_map core_map;
+static outer_map total_event_map;
+static outer_map net_event_map;
+
 enum air_traffic_event_t
 {
     DEP_REQ, //0
