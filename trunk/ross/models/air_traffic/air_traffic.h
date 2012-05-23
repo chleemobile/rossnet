@@ -2,12 +2,20 @@
 #define INC_airport_h
 
 #include <ross.h>
-#include "iostream"
 #include <stack>
 #include <deque>
+#include <map>
+#include <string>
+#include <sstream> 
+#include <fstream>
+#include <iostream>
+
+#include <stdio.h>
+
+#include "iostream"
 #include "Graph.hpp"
 #include "Constants.hpp"
-#include <map>
+
 
 using std::max;
 using namespace std;
@@ -18,22 +26,22 @@ typedef struct air_traffic_message air_traffic_message;
 typedef map<int, int> inner_map;
 typedef map<int, inner_map> outer_map;
 
-static outer_map m;
-
+static outer_map lp_map;
+static inner_map core_map;
 enum air_traffic_event_t
 {
-    DEP_REQ,
-    DEP_DELAY,
-	TAXI_OUT,
-    TAKE_OFF,
-	TRANSIT_REQ,
-	ON_THE_AIR,
-	TRANSIT_DELAY,
-    LANDING_REQ,
-	LANDING_DELAY,
-	LANDING,
-	TAXI_IN,
-	ARRIVAL
+    DEP_REQ, //0
+    DEP_DELAY, //1
+	TAXI_OUT, //2
+    TAKE_OFF, //3
+	TRANSIT_REQ, //4
+	ON_THE_AIR, //5
+	TRANSIT_DELAY, //6
+    LANDING_REQ, //7
+	LANDING_DELAY, //8
+	LANDING, //9
+	TAXI_IN, //10
+	ARRIVAL //11
 };
 
 typedef enum air_traffic_event_t air_traffic_event_t;

@@ -50,7 +50,6 @@ const tw_optdef *
 tw_net_init(int *argc, char ***argv)
 {
   int my_rank;
-
   if (MPI_Init(argc, argv) != MPI_SUCCESS)
     tw_error(TW_LOC, "MPI_Init failed.");
   if (MPI_Comm_rank(MPI_COMM_WORLD, &my_rank) != MPI_SUCCESS)

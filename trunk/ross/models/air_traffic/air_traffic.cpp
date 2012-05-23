@@ -14,19 +14,21 @@
  David Bauer
  */
 
-/*
- This is a simple version using a graph to run a path find algorithm!
- */
+#define TOTAL_EVENT_COUNT 0
+
 int get_region(int airport);
 int mapping_to_local_index(int lpid);
 int increase_counter(int lipd, int event_type);
+int decrease_counter(int lipd, int event_type);
 void print_map();
+void write_lp_map();
+void write_core_map();
 
 static int path_cal=0;
 
 
 tw_peid
-mapping(tw_lpid gid)
+mapping_to_pe(tw_lpid gid)
 {    
     
 	if(tw_nnodes() == 1)
@@ -1082,6 +1084,8 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 void
 rc_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * lp)
 {    
+	if(!TOTAL_EVENT_COUNT) decrease_counter(lp->gid, msg->type);
+	
     switch(msg->type)
     {
         case DEP_REQ:
@@ -1280,7 +1284,7 @@ tw_lptype airport_lps[] =
 		(event_f) fw_event_handler,
 		(revent_f) rc_event_handler,
 		(final_f) final,
-		(map_f) mapping,
+		(map_f) mapping_to_pe,
 		sizeof(airport_state),
 	},
 	{0},
@@ -1490,11 +1494,11 @@ void air_traffic_mapping()
     
     for (int lpid = 0; lpid < NUMBER_OF_LP; lpid++)
     {
-        if( g_tw_mynode == mapping(lpid) )
+        if( g_tw_mynode == mapping_to_pe(lpid) )
         {
             kpid = local_lp_count/nlp_per_kp;
             local_lp_count++; // MUST COME AFTER!! DO NOT PRE-INCREMENT ELSE KPID is WRONG!!
-            
+
             if( kpid >= g_tw_nkp )
                 tw_error(TW_LOC, "Attempting to mapping a KPid (%llu) for Global LPid %llu that is beyond g_tw_nkp (%llu)\n",
                          kpid, lpid, g_tw_nkp );
@@ -1553,15 +1557,15 @@ main(int argc, char **argv, char **env)
     //init map to count how many events are executed by each lp
     //key lpid, value map<event type, counter>
     
-    for (i=0; i<348; i++) 
+    for (i=0; i<NUMBER_OF_LP; i++) 
     {
-        m.insert(make_pair(i, inner_map()));
+        lp_map.insert(make_pair(i, inner_map()));
         for(int j=0; i< ARRIVAL+1; i++)
         {
-            m[i].insert(make_pair(j,0));
+            lp_map[i].insert(make_pair(j,0));
         }
     }
-    
+	
 	tw_run();
     
 	if(tw_ismaster())
@@ -1587,9 +1591,14 @@ main(int argc, char **argv, char **env)
     
 	tw_end();
 	
+	/********************
+	Optional Analyze Tool
+	*********************/
+	
 	//cout<<path_cal<<endl;
-	print_map();
-    
+	//print_map();
+    write_lp_map();
+
 	if(0)
 	{
         //	cout<<"Memory usage : "<<memusage<<" bytes,"<<" Store operations "<<store_operation<<" Restore operation "<<restore_operation<<endl;
@@ -1601,7 +1610,12 @@ main(int argc, char **argv, char **env)
 
 int increase_counter(int lpid, int event_type)
 {
-    m[lpid][event_type]++;
+    lp_map[lpid][event_type]++;
+}
+
+int decrease_counter(int lpid, int event_type)
+{
+    lp_map[lpid][event_type]--;
 }
 
 void print_map()
@@ -1609,12 +1623,96 @@ void print_map()
     map<int, inner_map>::iterator it;
 	map<int, int>::iterator inner_it;
     
-	for ( it=m.begin() ; it != m.end(); it++ ) 
+	for ( it=lp_map.begin() ; it != lp_map.end(); it++ ) 
     {
 		cout << "\n\nNew element\n" << (*it).first << endl;
 		for( inner_it=(*it).second.begin(); inner_it != (*it).second.end(); inner_it++)
         cout << (*inner_it).first << " => " << (*inner_it).second << endl;
     }
+}
+
+void write_lp_map()
+{
+	FILE *fp;
+	stringstream sstm;
+	string name = "lpmap";
+	int mynode = g_tw_mynode;
+
+	if (TOTAL_EVENT_COUNT)
+		sstm<<"t_"<<tw_nnodes()<<"_"<<name<<"_"<<mynode<<".txt";
+	else
+		sstm<<"c_"<<tw_nnodes()<<"_"<<name<<"_"<<mynode<<".txt";		
+	
+
+	string file_name = sstm.str();
+	
+	ofstream file(file_name.c_str());
+	
+	if (file.is_open()) 
+	{
+		map<int, inner_map>::iterator it;
+		map<int, int>::iterator inner_it;
+		
+		for ( it=lp_map.begin() ; it != lp_map.end(); it++ ) 
+		{
+			for( inner_it=(*it).second.begin(); inner_it != (*it).second.end(); inner_it++)
+			{
+				int event_type = (*inner_it).first;
+				string event_name;
+				if (event_type == 0) {
+					event_name = "DEP_REQ";
+				}
+				else if(event_type== 1){
+					event_name = "DEP_DELAY";
+				}
+				else if(event_type== 2){
+					event_name = "TAXI_OUT";
+				}
+				else if(event_type== 3){
+					event_name = "TAKE_OFF";
+				}				
+				else if(event_type== 4){
+					event_name = "TRANSIT_REQ";
+				}
+				else if(event_type== 5){
+					event_name = "ON_THE_AIR";
+				}
+				else if(event_type== 6){
+					event_name = "TRANSIT_DELAY";
+				}				
+				else if(event_type== 7){
+					event_name = "LANDING_REQ";
+				}
+				else if(event_type== 8){
+					event_name = "LANDING_DELAY";
+				}
+				else if(event_type== 9){
+					event_name = "LANDING";
+				}
+				else if(event_type== 10){
+					event_name = "TAXI_IN";
+				}
+				else {
+					event_name = "ARRIVAL";
+				}	
+				string lp_name;
+				
+				if ((*it).first < NUMBER_OF_REGION_CONTROLLER) {
+					lp_name = "RC";
+				}
+				else {
+					lp_name = "Airport";
+				}
+
+				file<<mynode<<","<<lp_name<<","<<(*it).first<<","<<event_name<<","<<(*inner_it).second<<"\n";
+			}
+		}
+	}
+	else
+	{
+		cout<<"write_map, couldn't open a file"<<endl;
+	}
+
 }
 
 int get_region(int airport)
