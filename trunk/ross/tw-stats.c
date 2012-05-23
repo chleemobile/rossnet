@@ -163,8 +163,7 @@ tw_stats(tw_pe * me)
 	printf("\n");
 	show_lld("Net Events Processed", s.s_net_events);
     fprintf(fp,"%ld,", s.s_net_events);
-    fprintf(fp,"\n");
-    fclose(fp);
+
 	show_1f(
 		"Event Rate (events/sec)",
 		((double)s.s_net_events / s.s_max_run_time)
@@ -207,5 +206,10 @@ tw_stats(tw_pe * me)
 #endif
 
 	tw_gvt_stats(stdout);
+    fprintf(fp,"%ld,", g_tw_gvt_interval);
+	fprintf(fp,"%ld,", g_tw_mblock);
+	fprintf(fp,"\n");
+    fclose(fp);
+	
 #endif
 }
