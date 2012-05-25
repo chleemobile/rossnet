@@ -2029,7 +2029,8 @@ main(int argc, char **argv, char **env)
     loop_size = LOOP_SCALE * size;
     cout<<"loop size : "<<loop_size<<endl;
     argv[argc-1] = "";
-    
+    argc = argc-1;
+	
 	int i;
     
 	tw_opt_add(app_opt);
