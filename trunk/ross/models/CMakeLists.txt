@@ -1,6 +1,10 @@
 ADD_SUBDIRECTORY(airport)
+#Lee's own models
 ADD_SUBDIRECTORY(air_traffic)
 ADD_SUBDIRECTORY(simple_sim)
+ADD_SUBDIRECTORY(ping_pong)
+#
+
 ADD_SUBDIRECTORY(disksim)
 ADD_SUBDIRECTORY(olsr-c)
 ADD_SUBDIRECTORY(olsr-j)
