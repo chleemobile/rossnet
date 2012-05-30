@@ -17,7 +17,7 @@ struct simple_sim_message
 };
 
 tw_stime lookahead = 1.0;
-static unsigned int nlp_per_pe = 8;
+static unsigned int nlp_per_pe = 1;
 static int g_start_events = 1;
 static int optimistic_memory = 100;
 

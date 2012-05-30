@@ -1,3 +1,17 @@
+/*
+
+ping_pong.cpp
+Ping Pong simulation to measure MPI overhead.
+
+A two-LP run in two MPI ranks of Ping-Pong,
+in which each event schedules an event for the other LP at time (now + 1). 
+This will allow us to measure the minimum MPI overhead.
+
+5/30/2021
+Chayong Lee
+
+ */
+
 #include "ping_pong.hpp"
 
 tw_peid
@@ -9,6 +23,8 @@ map_to_pe(tw_lpid gid)
 void
 init(ping_pong_state * s, tw_lp * lp)
 {
+    if(g_tw_mynode == 0)
+    {
 	for(int i=0; i<g_start_events; i++)
 	{
 		tw_stime ts;
@@ -16,10 +32,11 @@ init(ping_pong_state * s, tw_lp * lp)
 		ping_pong_message *m;
 
 		ts=1;
-		e = tw_event_new(lp->gid, ts, lp);
+		e = tw_event_new(1, ts, lp);
 		m = (ping_pong_message *)tw_event_data(e);
 		tw_event_send(e);
 	}
+    }
 }
 
 
@@ -29,9 +46,23 @@ event_handler(ping_pong_state * s, tw_bf * bf, ping_pong_message * in_m, tw_lp *
 	tw_stime ts;
 	tw_event *e;
 	ping_pong_message *m;
-
+	int dest=0;
 	ts=1;
-	e = tw_event_new(lp->gid, ts, lp);
+
+	if(g_tw_mynode == 0)
+	{
+		dest = 1;
+	}
+	else if (g_tw_mynode == 1)
+	{
+		dest = 0;
+	}
+	else
+	{
+	    cout<<"invalid core number"<<endl;
+	    assert(false);
+	}
+	e = tw_event_new(dest, ts, lp);
 	m = (ping_pong_message *)tw_event_data(e);
 	tw_event_send(e);
 }

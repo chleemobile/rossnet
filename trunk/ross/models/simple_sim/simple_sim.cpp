@@ -1,3 +1,17 @@
+/*
+
+simple_sim.cpp
+Simsiple Simulation to measure ROSS event overhead.
+
+A sequential run in which an event does nothing more than schedule itself again for time (now +1). 
+This should measure the minimum ROSS event overhead in a sequential execution.
+
+5/30/2021
+Chayong Lee
+
+ */
+
+
 #include "simple_sim.hpp"
 
 tw_peid
