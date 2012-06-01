@@ -22,7 +22,7 @@ struct ping_pong_message
 
 tw_stime lookahead = 1.0;
 
-//This simulation only works with 2 cores with one LP per each core.
+//This simulation only works with 2 cores, one LP per each core.
 static unsigned int nlp_per_pe = 1;
 static int g_start_events = 1;
 static int optimistic_memory = 100;

@@ -71,7 +71,7 @@ mapping_to_pe(tw_lpid gid)
 	}
 	else 
 	{
-		cout << "support upto 4 cores"<<endl;
+		std::cout << "support upto 4 cores"<<std::endl;
 		assert(false);
 	}
 	
@@ -300,7 +300,7 @@ event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * 
 			
 			int src_region = get_region(lp->gid);
 			int next_region =-1;
-			deque<int> p = graph->get_shortest_path(src_region, msg->dest_region);
+			std::deque<int> p = graph->get_shortest_path(src_region, msg->dest_region);
 			
 			if (p.size() != 1) 
 			{
@@ -375,7 +375,7 @@ event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * 
 			
 			int next_region = bs_rand_integer(s->rn, 0, NUMBER_OF_REGION_CONTROLLER-1);
 			
-			deque<int> p = graph->get_shortest_path(lp->gid, msg->dest_region);
+			std::deque<int> p = graph->get_shortest_path(lp->gid, msg->dest_region);
 			
 			if (p.size() != 1) 
 			{
@@ -800,7 +800,7 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 			
 			int src_region = get_region(lp->gid);
 			int next_region =-1;
-			deque<int> p = graph->get_shortest_path(src_region, msg->dest_region);
+			std::deque<int> p = graph->get_shortest_path(src_region, msg->dest_region);
 			if (p.size() != 1) 
 			{
 				p.pop_front();
@@ -887,7 +887,7 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 			
 			int next_region = bs_rand_integer2(s->rn, 0, NUMBER_OF_REGION_CONTROLLER-1, lp);
 			
-			deque<int> p = graph->get_shortest_path(lp->gid, msg->dest_region);
+			std::deque<int> p = graph->get_shortest_path(lp->gid, msg->dest_region);
 			
 			if (p.size() != 1) 
 			{
@@ -1813,6 +1813,9 @@ const tw_optdef app_opt [] =
 	TWOPT_UINT("nplanes", planes_per_airport, "initial # of planes per airport(events)"),
 	TWOPT_STIME("mean", mean_flight_time, "mean flight time for planes"),
 	TWOPT_UINT("memory", opt_mem, "optimistic memory"),
+	TWOPT_UINT("loopsize", loop_size, "padding loop size"),
+
+
 	TWOPT_END()
 };
 
@@ -1889,7 +1892,7 @@ tw_lp* mapping_to_lp(tw_lpid lpid)
 	}
 	else 
 	{
-		cout << "Only support upto 4 cores "<<endl;;
+		std::cout << "Only support upto 4 cores "<<std::endl;;
 		assert(false);
 	}
 	
@@ -1970,7 +1973,7 @@ int mapping_to_local_index(int lpid)
 	}
 	else 
 	{
-		cout << "Only support upto 4 cores "<<endl;;
+		std::cout << "Only support upto 4 cores "<<std::endl;;
 		assert(false);
 	}
 	
@@ -1985,7 +1988,7 @@ void air_traffic_mapping()
     int	 nlp_per_kp;
 	nlp_per_kp = ceil((double) g_tw_nlp / (double) g_tw_nkp);
 	
-    cout <<"nlp_per_kp"<<nlp_per_kp<<endl;
+    std::cout <<"nlp_per_kp"<<nlp_per_kp<<std::endl;
     
 	int local_lp_count=0;
     
@@ -2019,21 +2022,19 @@ void air_traffic_mapping()
 int
 main(int argc, char **argv, char **env)
 {
-	cout << "####"<<endl;
-	cout << "ROSE" << endl;;
-	cout << "####"<<endl;
 	
     //int loop_size = LOOP_SCALE * atoi(argv[argc-1].c_str());
-    string ssize = argv[argc-1];
-    int size = atoi(ssize.c_str());
-    loop_size = LOOP_SCALE * size;
-    cout<<"loop size : "<<loop_size<<endl;
-    argv[argc-1] = "";
-    argc = argc-1;
+    //std::string ssize = argv[argc-1];
+    //int size = atoi(ssize.c_str());
+    //loop_size = LOOP_SCALE * size;
+    //std::cout<<"loop size : "<<loop_size<<std::endl;
+    //argv[argc-1] = "";
+    //argc = argc-1;
 	
 	int i;
     
 	tw_opt_add(app_opt);
+	
 	tw_init(&argc, &argv);
     
 	nlp_per_pe /= (tw_nnodes() * g_tw_npe);
@@ -2071,11 +2072,14 @@ main(int argc, char **argv, char **env)
 			for(int j=0; i< ARRIVAL+1; i++)
 			{
 				counter_container c = {0,0};
-				counters[i].insert(make_pair(j,c));
+				counters[i].insert(std::make_pair(j,c));
 			}
 		}
 		
 	}
+	
+	loop_size *= LOOP_SCALE;
+	printf("loop size %d \n", loop_size);
 	
 	tw_run();
     
@@ -2088,14 +2092,14 @@ main(int argc, char **argv, char **env)
 		printf("\t%-50s %11lld\n", "Number of planes", 
                planes_per_airport * nlp_per_pe * g_tw_npe * tw_nnodes());
         
-        cout<<"\tTotal Transit Accepted : "<<total_transit_accepted<<endl;
-        cout<<"\tTotal Transit Rejected : "<<total_transit_rejected<<endl;
+        std::cout<<"\tTotal Transit Accepted : "<<total_transit_accepted<<std::endl;
+        std::cout<<"\tTotal Transit Rejected : "<<total_transit_rejected<<std::endl;
         
-        cout<<"\tTotal Departure Req Accepted : "<<total_dep_req_accepted<<endl;
-        cout<<"\tTotal Departure Req Rejected : "<<total_dep_req_rejected<<endl;
+        std::cout<<"\tTotal Departure Req Accepted : "<<total_dep_req_accepted<<std::endl;
+        std::cout<<"\tTotal Departure Req Rejected : "<<total_dep_req_rejected<<std::endl;
         
-        cout<<"\tTotal Arrival Req Accepted : "<<total_landing_req_accepted<<endl;
-        cout<<"\tTotal Arrival Req Rejected : "<<total_landing_req_rejected<<endl;
+        std::cout<<"\tTotal Arrival Req Accepted : "<<total_landing_req_accepted<<std::endl;
+        std::cout<<"\tTotal Arrival Req Rejected : "<<total_landing_req_rejected<<std::endl;
         
         
 	}
@@ -2113,7 +2117,7 @@ main(int argc, char **argv, char **env)
 	if(0)
 	{
         //	cout<<"Memory usage : "<<memusage<<" bytes,"<<" Store operations "<<store_operation<<" Restore operation "<<restore_operation<<endl;
-		cout<<memusage<<","<<endl;
+		std::cout<<memusage<<","<<std::endl;
 	}	
     
 	return 0;
@@ -2133,28 +2137,28 @@ int decrease_counter(int lpid, int event_type)
 void write_map()
 {
 	FILE *fp;
-	stringstream sstm;
-	string name = "lpmap";
+	std::stringstream sstm;
+	std::string name = "lpmap";
 	int mynode = g_tw_mynode;
 	
     sstm<<tw_nnodes()<<"_"<<name<<"_"<<mynode<<".txt";
 	
 	
-	string file_name = sstm.str();
+	std::string file_name = sstm.str();
 	
-	ofstream file(file_name.c_str());
+	std::ofstream file(file_name.c_str());
 	
 	if (file.is_open()) 
 	{
-		map<int, inner_map>::iterator it;
-		map<int, counter_container>::iterator inner_it;
+		std::map<int, inner_map>::iterator it;
+		std::map<int, counter_container>::iterator inner_it;
 		
 		for ( it=counters.begin() ; it != counters.end(); it++ ) 
 		{
 			for( inner_it=(*it).second.begin(); inner_it != (*it).second.end(); inner_it++)
 			{
 				int event_type = (*inner_it).first;
-				string event_name;
+				std::string event_name;
 				if (event_type == 0) {
 					event_name = "DEP_REQ";
 				}
@@ -2191,7 +2195,7 @@ void write_map()
 				else {
 					event_name = "ARRIVAL";
 				}	
-				string lp_name;
+				std::string lp_name;
 				
 				if ((*it).first < NUMBER_OF_REGION_CONTROLLER) {
 					lp_name = "RC";
@@ -2206,7 +2210,7 @@ void write_map()
 	}
 	else
 	{
-		cout<<"write_map, couldn't open a file"<<endl;
+		std::cout<<"write_map, couldn't open a file"<<std::endl;
 	}
 	
 }
@@ -2295,7 +2299,7 @@ int get_region(int airport)
     }   
     else
     {
-        cout<<"airport region failed"<<endl;
+        std::cout<<"airport region failed"<<std::endl;
         assert(false);
     }
     

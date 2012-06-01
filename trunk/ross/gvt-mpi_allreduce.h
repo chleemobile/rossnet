@@ -22,9 +22,10 @@ gvt_print(tw_stime gvt)
 		return;
 	}
 
-	printf("GVT #%d: simulation %d%% complete (",
-		g_tw_gvt_done,
-		(int) min(100, floor(100 * (gvt/g_tw_ts_end))));
+	int min = floor(100 * (gvt/g_tw_ts_end));
+	if(min > 100) min = 100;
+
+	printf("GVT #%d: simulation %d%% complete (", g_tw_gvt_done, min);
 
 	if (gvt == DBL_MAX)
 		printf("GVT = %s", "MAX");

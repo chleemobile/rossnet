@@ -5,7 +5,6 @@
 #include <sstream>
 #include <assert.h>
 
-using namespace std;
 
 
 Graph::Graph(int nodes)
@@ -20,10 +19,10 @@ Graph::~Graph()
 
 void Graph::create_graph(const char *path)
 {
-    cout<<path<<endl;
-	ifstream infile;
-	string line;
-	infile.open(path, ifstream::in);
+	std::cout<<path<<std::endl;
+	std::ifstream infile;
+	std::string line;
+	infile.open(path, std::ifstream::in);
 		
 	//allocate 
     adjMatrix = new float*[num_node];
@@ -42,10 +41,10 @@ void Graph::create_graph(const char *path)
 	if(infile.is_open())
 	{
 		int i=0;
-		while(getline(infile, line))
+		while(std::getline(infile, line))
 		{
-			istringstream linestream(line);
-			string item;
+			std::istringstream linestream(line);
+			std::string item;
 			int j=0;
 			while (getline (linestream, item, ','))
 			{
@@ -60,12 +59,12 @@ void Graph::create_graph(const char *path)
 	}
 	else
 	{
-		cout << "Error opening file";
+		std::cout << "Error opening file";
         assert(false);
 	}
 }
 
-deque<int> Graph::get_shortest_path(int source, int dest)
+std::deque<int> Graph::get_shortest_path(int source, int dest)
 {
     /*
      Indexing is one off
@@ -107,7 +106,7 @@ deque<int> Graph::get_shortest_path(int source, int dest)
 	}
 
 
-    deque<int> ret;
+    std::deque<int> ret;
     int v = dest;
     while(1){
 		if(prev[v] == -1){break;}
@@ -138,9 +137,9 @@ void Graph::print_adjmatrix()
 {
 	for(int i=0; i < num_node; i++){
 		for (int j=0; j<num_node; j++) {
-			cout<<adjMatrix[i][j]<<",";
+			std::cout<<adjMatrix[i][j]<<",";
 		}
-		cout << ""<<endl;;
+		std::cout << ""<<std::endl;;
 	}
 }
 

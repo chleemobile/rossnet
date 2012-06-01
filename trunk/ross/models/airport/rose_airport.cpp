@@ -2,7 +2,6 @@
 #include "rctypes.h"
 #include <backstroke/rand.h>
 #include <math.h>
-#include "rctypes.h" 
 
 tw_peid mapping(tw_lpid gid)
 {

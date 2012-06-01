@@ -17,8 +17,8 @@
 #include "Constants.hpp"
 
 
-using std::max;
-using namespace std;
+//using std::max;
+//using namespace std;
 
 typedef struct airport_state airport_state;
 typedef struct air_traffic_message air_traffic_message;
@@ -87,8 +87,8 @@ struct counter_container
     int net_event_count;
 };
 
-typedef map<int, counter_container> inner_map;
-typedef map<int, inner_map> outer_map;
+typedef std::map<int, counter_container> inner_map;
+typedef std::map<int, inner_map> outer_map;
 
 static outer_map counters;
 

@@ -8,7 +8,7 @@
 #define MEAN_DEPARTURE 30.0
 #define MEAN_LAND 10.0
 
-using std::max;
+//using std::max;
 using namespace std;
 
 typedef struct airport_state airport_state;
