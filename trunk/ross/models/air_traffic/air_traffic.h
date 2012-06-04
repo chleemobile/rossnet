@@ -91,24 +91,6 @@ typedef std::map<int, counter_container> inner_map;
 typedef std::map<int, inner_map> outer_map;
 
 static outer_map counters;
-
-static int total_transit_accepted = 0;
-static int total_transit_rejected = 0;
-
-static int total_dep_req_accepted = 0;
-static int total_dep_req_rejected = 0;
-
-static int total_landing_req_accepted = 0;
-static int total_landing_req_rejected = 0;
-
-static int nlp = NUMBER_OF_LP;
-static tw_lpid	 nlp_per_pe = NUMBER_OF_LP;
-
-static tw_stime	 mean_flight_time = 1;
-static int       opt_mem = 100000;
-static int       planes_per_airport = NUMBER_OF_PLANES_PER_AIRPORT;
-
-static tw_stime	 wait_time_avg = 0.0;
 static Graph *graph;
 
 #endif

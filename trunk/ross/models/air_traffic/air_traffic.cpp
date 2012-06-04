@@ -3,6 +3,10 @@
 #include <backstroke/rand.h>
 #include <math.h>
 
+#define P_RUN 1
+#define PADDING_LOOP 1
+#define COUNT_EVENT 0
+
 
 /*
  Air_Traffic.cpp
@@ -14,11 +18,6 @@
  Modified for ROSS 4.0
  David Bauer
  */
-
-#define PRALLEL_RUN 1
-#define BACKSTROKE 1
-#define COUNT_EVENT 0
-#define LOOP_SCALE 1000
 
 int get_region(int airport);
 int mapping_to_local_index(int lpid);
@@ -683,7 +682,7 @@ p_init(airport_state * s, tw_lp * lp)
 }
 
 void
-fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * lp)
+event_handler_fw(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * lp)
 {    	
     tw_stime ts;
     tw_event *e;
@@ -699,7 +698,8 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
         {
 			assert(lp->gid > NUMBER_OF_REGION_CONTROLLER-1);
             
-			for (unsigned volatile long var = 0; var < loop_size;) {var++;}
+			if(PADDING_LOOP)
+				for (unsigned volatile long var = 0; var < loop_size;var++){}
 			
 			int weather = bs_rand_integer2(s->rn, 0, 3, lp);
 			
@@ -757,7 +757,9 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
         case DEP_DELAY:
         {
 			
-			for (unsigned volatile long var = 0; var < loop_size;) {var++;}
+			if(PADDING_LOOP)
+				for (unsigned volatile long var = 0; var < loop_size;var++){}
+
 			
 			ts = bs_rand_exponential2(s->rn, MEAN_DELAY, lp);
 			
@@ -772,7 +774,9 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
             
 		case TAXI_OUT:
 		{
-			for (unsigned volatile long var = 0; var < loop_size;) {var++;}
+			if(PADDING_LOOP)
+				for (unsigned volatile long var = 0; var < loop_size;var++){}
+
 			
 			assert(msg->dest_region < NUMBER_OF_REGION_CONTROLLER);
 			
@@ -792,7 +796,9 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 			
         case TAKE_OFF:
         {            
-			for (unsigned volatile long var = 0; var < loop_size;) {var++;}
+			if(PADDING_LOOP)
+				for (unsigned volatile long var = 0; var < loop_size;var++){}
+
 			__store__(s->runway_in_use, lp);
             s->runway_in_use--;
 			
@@ -828,7 +834,9 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
             
 		case TRANSIT_REQ:
 		{
-			for (unsigned volatile long var = 0; var < loop_size;) {var++;}
+			if(PADDING_LOOP)
+				for (unsigned volatile long var = 0; var < loop_size;var++){}
+
 			int path = 0;
 			
             if ((path = (s->airplane_in_region < s->max_capacity)))
@@ -880,7 +888,9 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 			
 		case ON_THE_AIR:
 		{
-			for (unsigned volatile long var = 0; var < loop_size;) {var++;}
+			if(PADDING_LOOP)
+				for (unsigned volatile long var = 0; var < loop_size;var++){}
+
 			assert(lp->gid < NUMBER_OF_REGION_CONTROLLER);
 			
 			path_cal++;
@@ -936,7 +946,9 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 			
 		case TRANSIT_DELAY:
 		{
-			for (unsigned volatile long var = 0; var < loop_size;) {var++;}
+			if(PADDING_LOOP)
+				for (unsigned volatile long var = 0; var < loop_size;var++){}
+
 			ts = bs_rand_exponential2(s->rn, MEAN_DELAY, lp);
 			
             e = tw_event_new(lp->gid, ts, lp);
@@ -954,7 +966,9 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 			
         case LANDING_REQ:
         {
-			for (unsigned volatile long var = 0; var < loop_size;) {var++;}
+			if(PADDING_LOOP)
+				for (unsigned volatile long var = 0; var < loop_size;var++){}
+
 			int weather = bs_rand_integer2(s->rn, 0, 3, lp);
 			
 			int path = 0;
@@ -1010,7 +1024,9 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 			
 		case LANDING_DELAY:
 		{	
-			for (unsigned volatile long var = 0; var < loop_size;) {var++;}
+			if(PADDING_LOOP)
+				for (unsigned volatile long var = 0; var < loop_size;var++){}
+
 			ts = bs_rand_exponential2(s->rn, MEAN_DELAY, lp);
 			
             e = tw_event_new(lp->gid, ts, lp);
@@ -1028,7 +1044,9 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 			
 		case LANDING:
 		{
-			for (unsigned volatile long var = 0; var < loop_size;) {var++;}
+			if(PADDING_LOOP)
+				for (unsigned volatile long var = 0; var < loop_size;var++){}
+
 			ts = bs_rand_exponential2(s->rn, MEAN_TAXI, lp);
 			
             e = tw_event_new(lp->gid, ts, lp);
@@ -1046,7 +1064,9 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 			
 		case TAXI_IN:
 		{
-			for (unsigned volatile long var = 0; var < loop_size;) {var++;}
+			if(PADDING_LOOP)
+				for (unsigned volatile long var = 0; var < loop_size;var++){}
+
 			ts = bs_rand_exponential2(s->rn, MEAN_ARRIVAL, lp);
 			
             e = tw_event_new(lp->gid, ts, lp);
@@ -1064,7 +1084,9 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 			
 		case ARRIVAL:
 		{
-			for (unsigned volatile long var = 0; var < loop_size;) {var++;}
+			if(PADDING_LOOP)
+				for (unsigned volatile long var = 0; var < loop_size;var++){}
+
 			__store__(s->runway_in_use, lp);
 			s->runway_in_use--;
 			
@@ -1088,7 +1110,7 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 
 
 void
-rc_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * lp)
+event_handler_rc(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * lp)
 {    	
 	if(COUNT_EVENT) decrease_counter(lp->gid, msg->type);
     
@@ -1775,13 +1797,12 @@ final(airport_state * s, tw_lp * lp)
  Parallel Running
  */
 
-#if PRALLEL_RUN
 tw_lptype airport_lps[] =
 {
 	{
 		(init_f) p_init,
-		(event_f) fw_event_handler,
-		(revent_f) rc_event_handler,
+		(event_f) event_handler_forward,
+		(revent_f) event_handler_reverse,
 		(final_f) final,
 		(map_f) mapping_to_pe,
 		sizeof(airport_state),
@@ -1789,22 +1810,6 @@ tw_lptype airport_lps[] =
 	{0},
 };
 
-#else
-
-tw_lptype airport_lps[] =
-{
-	{
-		(init_f) init,
-		(event_f) event_handler,
-		(revent_f) rc_event_handler,
-		(final_f) final,
-		(map_f) mapping_to_pe,
-		sizeof(airport_state),
-	},
-	{0},
-};
-
-#endif
 
 const tw_optdef app_opt [] =
 {
@@ -1814,7 +1819,7 @@ const tw_optdef app_opt [] =
 	TWOPT_STIME("mean", mean_flight_time, "mean flight time for planes"),
 	TWOPT_UINT("memory", opt_mem, "optimistic memory"),
 	TWOPT_UINT("loopsize", loop_size, "padding loop size"),
-
+	TWOPT_UINT("prun", p_run, "parallel run"),
 
 	TWOPT_END()
 };
@@ -2058,7 +2063,6 @@ main(int argc, char **argv, char **env)
 	{
 		for(i = 0; i < g_tw_nlp; i++)
 			tw_lp_settype(i, &airport_lps[0]);
-		
 	}
     
     //init map to count how many events are executed by each lp
@@ -2078,7 +2082,6 @@ main(int argc, char **argv, char **env)
 		
 	}
 	
-	loop_size *= LOOP_SCALE;
 	printf("loop size %d \n", loop_size);
 	
 	tw_run();
