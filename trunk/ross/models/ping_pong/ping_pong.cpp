@@ -21,7 +21,8 @@ tw_peid map_to_pe(tw_lpid gid)
 
 void init(ping_pong_state * s, tw_lp * lp)
 {
-	if(g_tw_mynode == 0)
+//	if(g_tw_mynode == 0)
+	if(lp->gid == 0)
 	{
 		for(int i=0; i<g_start_events; i++)
 		{
@@ -46,11 +47,14 @@ void event_handler(ping_pong_state * s, tw_bf * bf, ping_pong_message * in_m, tw
 	int dest=0;
 	ts=1;
 
-	if(g_tw_mynode == 0)
+//	if(g_tw_mynode == 0)
+	if(lp->gid == 0)
 	{
 		dest = 1;
 	}
-	else if (g_tw_mynode == 1)
+//	else if (g_tw_mynode == 1)
+	else if (lp->gid == 1)
+
 	{
 		dest = 0;
 	}
