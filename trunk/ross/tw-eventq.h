@@ -155,7 +155,14 @@ tw_eventq_alloc(tw_eventq * q, unsigned int cnt)
    *  ------------------
    */
 
-  align = max(sizeof(double), sizeof(void*));
+  size_t s_double = sizeof(double);
+  size_t s_void_ptr = sizeof(void*);
+
+  align = s_double;
+  if(s_double < s_void_ptr)
+	  align = s_void_ptr;
+
+//  align = max(sizeof(double), sizeof(void*));
   event_len = sizeof(tw_event) + g_tw_msg_sz;
   if (event_len & (align - 1))
     {
