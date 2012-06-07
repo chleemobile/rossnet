@@ -25,9 +25,75 @@ mapping(tw_lpid gid)
 	return (tw_peid) gid / g_tw_nlp;
 }
 
+void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * lp)
+{    
+    tw_stime ts;
+    tw_event *e;
+    air_traffic_message *m;
+    
+    switch(msg->type)
+    {
+        //* (int *)bf = (int)0;
+            
+        case DEP:
+        {
+			s->queue.push_back(msg->aircraft);
+			
+            if (s->runway_in_use < s->max_runway) 
+            {
+                //bf->c1=0;
+                s->runway_in_use++;
+				s->arrival_req_accepted++;
 
-void
-p_init(airport_state * s, tw_lp * lp)
+                e = tw_event_new(lp->gid, bs_rand_exponential(s->rn, 1),lp);
+                m = (air_traffic_message*)tw_event_data(e);
+                m->type = TAKE_OFF;
+               	m->aircraft = s->queue.front();
+				s->queue.erase(s->queue.begin());
+				tw_event_send(e);
+
+            }
+            else
+            {
+				//s->queue.push_back(msg->aircraft);
+				s->dep_req_rejected++;
+                //bf->c1=1;
+
+            }
+		
+           	break;
+        }
+
+        case TAKE_OFF:
+        {            
+            s->runway_in_use--;
+
+            int dest = msg->aircraft.get_dest_region();
+			e = tw_event_new(dest, bs_rand_exponential(s->rn, 10),lp);
+            m = (air_traffic_message*)tw_event_data(e);
+            m->type = ON_AIR;
+			m->aircraft = msg->aircraft;
+            tw_event_send(e);
+
+            break;
+        }
+            
+        case ON_AIR:
+        {
+            e = tw_event_new(lp->gid, bs_rand_exponential(s->rn, 1), lp);            
+            m = (air_traffic_message*)tw_event_data(e);
+            int dest_region = bs_rand_integer(s->rn, 0, NUMBER_OF_REGION_CONTROLLER-1);
+			
+            m->type = DEP;       
+			m->aircraft.set_dest_region(dest_region);
+            break;
+        }
+                
+    }
+}
+
+
+void p_init(airport_state * s, tw_lp * lp)
 {
     static int init_seed = 1;
     BSStack* stack = new BSStack();
@@ -65,15 +131,18 @@ p_init(airport_state * s, tw_lp * lp)
         {
             e = tw_event_new(lp->gid, bs_rand_exponential2(s->rn, 1, lp), lp);            
             m = (air_traffic_message*)tw_event_data(e);
-            m->type = DEP;            
+            int dest_region = bs_rand_integer2(s->rn, 0, NUMBER_OF_REGION_CONTROLLER-1, lp);
+			
+            m->type = DEP;       
+			m->aircraft.set_dest_region(dest_region);
+			
             tw_event_send(e);
         }
         
     }
 }
 
-void
-fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * lp)
+void fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * lp)
 {    
     tw_stime ts;
     tw_event *e;
@@ -85,23 +154,30 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
             
         case DEP:
         {
+			s->queue.push_back(msg->aircraft);
+			
             if (s->runway_in_use < s->max_runway) 
             {
                 bf->c1=0;
                 s->runway_in_use++;
-                int dest_region = bs_rand_integer2(s->rn, 0, NUMBER_OF_REGION_CONTROLLER-1, lp);
-                e = tw_event_new(dest_region, bs_rand_exponential2(s->rn, 1, lp)+1, lp);
+				s->arrival_req_accepted++;
+
+                e = tw_event_new(lp->gid, bs_rand_exponential2(s->rn, 1, lp)+1, lp);
                 m = (air_traffic_message*)tw_event_data(e);
                 m->type = TAKE_OFF;
-                m->dest_region = dest_region;
-                tw_event_send(e);
+                m->aircraft = s->queue.front();
+				s->queue.erase(s->queue.begin());
+				tw_event_send(e);
 
             }
             else
             {
+				//s->queue.push_back(msg->aircraft);
+				s->dep_req_rejected++;
                 bf->c1=1;
 
             }
+			
 
             break;
         }
@@ -110,11 +186,11 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
         {            
             s->runway_in_use--;
 
-            int dest = bs_rand_integer2(s->rn, 0, NUMBER_OF_LP-1, lp);
-            e = tw_event_new(dest, bs_rand_exponential2(s->rn, 10, lp)+1, lp);
+            int dest = msg->aircraft.get_dest_region();
+			e = tw_event_new(dest, bs_rand_exponential2(s->rn, 10, lp)+1, lp);
             m = (air_traffic_message*)tw_event_data(e);
             m->type = ON_AIR;
-            m->dest_region = msg->dest_region;
+			m->aircraft = msg->aircraft;
             tw_event_send(e);
 
             break;
@@ -122,13 +198,12 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
             
         case ON_AIR:
         {
-            int dest = bs_rand_integer2(s->rn, 0, NUMBER_OF_LP-1, lp);
-            e = tw_event_new(dest, bs_rand_exponential2(s->rn, 10, lp)+1, lp);
+            e = tw_event_new(lp->gid, bs_rand_exponential2(s->rn, 1, lp), lp);            
             m = (air_traffic_message*)tw_event_data(e);
-            m->type = DEP;
-            m->dest_region = msg->dest_region;
-
-            tw_event_send(e);
+            int dest_region = bs_rand_integer2(s->rn, 0, NUMBER_OF_REGION_CONTROLLER-1, lp);
+			
+            m->type = DEP;       
+			m->aircraft.set_dest_region(dest_region);
             break;
         }
                 
@@ -136,8 +211,7 @@ fw_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
 }
 
 
-void
-rc_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * lp)
+void rc_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * lp)
 {    
     switch(msg->type)
     {
@@ -146,11 +220,14 @@ rc_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
             if(bf->c1=0)
             {
                 s->runway_in_use--;
-                bs_rand_rvs(s->rn, lp);
+				s->arrival_req_accepted--;
+
                 bs_rand_rvs(s->rn, lp);
             }
             else
             {
+				s->queue.pop_back();
+				s->dep_req_rejected--;				
             }
 
             break;
@@ -159,7 +236,6 @@ rc_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
         {
             s->runway_in_use++;
 
-            bs_rand_rvs(s->rn, lp);
             bs_rand_rvs(s->rn, lp);
 
             break;
@@ -174,8 +250,7 @@ rc_event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp
     }
 }
 
-void
-final(airport_state * s, tw_lp * lp)
+void final(airport_state * s, tw_lp * lp)
 
 {
 	//wait_time_avg += ((s->waiting_time / (double) s->landings) / nlp_per_pe);
@@ -235,8 +310,7 @@ const tw_optdef app_opt [] =
 	TWOPT_END()
 };
 
-int
-main(int argc, char **argv, char **env)
+int main(int argc, char **argv, char **env)
 {
 	int i;
     

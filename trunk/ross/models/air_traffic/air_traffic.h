@@ -2,11 +2,13 @@
 #define INC_airport_h
 
 #include <ross.h>
-#include "iostream"
 #include <stack>
 #include <deque>
-#include "Graph.hpp"
+#include <vector>
 
+#include "iostream"
+#include "Graph.hpp"
+#include "Aircraft.hpp"
 
 #define GRAPH_CSV_FILE_PATH "adjlist_csv.csv"
 
@@ -24,7 +26,7 @@
 #define NUMBER_OF_RUNWAY_LARGE_AIRPORT 1
 #define NUMBER_OF_RUNWAY_MEDIUM_AIRPORT 1
 #define NUMBER_OF_RUNWAY_SMALL_AIRPORT 1
-#define NUMBER_OF_RUNWAY_NH_AIRPORT 1
+#define NUMBER_OF_RUNWAY_NH_AIRPORT 5
 
 #define AIRCRAFT_CAPACITY_OF_LARGE_REGION 1
 #define AIRCRAFT_CAPACITY_OF_MEDIUM_REGION 100
@@ -52,6 +54,8 @@ struct airport_state
 {
     int rn;
     int from;
+	vector<Aircraft> queue;
+
     /*
      Region Controller State Variable
      */
@@ -75,6 +79,8 @@ struct airport_state
 
 struct air_traffic_message
 {
+	Aircraft aircraft;
+	
 	air_traffic_event_t	 type;
     
     int dest_region;
