@@ -6,6 +6,7 @@
 #include <deque>
 #include <queue>
 #include "ross-types.h"
+#include <boost/any.hpp>
 
 #include <iostream>
 using std::cout;
@@ -17,12 +18,15 @@ using std::cout;
 #define DEF_STACK(T) std::stack<T> T##_stack; 
 
 #define DEF_GET_STACK(T) \
-template<> std::stack<T>& data_stack<T>(BSStack *stk) { return stk->T##_stack; }
+template<> struct StackType<T> { typedef std::stack<T> type; }; \
+template<> StackType<T>::type& data_stack<T>(BSStack *stk) { return stk->T##_stack; } \
+template<> T get_top<T>(const std::stack<T>& stk) { return stk.top(); } 
 
 typedef unsigned char BS_UCHAR;
 typedef unsigned short BS_USHORT;
 typedef unsigned int BS_UINT;
 typedef unsigned long BS_ULONG;
+typedef boost::any BS_ANY;
 
 
 
@@ -41,17 +45,46 @@ struct BSStack
     DEF_STACK(BS_USHORT)
     DEF_STACK(BS_UINT)
     DEF_STACK(BS_ULONG)
+
+    std::stack<boost::any> general_stack;
+    //DEF_STACK(BS_ANY)
     
     BSStack() : index(counter++){} 
     int index;
 };
 
+template <class T>
+struct StackType
+{
+    typedef std::stack<boost::any> type;
+};
+
+    
+
 //static std::deque<boost::any> data_stack;
-template<class T> std::stack<T>& data_stack(BSStack *stk) 
+template<class T> 
+typename StackType<T>::type& data_stack(BSStack *stk) 
+{
+    return stk->general_stack;
+    //assert(false);
+    //return std::stack<T>();
+}
+
+
+template<class T> 
+T get_top(const std::stack<T>& stk) 
 {
     assert(false);
-    return std::stack<T>();
+    return T();
 }
+
+template<class T> 
+T get_top(const std::stack<boost::any>& stk) 
+{
+    return boost::any_cast<T>(stk.top());
+}
+
+
 
 DEF_GET_STACK(char)
 DEF_GET_STACK(short)
@@ -64,6 +97,9 @@ DEF_GET_STACK(BS_UCHAR)
 DEF_GET_STACK(BS_USHORT)
 DEF_GET_STACK(BS_UINT)
 DEF_GET_STACK(BS_ULONG)
+
+
+
 
 //static std::stack<int> int_stack;
 
@@ -98,7 +134,7 @@ inline T pop(BSStack* stk)
     //cout << typeid(data_stack<T>(stk)).name() << '\n';
     //cout << "@@@@@@@@@@"  << stk->index << " " << data_stack<T>(stk).size() << "\n";
     assert(!data_stack<T>(stk).empty());
-    T val = data_stack<T>(stk).top();
+    T val = get_top<T>(data_stack<T>(stk));
     data_stack<T>(stk).pop();
     return val;
 }
