@@ -41,6 +41,16 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
             {
                 bf->c1=0;
                 s->runway_in_use++;
+				s->dep_req_accepted++;
+
+				//dummy loop
+				int i=0;
+				while(i < s->max_runway)
+				{
+					s->arrival_req_accepted++;
+					i++;
+				}
+
                 int dest_region = bs_rand_integer(s->rn, 0, NUMBER_OF_REGION_CONTROLLER-1);
                 e = tw_event_new(dest_region, bs_rand_exponential(s->rn, 1), lp);
                 m = (air_traffic_message*)tw_event_data(e);
@@ -52,6 +62,7 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
             else
             {
                 bf->c1=1;
+				s->dep_req_rejected++;
 
             }
 
@@ -259,7 +270,7 @@ tw_lptype airport_lps[] =
 {
 	{
 		(init_f) p_init,
-		(event_f) fw_event_handler,
+		(event_f) event_handler,
 		(revent_f) rc_event_handler,
 		(final_f) final,
 		(map_f) mapping,
