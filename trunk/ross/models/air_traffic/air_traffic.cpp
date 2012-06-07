@@ -25,6 +25,66 @@ mapping(tw_lpid gid)
 	return (tw_peid) gid / g_tw_nlp;
 }
 
+void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * lp)
+{    
+    tw_stime ts;
+    tw_event *e;
+    air_traffic_message *m;
+    
+    switch(msg->type)
+    {
+        * (int *)bf = (int)0;
+            
+        case DEP:
+        {
+            if (s->runway_in_use < s->max_runway) 
+            {
+                bf->c1=0;
+                s->runway_in_use++;
+                int dest_region = bs_rand_integer(s->rn, 0, NUMBER_OF_REGION_CONTROLLER-1);
+                e = tw_event_new(dest_region, bs_rand_exponential(s->rn, 1), lp);
+                m = (air_traffic_message*)tw_event_data(e);
+                m->type = TAKE_OFF;
+                m->dest_region = dest_region;
+                tw_event_send(e);
+
+            }
+            else
+            {
+                bf->c1=1;
+
+            }
+
+            break;
+        }
+
+        case TAKE_OFF:
+        {            
+            s->runway_in_use--;
+
+            int dest = bs_rand_integer(s->rn, 0, NUMBER_OF_LP-1);
+            e = tw_event_new(dest, bs_rand_exponential(s->rn, 10), lp);
+            m = (air_traffic_message*)tw_event_data(e);
+            m->type = ON_AIR;
+            m->dest_region = msg->dest_region;
+            tw_event_send(e);
+
+            break;
+        }
+            
+        case ON_AIR:
+        {
+            int dest = bs_rand_integer(s->rn, 0, NUMBER_OF_LP-1);
+            e = tw_event_new(dest, bs_rand_exponential(s->rn, 10), lp);
+            m = (air_traffic_message*)tw_event_data(e);
+            m->type = DEP;
+            m->dest_region = msg->dest_region;
+
+            tw_event_send(e);
+            break;
+        }
+    }
+}
 
 void
 p_init(airport_state * s, tw_lp * lp)
