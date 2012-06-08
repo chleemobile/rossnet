@@ -8,12 +8,12 @@
 #include "Aircraft.hpp"
 #include "Controller.hpp"
 
+#define NUMBER_OF_LP 256
 #define MEAN_DEPARTURE 30.0
 #define MEAN_LAND 10.0
 
-const int MAX_CAPACITY = 4;
+const int MAX_CAPACITY = 1;
 
-//using std::max;
 using namespace std;
 
 typedef struct airport_state airport_state;
@@ -30,12 +30,6 @@ typedef enum airport_event_t airport_event_t;
 
 struct airport_state
 {
-	int		landings;
-	int		planes_in_the_sky;
-	int		planes_on_the_ground;
-
-	tw_stime	waiting_time;
-	tw_stime	furthest_flight_landing;
     
     int rn;
 	int max_capacity;
@@ -57,18 +51,14 @@ struct airport_message
     int msg_from;
 };
 
-#define NUMBER_OF_LP 12
 static int nlp = NUMBER_OF_LP;
 static tw_lpid	 nlp_per_pe = NUMBER_OF_LP;
 
-static int sqrt_nlp = 0;
-static int sqrt_nlp_1 =0;
 
 static tw_stime	 mean_flight_time = 1;
 static int       opt_mem = 10000;
-static int	 planes_per_airport = 1;
+static int		 planes_per_airport = 10;
 
-static tw_stime	 wait_time_avg = 0.0;
 
 
 #endif

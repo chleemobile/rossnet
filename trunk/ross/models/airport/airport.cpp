@@ -25,14 +25,10 @@ void init(airport_state * s, tw_lp * lp)
 	//lp->stack_pointer = stack;
 
 	int i;
+	tw_lpid evnt_to;
+	tw_stime ts;
 	tw_event *e;
 	airport_message *m;
-
-	s->landings = 0;
-	s->planes_in_the_sky = 0;
-	s->planes_on_the_ground = planes_per_airport;
-	s->waiting_time = 0.0;
-	s->furthest_flight_landing = 0.0;
 
 	s->current_capacity = 0;
 	s->max_capacity = MAX_CAPACITY;
@@ -41,19 +37,26 @@ void init(airport_state * s, tw_lp * lp)
 
 	for(i = 0; i < planes_per_airport; i++)
 	{
-		e = tw_event_new(lp->gid, bs_rand_exponential(s->rn, MEAN_DEPARTURE), lp);
+		evnt_to = lp->gid;
+		ts = bs_rand_exponential(s->rn, MEAN_DEPARTURE);
+
+		int aircraft_dest = bs_rand_integer(s->rn, 0, NUMBER_OF_LP-1);		
+
+		e = tw_event_new(evnt_to, ts, lp);
+
+		Aircraft int_aircraft;		
 		m = (airport_message*)tw_event_data(e);
-		Aircraft int_aircraft;
 		m->type = DEPARTURE;
 		m->aircraft = int_aircraft;
+		m->aircraft.set_dest(aircraft_dest);
+
 		tw_event_send(e);
 	}
 }
 
 void event_handler(airport_state * s, tw_bf * bf, airport_message * msg, tw_lp * lp)
 {
-	int rand_result;
-	tw_lpid dst_lp;
+	tw_lpid evnt_to;
 	tw_stime ts;
 	tw_event *e;
 	airport_message *m;
@@ -64,90 +67,50 @@ void event_handler(airport_state * s, tw_bf * bf, airport_message * msg, tw_lp *
 		case ARRIVAL:
 			{
 				// Schedule a landing in the future	
-				s->planes_in_the_sky++;
-				msg->saved_furthest_flight_landing = s->furthest_flight_landing;
-				s->furthest_flight_landing = max(s->furthest_flight_landing, tw_now(lp));
+				evnt_to = lp->gid;
 				ts = bs_rand_exponential(s->rn, MEAN_LAND);
-				e = tw_event_new(lp->gid, ts + s->furthest_flight_landing - tw_now(lp), lp);
+
+				e = tw_event_new(lp->gid, ts, lp);
+
 				m = (airport_message*)tw_event_data(e);
 				m->type = LAND;
-				m->waiting_time = s->furthest_flight_landing - tw_now(lp);
 				m->aircraft = msg->aircraft;
-				s->furthest_flight_landing += ts;
 				tw_event_send(e);
 				break;
 			}
 
 		case DEPARTURE:
 			{
-				cout<<"handling "<<msg->aircraft.get_id()<<endl;
+				//cout<<"handling "<<msg->aircraft.get_id()<<endl;
 
 				if(s->current_capacity < s->max_capacity)
 				{
-					s->dep_processed;
+					s->dep_processed++;
 					s->current_capacity++;
-					s->planes_on_the_ground--;
+					
+					evnt_to = msg->aircraft.get_dest();							
 					ts = bs_rand_exponential(s->rn, mean_flight_time);
-					rand_result = bs_rand_integer(s->rn, 0, 3);
-					dst_lp = 0;
 
-					switch(rand_result)
-					{
-						case 0:
-							// Fly north
-							if(lp->gid < sqrt_nlp)
-								// Wrap around
-								dst_lp = lp->gid + sqrt_nlp_1 * sqrt_nlp;
-							else
-								dst_lp = lp->gid - sqrt_nlp_1;
-							break;
-						case 1:
-							// Fly south
-							if(lp->gid >= sqrt_nlp_1 * sqrt_nlp)
-								// Wrap around
-								dst_lp = lp->gid - sqrt_nlp_1 * sqrt_nlp;
-							else
-								dst_lp = lp->gid + sqrt_nlp_1;
-							break;
-						case 2:
-							// Fly east
-							if((lp->gid % sqrt_nlp) == sqrt_nlp_1)
-								// Wrap around
-								dst_lp = lp->gid - sqrt_nlp_1;
-							else
-								dst_lp = lp->gid + 1;
-							break;
-						case 3:
-							// Fly west
-							if((lp->gid % sqrt_nlp) == 0)
-								// Wrap around
-								dst_lp = lp->gid + sqrt_nlp_1;
-							else
-								dst_lp = lp->gid - 1;
-							break;
+					e = tw_event_new(evnt_to, ts, lp);
 
-					}
-
-					e = tw_event_new(dst_lp, ts, lp);
 					m = (airport_message*)tw_event_data(e);
 					m->type = ARRIVAL;
+					m->aircraft = msg->aircraft;
 					tw_event_send(e);
 
 				}
 				else
 				{
 					s->dep_queued++;
-					
-					cout<<"queuing "<<msg->aircraft.get_id()<<endl;
 
+					cout<<"queuing "<<msg->aircraft.get_id()<<"("<<s->queue.size()<<")"<<endl;
 					s->queue.push_back(msg->aircraft);
-					Aircraft temp = s->queue.front();
-					cout<<"temp "<<temp.get_id()<<endl;
 
-					s->queue.erase(s->queue.begin());
-					cout<<"after erase "<<temp.get_id()<<endl;
-
-
+					for (vector<Aircraft>::iterator i = s->queue.begin(); i != s->queue.end();++i)
+					{
+						cout << (*i).get_id() << ",";
+					}	
+					cout<<""<<endl;
 				}
 
 				break;
@@ -155,171 +118,31 @@ void event_handler(airport_state * s, tw_bf * bf, airport_message * msg, tw_lp *
 
 		case LAND:
 			{
-				//s->current_capacity--;				
-				s->planes_on_the_ground++;
-				s->planes_in_the_sky--;
-				s->landings++;
-				s->waiting_time += msg->waiting_time;
+				s->current_capacity--;				
 
-				e = tw_event_new(lp->gid, bs_rand_exponential(s->rn, MEAN_DEPARTURE), lp);
-				m = (airport_message*)tw_event_data(e);
-				Aircraft new_aircraft;
-				m->type = DEPARTURE;
-				m->aircraft = new_aircraft;
-				tw_event_send(e);
-				break;
-			}
+				evnt_to = lp->gid;	
+				ts = bs_rand_exponential(s->rn, mean_flight_time);
 
-	}
-}
+				e = tw_event_new(evnt_to, ts, lp);
 
-
-	void
-fw_event_handler(airport_state * s, tw_bf * bf, airport_message * msg, tw_lp * lp)
-{    
-	int rand_result;
-	tw_lpid dst_lp;
-	tw_stime ts;
-	tw_event *e;
-	airport_message *m;
-
-	switch(msg->type)
-	{
-		case ARRIVAL:
-			{
-				// Schedule a landing in the future	
-				s->planes_in_the_sky++;
-				msg->saved_furthest_flight_landing = s->furthest_flight_landing;
-				s->furthest_flight_landing = max(s->furthest_flight_landing, tw_now(lp));
-				ts = bs_rand_exponential2(s->rn, MEAN_LAND, lp);
-				e = tw_event_new(lp->gid, ts + s->furthest_flight_landing - tw_now(lp), lp);
-				m = (airport_message*)tw_event_data(e);
-				m->type = LAND;
-				m->waiting_time = s->furthest_flight_landing - tw_now(lp);
-				s->furthest_flight_landing += ts;
-				tw_event_send(e);
-				break;
-			}
-
-		case DEPARTURE:
-			{
-				s->planes_on_the_ground--;
-				ts = bs_rand_exponential2(s->rn, mean_flight_time, lp);
-				rand_result = bs_rand_integer2(s->rn, 0, 3, lp);
-				dst_lp = 0;
-
-				int approved = bs_rand_integer2(s->rn, 0, 3, lp);
-
-				if (approved == 1) 
-				{
-					switch(rand_result)
-					{
-						case 0:
-							// Fly north
-							if(lp->gid < sqrt_nlp)
-								// Wrap around
-								dst_lp = lp->gid + sqrt_nlp_1 * sqrt_nlp;
-							else
-								dst_lp = lp->gid - sqrt_nlp_1;
-							break;
-						case 1:
-							// Fly south
-							if(lp->gid >= sqrt_nlp_1 * sqrt_nlp)
-								// Wrap around
-								dst_lp = lp->gid - sqrt_nlp_1 * sqrt_nlp;
-							else
-								dst_lp = lp->gid + sqrt_nlp_1;
-							break;
-						case 2:
-							// Fly east
-							if((lp->gid % sqrt_nlp) == sqrt_nlp_1)
-								// Wrap around
-								dst_lp = lp->gid - sqrt_nlp_1;
-							else
-								dst_lp = lp->gid + 1;
-							break;
-						case 3:
-							// Fly west
-							if((lp->gid % sqrt_nlp) == 0)
-								// Wrap around
-								dst_lp = lp->gid + sqrt_nlp_1;
-							else
-								dst_lp = lp->gid - 1;
-							break;
-					}
-
-					e = tw_event_new(dst_lp, ts, lp);
-					m = (airport_message*)tw_event_data(e);
-					m->type = LAND;
-					m->msg_from = lp->gid;
-
-					tw_event_send(e);
-
-				}
-				else
-				{
-					e = tw_event_new(lp->gid, ts, lp);
-					m = (airport_message*)tw_event_data(e);
-					m->type = DEPARTURE;
-					m->msg_from = lp->gid;
-
-					tw_event_send(e);	
-				}
-
-
-				break;
-			}
-
-		case LAND:
-			{
-				s->planes_on_the_ground++;
-				s->planes_in_the_sky--;
-				s->landings++;
-				s->waiting_time += msg->waiting_time;
-
-				e = tw_event_new(lp->gid, bs_rand_exponential2(s->rn, MEAN_DEPARTURE, lp), lp);
+				int aircraft_dest = bs_rand_integer(s->rn, 0, NUMBER_OF_LP-1);		
+				Aircraft int_aircraft;		
 				m = (airport_message*)tw_event_data(e);
 				m->type = DEPARTURE;
+				m->aircraft = int_aircraft;
+				m->aircraft.set_dest(aircraft_dest);
+				
 				tw_event_send(e);
+
 				break;
 			}
 
 	}
 }
 
-	void
-rc_event_handler(airport_state * s, tw_bf * bf, airport_message * msg, tw_lp * lp)
-{    
-	switch(msg->type)
-	{
-		case ARRIVAL:
-			s->planes_in_the_sky--;
-			s->furthest_flight_landing = msg->saved_furthest_flight_landing;
-			bs_rand_rvs(s->rn, lp);
-			break;
 
-		case DEPARTURE:
-			s->planes_on_the_ground++;
-			bs_rand_rvs(s->rn, lp);
-			bs_rand_rvs(s->rn, lp);
-			bs_rand_rvs(s->rn, lp);
-
-			break;
-
-		case LAND:
-			s->planes_on_the_ground--;
-			s->planes_in_the_sky++;
-			s->landings--;
-			s->waiting_time -= msg->waiting_time;
-			bs_rand_rvs(s->rn, lp);
-			break;
-	}
-}
-
-	void
-final(airport_state * s, tw_lp * lp)
+void final(airport_state * s, tw_lp * lp)
 {
-	wait_time_avg += ((s->waiting_time / (double) s->landings) / nlp_per_pe);
 }
 
 
@@ -328,7 +151,7 @@ tw_lptype airport_lps[] =
 	{
 		(init_f) init,
 		(event_f) event_handler,
-		(revent_f) rc_event_handler,
+		(revent_f) event_handler,
 		(final_f) final,
 		(map_f) mapping,
 		sizeof(airport_state),
@@ -363,14 +186,11 @@ main(int argc, char **argv, char **env)
 	for(i = 0; i < g_tw_nlp; i++)
 		tw_lp_settype(i, &airport_lps[0]);
 
-	sqrt_nlp = (int)sqrt(nlp);
-	sqrt_nlp_1 = sqrt_nlp-1;
 	tw_run();
 
 	if(tw_ismaster())
 	{
 		printf("\nAirport Model Statistics:\n");
-		printf("\t%-50s %11.4lf\n", "Average Waiting Time", wait_time_avg);
 		printf("\t%-50s %11lld\n", "Number of airports", 
 				nlp_per_pe * g_tw_npe * tw_nnodes());
 		printf("\t%-50s %11lld\n", "Number of planes", 
