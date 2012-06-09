@@ -30,10 +30,13 @@ void init(airport_state * s, tw_lp * lp)
 	tw_event *e;
 	airport_message *m;
 
+	s->rn = lp->gid;
 	s->current_capacity = 0;
 	s->max_capacity = MAX_CAPACITY;
 	s->dep_processed = 0;
 	s->dep_queued = 0;
+	s->wdelay = 0;
+	s->sdelay = 0;
 
 	for(i = 0; i < planes_per_airport; i++)
 	{
@@ -67,6 +70,8 @@ void event_handler(airport_state * s, tw_bf * bf, airport_message * msg, tw_lp *
 		case ARRIVAL:
 			{
 				// Schedule a landing in the future	
+				//printf("ARRIVAL aircraft %d arrived \n", msg->aircraft.get_id());
+				
 				evnt_to = lp->gid;
 				ts = bs_rand_exponential(s->rn, MEAN_LAND);
 
@@ -82,20 +87,38 @@ void event_handler(airport_state * s, tw_bf * bf, airport_message * msg, tw_lp *
 		case DEPARTURE:
 			{
 				//cout<<"handling "<<msg->aircraft.get_id()<<endl;
+			
+				msg->aircraft.set_wclock(tw_now(lp));
 
+				s->queue.push_back(msg->aircraft);
+	
 				if(s->current_capacity < s->max_capacity)
 				{
 					s->dep_processed++;
 					s->current_capacity++;
 					
-					evnt_to = msg->aircraft.get_dest();							
-					ts = bs_rand_exponential(s->rn, mean_flight_time);
+					assert(s->queue.size() > 0);
+		
+					//printf("DEP handling %d aircraft \n", t_aircraft.get_id());
+
+
+					Aircraft t_aircraft = s->queue.front();
+					s->queue.erase(s->queue.begin());
+
+					s->wdelay += t_aircraft.get_wdelay();
+					s->sdelay += t_aircraft.get_sdelay();
+
+					t_aircraft.reset_delays();
+					
+					
+					evnt_to = t_aircraft.get_dest();							
+					ts = bs_rand_exponential(s->rn, MEAD_FLIGHT);
 
 					e = tw_event_new(evnt_to, ts, lp);
 
 					m = (airport_message*)tw_event_data(e);
 					m->type = ARRIVAL;
-					m->aircraft = msg->aircraft;
+					m->aircraft = t_aircraft;
 					tw_event_send(e);
 
 				}
@@ -103,14 +126,17 @@ void event_handler(airport_state * s, tw_bf * bf, airport_message * msg, tw_lp *
 				{
 					s->dep_queued++;
 
-					cout<<"queuing "<<msg->aircraft.get_id()<<"("<<s->queue.size()<<")"<<endl;
-					s->queue.push_back(msg->aircraft);
+					//cout<<"queuing "<<msg->aircraft.get_id()<<"("<<s->queue.size()<<")"<<endl;
 
-					for (vector<Aircraft>::iterator i = s->queue.begin(); i != s->queue.end();++i)
+					vector<Aircraft>::iterator itr = s->queue.begin(); 
+					while(itr != s->queue.end())
 					{
-						cout << (*i).get_id() << ",";
+						(*itr).calculate_wdelay(tw_now(lp));
+						(*itr).increase_sdelay();
+						itr++;
+						//printf("aircraft %d has been waiting %f, %d\n",(*itr).get_id(), (*itr).get_wdelay(), (*itr).get_sdelay());
 					}	
-					cout<<""<<endl;
+					//cout<<""<<endl;
 				}
 
 				break;
@@ -118,10 +144,12 @@ void event_handler(airport_state * s, tw_bf * bf, airport_message * msg, tw_lp *
 
 		case LAND:
 			{
+				//printf("LAND aircraft %d arrived \n", msg->aircraft.get_id());
+				
 				s->current_capacity--;				
 
 				evnt_to = lp->gid;	
-				ts = bs_rand_exponential(s->rn, mean_flight_time);
+				ts = bs_rand_exponential(s->rn, MEAD_FLIGHT);
 
 				e = tw_event_new(evnt_to, ts, lp);
 
@@ -143,6 +171,12 @@ void event_handler(airport_state * s, tw_bf * bf, airport_message * msg, tw_lp *
 
 void final(airport_state * s, tw_lp * lp)
 {
+	ttl_wdelay += s->wdelay;
+	ttl_sdelay += s->sdelay;
+	ttl_dep_processed += s->dep_processed;
+
+	avg_wdelay = ttl_wdelay / ttl_dep_processed;
+	avg_sdelay = ttl_sdelay / ttl_dep_processed;
 }
 
 
@@ -165,7 +199,6 @@ const tw_optdef app_opt [] =
 	TWOPT_GROUP("Airport Model"),
 	//TWOPT_UINT("nairports", nlp_per_pe, "initial # of airports(LPs)"),
 	TWOPT_UINT("nplanes", planes_per_airport, "initial # of planes per airport(events)"),
-	TWOPT_STIME("mean", mean_flight_time, "mean flight time for planes"),
 	TWOPT_UINT("memory", opt_mem, "optimistic memory"),
 	TWOPT_END()
 };
@@ -195,6 +228,10 @@ main(int argc, char **argv, char **env)
 				nlp_per_pe * g_tw_npe * tw_nnodes());
 		printf("\t%-50s %11lld\n", "Number of planes", 
 				planes_per_airport * nlp_per_pe * g_tw_npe * tw_nnodes());
+		cout<<"\tAvg wdelay : "<<avg_wdelay<<" in dep queue"<<endl;
+		cout<<"\tAvg sdelay : "<<avg_sdelay<<" in dep queue"<<endl;
+
+
 	}
 
 	tw_end();
