@@ -128,12 +128,14 @@ void event_handler(airport_state * s, tw_bf * bf, airport_message * msg, tw_lp *
 
 					//cout<<"queuing "<<msg->aircraft.get_id()<<"("<<s->queue.size()<<")"<<endl;
 
-					vector<Aircraft>::iterator itr = s->queue.begin(); 
-					while(itr != s->queue.end())
+					//vector<Aircraft>::iterator itr = s->queue.begin(); 
+					int temp_size = s->queue.size();
+					int temp_i = 0;
+					while(temp_i < temp_size)
 					{
-						(*itr).calculate_wdelay(tw_now(lp));
-						(*itr).increase_sdelay();
-						itr++;
+						s->queue[temp_i].calculate_wdelay(tw_now(lp));
+						s->queue[temp_i].increase_sdelay();
+						temp_i++;
 						//printf("aircraft %d has been waiting %f, %d\n",(*itr).get_id(), (*itr).get_wdelay(), (*itr).get_sdelay());
 					}	
 					//cout<<""<<endl;

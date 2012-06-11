@@ -13,7 +13,7 @@
 #define MEAD_FLIGHT 20.0
 #define MEAN_LAND 10.0
 
-const int MAX_CAPACITY = 1;
+#define MAX_CAPACITY 1
 
 using namespace std;
 
@@ -66,7 +66,5 @@ static tw_lpid	 nlp_per_pe = NUMBER_OF_LP;
 
 static int       opt_mem = 100000;
 static int		 planes_per_airport = 100;
-
-
 
 #endif

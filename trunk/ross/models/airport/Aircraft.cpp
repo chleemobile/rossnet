@@ -22,12 +22,12 @@ Aircraft::~Aircraft()
 
 }
 
-Aircraft& Aircraft::operator=( Aircraft &src)
-{
+//Aircraft& Aircraft::operator=( Aircraft &src)
+//{
 	//cout<<"copy contructor overloading"<<endl;
-	m_id = src.m_id;
-	return *this;
-}
+//	m_id = src.m_id;
+//	return *this;
+//}
 
 
 void Aircraft::set_dest(const int dest)

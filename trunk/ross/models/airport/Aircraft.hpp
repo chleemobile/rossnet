@@ -8,7 +8,7 @@ class Aircraft
 public:
 	Aircraft();
 	virtual ~Aircraft();
-	Aircraft& operator=( Aircraft &src);
+	//Aircraft& operator=( Aircraft &src);
 
 	void set_dest(const int dest);
 	void set_wclock(const double now);
