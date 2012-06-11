@@ -20,7 +20,7 @@ public:
 	int get_id();
 	int get_dest();
 	
-private:
+//private:
 	static int m_id_generator;
 
 	int m_id;

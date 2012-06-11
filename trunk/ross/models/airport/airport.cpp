@@ -88,7 +88,7 @@ void event_handler(airport_state * s, tw_bf * bf, airport_message * msg, tw_lp *
 			{
 				//cout<<"handling "<<msg->aircraft.get_id()<<endl;
 			
-				msg->aircraft.set_wclock(tw_now(lp));
+				msg->aircraft.m_wclock = tw_now(lp);
 
 				s->queue.push_back(msg->aircraft);
 	
@@ -105,13 +105,15 @@ void event_handler(airport_state * s, tw_bf * bf, airport_message * msg, tw_lp *
 					Aircraft t_aircraft = s->queue.front();
 					s->queue.erase(s->queue.begin());
 
-					s->wdelay += t_aircraft.get_wdelay();
-					s->sdelay += t_aircraft.get_sdelay();
+					s->wdelay += t_aircraft.m_wdelay;
+					s->sdelay += t_aircraft.m_sdelay;
 
-					t_aircraft.reset_delays();
+					t_aircraft.m_wdelay = 0;
+					t_aircraft.m_sdelay = 0;
+					t_aircraft.m_wclock = 0;
 					
 					
-					evnt_to = t_aircraft.get_dest();							
+					evnt_to = t_aircraft.m_dest;							
 					ts = bs_rand_exponential(s->rn, MEAD_FLIGHT);
 
 					e = tw_event_new(evnt_to, ts, lp);
@@ -133,8 +135,8 @@ void event_handler(airport_state * s, tw_bf * bf, airport_message * msg, tw_lp *
 					int temp_i = 0;
 					while(temp_i < temp_size)
 					{
-						s->queue[temp_i].calculate_wdelay(tw_now(lp));
-						s->queue[temp_i].increase_sdelay();
+						//s->queue[temp_i].calculate_wdelay(tw_now(lp));
+						s->queue[temp_i].m_sdelay++;
 						temp_i++;
 						//printf("aircraft %d has been waiting %f, %d\n",(*itr).get_id(), (*itr).get_wdelay(), (*itr).get_sdelay());
 					}	
@@ -160,7 +162,7 @@ void event_handler(airport_state * s, tw_bf * bf, airport_message * msg, tw_lp *
 				m = (airport_message*)tw_event_data(e);
 				m->type = DEPARTURE;
 				m->aircraft = int_aircraft;
-				m->aircraft.set_dest(aircraft_dest);
+				m->aircraft.m_dest = aircraft_dest;
 				
 				tw_event_send(e);
 
