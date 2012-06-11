@@ -132,6 +132,15 @@ void event_handler(airport_state * s, tw_bf * bf, airport_message * msg, tw_lp *
 					while(temp_i < temp_size)
 					{
 						//s->queue[temp_i].calculate_wdelay(tw_now(lp));
+						
+						double t_now = tw_now(lp);
+						double t_wdelay = s->queue[temp_i].m_wdelay;
+						double t_wclock = s->queue[temp_i].m_wclock;
+						t_wdelay = t_wdelay + (t_now - t_wclock );
+
+						s->queue[temp_i].m_wdelay = t_wdelay;
+						s->queue[temp_i].m_wclock = t_wclock;
+
 						s->queue[temp_i].m_sdelay++;
 						temp_i++;
 						//printf("aircraft %d has been waiting %f, %d\n",(*itr).get_id(), (*itr).get_wdelay(), (*itr).get_sdelay());
@@ -174,9 +183,10 @@ void final(airport_state * s, tw_lp * lp)
 	ttl_wdelay += s->wdelay;
 	ttl_sdelay += s->sdelay;
 	ttl_dep_processed += s->dep_processed;
+	ttl_dep_queued += s->dep_queued;
 
-	avg_wdelay = ttl_wdelay / ttl_dep_processed;
-	avg_sdelay = ttl_sdelay / ttl_dep_processed;
+	avg_wdelay = (double) ttl_wdelay / ttl_dep_processed;
+	avg_sdelay = (double) ttl_sdelay / ttl_dep_processed;
 }
 
 
@@ -228,6 +238,9 @@ main(int argc, char **argv, char **env)
 				nlp_per_pe * g_tw_npe * tw_nnodes());
 		printf("\t%-50s %11lld\n", "Number of planes", 
 				planes_per_airport * nlp_per_pe * g_tw_npe * tw_nnodes());
+		cout<<"\tdep processed : "<<ttl_dep_processed<<endl;
+		cout<<"\tdep delayed : "<<ttl_dep_queued<<endl;
+
 		cout<<"\tAvg wdelay : "<<avg_wdelay<<" in dep queue"<<endl;
 		cout<<"\tAvg sdelay : "<<avg_sdelay<<" in dep queue"<<endl;
 
