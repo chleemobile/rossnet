@@ -17,8 +17,8 @@ tw_peid mapping(tw_lpid gid)
 
 void init(airport_state * s, tw_lp * lp)
 {
-	//BSStack* stack = new BSStack();
-	//lp->stack_pointer = stack;
+	BSStack* stack = new BSStack();
+	lp->stack_pointer = stack;
 
 	int i;
 	tw_lpid evnt_to;
