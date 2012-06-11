@@ -4,14 +4,10 @@
 #include <math.h>
 
 /*
-   airport.c
-   Airport simulator
-   20011003
-   Justin M. LaPre
+ 	
+   Chayong Lee
+   06012012
 
-   2008/2/16
-   Modified for ROSS 4.0
-   David Bauer
  */
 
 tw_peid mapping(tw_lpid gid)
@@ -51,7 +47,7 @@ void init(airport_state * s, tw_lp * lp)
 		m = (airport_message*)tw_event_data(e);
 		m->type = DEPARTURE;
 		m->aircraft = int_aircraft;
-		m->aircraft.set_dest(aircraft_dest);
+		m->aircraft.m_dest = aircraft_dest;
 
 		tw_event_send(e);
 	}
