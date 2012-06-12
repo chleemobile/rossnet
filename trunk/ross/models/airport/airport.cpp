@@ -36,12 +36,13 @@ void init(airport_state * s, tw_lp * lp)
 
 	if(lp->gid % 2)
 	{
-		RegionController *rc = (RegionController*)&s->controller;
+		RegionController *rc = new RegionController();
+		s->controller = (*rc);
 	}
 	else
 	{
-		//(&(s->controller)) = new LocalTrafficController();
-
+		LocalTrafficController *ltc = new LocalTrafficController();
+		s->controller = (*ltc);
 	}
 
 	for(i = 0; i < planes_per_airport; i++)
@@ -78,7 +79,7 @@ void event_handler(airport_state * s, tw_bf * bf, airport_message * msg, tw_lp *
 				// Schedule a landing in the future	
 				//printf("ARRIVAL aircraft %d arrived \n", msg->aircraft.get_id());
 
-
+				s->controller.handle();
 				evnt_to = lp->gid;
 				ts = bs_rand_exponential(s->rn, MEAN_LAND);
 

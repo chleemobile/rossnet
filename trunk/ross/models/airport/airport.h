@@ -46,7 +46,7 @@ struct airport_state
 	double wdelay;
 	int sdelay;
 
-	Controller controller;
+	Controller &controller;
 	
 };
 
