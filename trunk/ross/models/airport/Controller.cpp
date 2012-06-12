@@ -9,3 +9,8 @@ Controller::~Controller()
 {
 
 }
+
+void Controller::handle()
+{
+	cout<<"CTR handle"<<endl;
+}

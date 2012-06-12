@@ -7,6 +7,9 @@
 #include <stack>
 #include "Aircraft.hpp"
 #include "Controller.hpp"
+#include "RegionController.hpp"
+#include "LocalTrafficController.hpp"
+
 
 #define NUMBER_OF_LP 1024
 #define MEAN_DEPARTURE 30.0
@@ -42,6 +45,8 @@ struct airport_state
 	vector<Aircraft> queue;
 	double wdelay;
 	int sdelay;
+
+	Controller controller;
 	
 };
 
@@ -56,6 +61,7 @@ struct airport_message
 static  double  ttl_wdelay = 0;
 static  long ttl_sdelay = 0;
 static  long ttl_dep_processed = 0;
+static  long ttl_dep_queued = 0;
 
 static double avg_wdelay = 0;
 static double avg_sdelay = 0;
@@ -64,7 +70,8 @@ static int nlp = NUMBER_OF_LP;
 static tw_lpid	 nlp_per_pe = NUMBER_OF_LP;
 
 
-static int       opt_mem = 100000;
-static int		 planes_per_airport = 100;
+static int       opt_mem = 1000000;
+static int		 planes_per_airport = 50;
+
 
 #endif

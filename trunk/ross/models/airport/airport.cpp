@@ -4,7 +4,7 @@
 #include <math.h>
 
 /*
- 	
+
    Chayong Lee
    06012012
 
@@ -33,6 +33,16 @@ void init(airport_state * s, tw_lp * lp)
 	s->dep_queued = 0;
 	s->wdelay = 0;
 	s->sdelay = 0;
+
+	if(lp->gid % 2)
+	{
+		RegionController *rc = (RegionController*)&s->controller;
+	}
+	else
+	{
+		//(&(s->controller)) = new LocalTrafficController();
+
+	}
 
 	for(i = 0; i < planes_per_airport; i++)
 	{
@@ -67,7 +77,8 @@ void event_handler(airport_state * s, tw_bf * bf, airport_message * msg, tw_lp *
 			{
 				// Schedule a landing in the future	
 				//printf("ARRIVAL aircraft %d arrived \n", msg->aircraft.get_id());
-				
+
+
 				evnt_to = lp->gid;
 				ts = bs_rand_exponential(s->rn, MEAN_LAND);
 
@@ -83,18 +94,18 @@ void event_handler(airport_state * s, tw_bf * bf, airport_message * msg, tw_lp *
 		case DEPARTURE:
 			{
 				//cout<<"handling "<<msg->aircraft.get_id()<<endl;
-			
+
 				msg->aircraft.m_wclock = tw_now(lp);
 
 				s->queue.push_back(msg->aircraft);
-	
+
 				if(s->current_capacity < s->max_capacity)
 				{
 					s->dep_processed++;
 					s->current_capacity++;
-					
+
 					assert(s->queue.size() > 0);
-		
+
 					//printf("DEP handling %d aircraft \n", t_aircraft.get_id());
 
 
@@ -107,8 +118,8 @@ void event_handler(airport_state * s, tw_bf * bf, airport_message * msg, tw_lp *
 					t_aircraft.m_wdelay = 0;
 					t_aircraft.m_sdelay = 0;
 					t_aircraft.m_wclock = 0;
-					
-					
+
+
 					evnt_to = t_aircraft.m_dest;							
 					ts = bs_rand_exponential(s->rn, MEAD_FLIGHT);
 
@@ -132,7 +143,7 @@ void event_handler(airport_state * s, tw_bf * bf, airport_message * msg, tw_lp *
 					while(temp_i < temp_size)
 					{
 						//s->queue[temp_i].calculate_wdelay(tw_now(lp));
-						
+
 						double t_now = tw_now(lp);
 						double t_wdelay = s->queue[temp_i].m_wdelay;
 						double t_wclock = s->queue[temp_i].m_wclock;
@@ -154,7 +165,7 @@ void event_handler(airport_state * s, tw_bf * bf, airport_message * msg, tw_lp *
 		case LAND:
 			{
 				//printf("LAND aircraft %d arrived \n", msg->aircraft.get_id());
-				
+
 				s->current_capacity--;				
 
 				evnt_to = lp->gid;	
@@ -168,7 +179,7 @@ void event_handler(airport_state * s, tw_bf * bf, airport_message * msg, tw_lp *
 				m->type = DEPARTURE;
 				m->aircraft = int_aircraft;
 				m->aircraft.m_dest = aircraft_dest;
-				
+
 				tw_event_send(e);
 
 				break;
