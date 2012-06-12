@@ -36,13 +36,11 @@ void init(airport_state * s, tw_lp * lp)
 
 	if(lp->gid % 2)
 	{
-		RegionController *rc = new RegionController();
-		s->controller = (*rc);
+		s->controller = new RegionController(4);
 	}
 	else
 	{
-		LocalTrafficController *ltc = new LocalTrafficController();
-		s->controller = (*ltc);
+		s->controller = new LocalTrafficController(1);
 	}
 
 	for(i = 0; i < planes_per_airport; i++)
@@ -50,7 +48,7 @@ void init(airport_state * s, tw_lp * lp)
 		evnt_to = lp->gid;
 		ts = bs_rand_exponential(s->rn, MEAN_DEPARTURE);
 
-		int aircraft_dest = bs_rand_integer(s->rn, 0, NUMBER_OF_LP-1);		
+		int aircraft_dest = bs_rand_integer(s->rn, 0, NUMBER_OF_LP-1);	
 
 		e = tw_event_new(evnt_to, ts, lp);
 
@@ -79,7 +77,6 @@ void event_handler(airport_state * s, tw_bf * bf, airport_message * msg, tw_lp *
 				// Schedule a landing in the future	
 				//printf("ARRIVAL aircraft %d arrived \n", msg->aircraft.get_id());
 
-				s->controller.handle();
 				evnt_to = lp->gid;
 				ts = bs_rand_exponential(s->rn, MEAN_LAND);
 
@@ -100,10 +97,12 @@ void event_handler(airport_state * s, tw_bf * bf, airport_message * msg, tw_lp *
 
 				s->queue.push_back(msg->aircraft);
 
-				if(s->current_capacity < s->max_capacity)
+				if(s->controller->m_current_capacity < s->controller->m_max_capacity)
 				{
+					s->controller->handle_incoming();
+
 					s->dep_processed++;
-					s->current_capacity++;
+
 
 					assert(s->queue.size() > 0);
 
@@ -167,7 +166,7 @@ void event_handler(airport_state * s, tw_bf * bf, airport_message * msg, tw_lp *
 			{
 				//printf("LAND aircraft %d arrived \n", msg->aircraft.get_id());
 
-				s->current_capacity--;				
+				s->controller->handle_outgoing();			
 
 				evnt_to = lp->gid;	
 				ts = bs_rand_exponential(s->rn, MEAD_FLIGHT);

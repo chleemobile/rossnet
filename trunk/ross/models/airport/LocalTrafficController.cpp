@@ -1,8 +1,9 @@
 #include "LocalTrafficController.hpp"
 
-LocalTrafficController::LocalTrafficController()
+LocalTrafficController::LocalTrafficController(int in_max_capacity)
 {
-
+	m_max_capacity = in_max_capacity;
+	m_current_capacity = 0;
 }
 
 LocalTrafficController::~LocalTrafficController()
@@ -10,8 +11,17 @@ LocalTrafficController::~LocalTrafficController()
 
 }
 
-void LocalTrafficController::handle()
+void LocalTrafficController::handle_incoming()
 {
-	cout<<"LTC handle"<<endl;
-	m_num_runways_used++;
+	//cout<<"LTC handle"<<endl;
+	m_current_capacity++;
+
 }
+
+void LocalTrafficController::handle_outgoing()
+{
+	//cout<<"LTC handle"<<endl;
+	m_current_capacity--;
+
+}
+

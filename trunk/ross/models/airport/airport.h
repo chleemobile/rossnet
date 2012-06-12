@@ -34,7 +34,9 @@ typedef enum airport_event_t airport_event_t;
 
 struct airport_state
 {
-    
+	airport_state(): controller(NULL) {}
+	~airport_state(){if(this->controller){delete controller;}}
+
     int rn;
 	int max_capacity;
 	int current_capacity;
@@ -46,7 +48,7 @@ struct airport_state
 	double wdelay;
 	int sdelay;
 
-	Controller &controller;
+	Controller *controller;
 	
 };
 

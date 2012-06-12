@@ -3,12 +3,13 @@
 class LocalTrafficController : public Controller
 {
 	public:
-		LocalTrafficController();
+		LocalTrafficController(int in_max_capacity);
 		virtual ~LocalTrafficController();
-		void handle();
+		void handle_incoming();
+		void handle_outgoing();
 
-		int m_max_runway;
-		int m_num_runways_used;
+		//int m_max_runway;
+		//int m_num_runways_used;
 
 };
 
