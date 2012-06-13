@@ -3,6 +3,8 @@
 
 #include <ross.h>
 #include <vector>
+#include <deque>
+
 #include "iostream"
 #include <stack>
 #include "Aircraft.hpp"
@@ -34,7 +36,9 @@ typedef enum airport_event_t airport_event_t;
 
 struct airport_state
 {
-	airport_state(): controller(NULL) {}
+	airport_state(): controller(NULL), q(100)
+	{
+	}
 	~airport_state(){if(this->controller){delete controller;}}
 
     int rn;
@@ -44,7 +48,9 @@ struct airport_state
 	int dep_processed;
 	int dep_queued;
 
-	vector<Aircraft> queue;
+	//vector<Aircraft> q;
+	deque<Aircraft> q;
+
 	double wdelay;
 	int sdelay;
 
@@ -73,7 +79,7 @@ static tw_lpid	 nlp_per_pe = NUMBER_OF_LP;
 
 
 static int       opt_mem = 1000000;
-static int		 planes_per_airport = 50;
+static int		 planes_per_airport = 1;
 
 
 #endif
