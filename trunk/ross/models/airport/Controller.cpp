@@ -1,4 +1,5 @@
 #include "Controller.hpp"
+#include "assert.h"
 
 Controller::Controller()
 {
@@ -17,11 +18,13 @@ Controller::~Controller()
 
 void Controller::handle_incoming()
 {
+	assert(false);
 	cout<<"CTR handle"<<endl;
 }
 
 void Controller::handle_outgoing()
 {
+	assert(false);
 	cout<<"CTR handle"<<endl;
 }
 

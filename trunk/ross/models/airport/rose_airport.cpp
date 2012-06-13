@@ -3,7 +3,6 @@
 #include <backstroke/rand.h>
 #include <math.h>
 /*
- 	
    Chayong Lee
    06012012
  */
@@ -30,6 +29,12 @@ void init(airport_state *s,tw_lp *lp)
   s -> airport_state::dep_queued = 0;
   s -> airport_state::wdelay = 0;
   s -> airport_state::sdelay = 0;
+  if (((lp -> tw_lp::gid) % 2)) {
+    s -> airport_state::controller = (::new RegionController (4));
+  }
+  else {
+    s -> airport_state::controller = (::new LocalTrafficController (1));
+  }
   for (i = 0; i < planes_per_airport; i++) {
     evnt_to = (lp -> tw_lp::gid);
     ts = bs_rand_exponential(s -> airport_state::rn,30.0);
@@ -53,19 +58,19 @@ void event_handler(airport_state *s,tw_bf *bf,airport_message *msg,tw_lp *lp)
 {
     int __item_selector__ = (int )(msg -> airport_message::type);
     if (__item_selector__ == ARRIVAL) {
-      goto LABEL0;;
+      goto LABEL0;
     }
     else {
       if (__item_selector__ == DEPARTURE) {
-        goto LABEL1;;
+        goto LABEL1;
       }
       else {
         if (__item_selector__ == LAND) {
-          goto LABEL2;;
+          goto LABEL2;
         }
-        else {;
-        };
-      };
+        else {
+        }
+      }
     }
     LABEL0:
 // Schedule a landing in the future	
@@ -77,27 +82,27 @@ void event_handler(airport_state *s,tw_bf *bf,airport_message *msg,tw_lp *lp)
     m -> airport_message::type = LAND;
     m -> airport_message::aircraft = (msg -> airport_message::aircraft);
     tw_event_send(e);
-    goto LABEL3;;;
+    goto LABEL3;
     LABEL1:
 //cout<<"handling "<<msg->aircraft.get_id()<<endl;
     msg -> airport_message::aircraft.Aircraft::m_wclock = tw_now(lp);
     s -> airport_state::queue. push_back (msg -> airport_message::aircraft);
-    if ((s -> airport_state::current_capacity) < (s -> airport_state::max_capacity)) {
+    if (( *(s -> airport_state::controller)).Controller::m_current_capacity < ( *(s -> airport_state::controller)).Controller::m_max_capacity) {
+      ( *(s -> airport_state::controller)). handle_incoming ();
       s -> airport_state::dep_processed++;
-      s -> airport_state::current_capacity++;
       bool __temp0__;
       __temp0__ = !(s -> airport_state::queue. size () > 0);
       if ((__builtin_expect(__temp0__,0))) {
-        __assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/airport/airport.cpp",96,"s->queue.size() > 0");;
+        __assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/airport/airport.cpp",107,"s->queue.size() > 0");
       }
       else {
-        (void )0;;
-      };
+        (void )0;
+      }
 //printf("DEP handling %d aircraft \n", t_aircraft.get_id());
       class Aircraft t_aircraft(s -> airport_state::queue. front ());
       std::vector< Aircraft ,std::allocator< Aircraft  > > ::iterator __temp1__;
       __temp1__ = s -> airport_state::queue. begin ();
-      s -> airport_state::queue. erase (__temp1__);;
+      s -> airport_state::queue. erase (__temp1__);
       s -> airport_state::wdelay += t_aircraft.Aircraft::m_wdelay;
       s -> airport_state::sdelay += t_aircraft.Aircraft::m_sdelay;
       t_aircraft.Aircraft::m_wdelay = 0;
@@ -109,14 +114,14 @@ void event_handler(airport_state *s,tw_bf *bf,airport_message *msg,tw_lp *lp)
       m = ((airport_message *)(tw_event_data(e)));
       m -> airport_message::type = ARRIVAL;
       m -> airport_message::aircraft = (t_aircraft);
-      tw_event_send(e);;
+      tw_event_send(e);
     }
     else {
       s -> airport_state::dep_queued++;
 //cout<<"queuing "<<msg->aircraft.get_id()<<"("<<s->queue.size()<<")"<<endl;
 //vector<Aircraft>::iterator itr = s->queue.begin(); 
       int temp_size = (s -> airport_state::queue. size ());
-      int temp_i = 0;;
+      int temp_i = 0;
       while(temp_i < temp_size){
 //s->queue[temp_i].calculate_wdelay(tw_now(lp));
         double t_now = tw_now(lp);
@@ -126,16 +131,16 @@ void event_handler(airport_state *s,tw_bf *bf,airport_message *msg,tw_lp *lp)
         s -> airport_state::queue[temp_i].Aircraft::m_wdelay = t_wdelay;
         s -> airport_state::queue[temp_i].Aircraft::m_wclock = t_wclock;
         s -> airport_state::queue[temp_i].Aircraft::m_sdelay++;
-        temp_i++;;
+        temp_i++;
 //printf("aircraft %d has been waiting %f, %d\n",(*itr).get_id(), (*itr).get_wdelay(), (*itr).get_sdelay());
-      };
+      }
 //cout<<""<<endl;
     }
-    goto LABEL3;;;
+    goto LABEL3;
     LABEL2:
 {
 //printf("LAND aircraft %d arrived \n", msg->aircraft.get_id());
-      s -> airport_state::current_capacity--;
+      ( *(s -> airport_state::controller)). handle_outgoing ();
       evnt_to = (lp -> tw_lp::gid);
       ts = bs_rand_exponential(s -> airport_state::rn,20.0);
       e = tw_event_new(evnt_to,ts,lp);
@@ -148,65 +153,10 @@ void event_handler(airport_state *s,tw_bf *bf,airport_message *msg,tw_lp *lp)
       m -> airport_message::aircraft = (int_aircraft);
       m -> airport_message::aircraft.Aircraft::m_dest = aircraft_dest;
       tw_event_send(e);
-      goto LABEL3;;
-    };
-    LABEL3:;;;
+      goto LABEL3;
+    }
+    LABEL3:;
   }
-  s -> airport_state::rn;
-  s -> airport_state::max_capacity;
-  s -> airport_state::current_capacity;
-  s -> airport_state::dep_processed;
-  s -> airport_state::dep_queued;
-  s -> airport_state::queue;
-  s -> airport_state::wdelay;
-  s -> airport_state::sdelay;
-  bf -> tw_bf::c0;
-  bf -> tw_bf::c1;
-  bf -> tw_bf::c2;
-  bf -> tw_bf::c3;
-  bf -> tw_bf::c4;
-  bf -> tw_bf::c5;
-  bf -> tw_bf::c6;
-  bf -> tw_bf::c7;
-  bf -> tw_bf::c8;
-  bf -> tw_bf::c9;
-  bf -> tw_bf::c10;
-  bf -> tw_bf::c11;
-  bf -> tw_bf::c12;
-  bf -> tw_bf::c13;
-  bf -> tw_bf::c14;
-  bf -> tw_bf::c15;
-  bf -> tw_bf::c16;
-  bf -> tw_bf::c17;
-  bf -> tw_bf::c18;
-  bf -> tw_bf::c19;
-  bf -> tw_bf::c20;
-  bf -> tw_bf::c21;
-  bf -> tw_bf::c22;
-  bf -> tw_bf::c23;
-  bf -> tw_bf::c24;
-  bf -> tw_bf::c25;
-  bf -> tw_bf::c26;
-  bf -> tw_bf::c27;
-  bf -> tw_bf::c28;
-  bf -> tw_bf::c29;
-  bf -> tw_bf::c30;
-  bf -> tw_bf::c31;
-  msg -> airport_message::type;
-  msg -> airport_message::aircraft;
-  msg -> airport_message::msg_from;
-  lp -> tw_lp::id;
-  lp -> tw_lp::gid;
-  lp -> tw_lp::pe;
-  lp -> tw_lp::kp;
-  lp -> tw_lp::cur_state;
-  lp -> tw_lp::state_qh;
-  lp -> tw_lp::type;
-  lp -> tw_lp::rng;
-  lp -> tw_lp::stack_pointer;
-  lp -> tw_lp::current_seed;
-  lp -> tw_lp::seed_head;
-  lp -> tw_lp::seed_tail;;
 }
 
 void event_handler_forward(airport_state *s,tw_bf *bf,airport_message *msg,tw_lp *lp)
@@ -219,22 +169,22 @@ void event_handler_forward(airport_state *s,tw_bf *bf,airport_message *msg,tw_lp
 {
     int __item_selector__ = (int )(msg -> airport_message::type);
     if (__item_selector__ == ARRIVAL) {
-      goto LABEL0;;
+      goto LABEL0;
     }
     else {
       __num0 += 8;
       if (__item_selector__ == DEPARTURE) {
-        goto LABEL1;;
+        goto LABEL1;
       }
       else {
         __num0 += 4;
         if (__item_selector__ == LAND) {
-          goto LABEL2;;
+          goto LABEL2;
         }
         else {
-          __num0 += 1;;
-        };
-      };
+          __num0 += 1;
+        }
+      }
     }
     LABEL0:
 // Schedule a landing in the future	
@@ -247,29 +197,30 @@ void event_handler_forward(airport_state *s,tw_bf *bf,airport_message *msg,tw_lp
     m -> airport_message::type = LAND;
     m -> airport_message::aircraft = (msg -> airport_message::aircraft);
     tw_event_send(e);
-    goto LABEL3;;;
+    goto LABEL3;
     LABEL1:
 //cout<<"handling "<<msg->aircraft.get_id()<<endl;
     msg -> airport_message::aircraft.Aircraft::m_wclock = tw_now(lp);
     __store__(s -> airport_state::queue,lp);
     s -> airport_state::queue. push_back (msg -> airport_message::aircraft);
-    if ((s -> airport_state::current_capacity) < (s -> airport_state::max_capacity)) {
+    if (( *(s -> airport_state::controller)).Controller::m_current_capacity < ( *(s -> airport_state::controller)).Controller::m_max_capacity) {
+      __store__(s -> airport_state::controller,lp);
+      ( *(s -> airport_state::controller)). handle_incoming_forward ();
       s -> airport_state::dep_processed++;
-      s -> airport_state::current_capacity++;
       bool __temp0__;
       __temp0__ = !(s -> airport_state::queue. size () > 0);
       if ((__builtin_expect(__temp0__,0))) {
-        __assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/airport/airport.cpp",96,"s->queue.size() > 0");;
+        __assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/airport/airport.cpp",107,"s->queue.size() > 0");
       }
       else {
         __num0 += 1;
-        (void )0;;
-      };
+        (void )0;
+      }
 //printf("DEP handling %d aircraft \n", t_aircraft.get_id());
       class Aircraft t_aircraft(s -> airport_state::queue. front ());
       std::vector< Aircraft ,std::allocator< Aircraft  > > ::iterator __temp1__;
       __temp1__ = s -> airport_state::queue. begin ();
-      s -> airport_state::queue. erase (__temp1__);;
+      s -> airport_state::queue. erase (__temp1__);
       __store__(s -> airport_state::wdelay,lp);
       s -> airport_state::wdelay += t_aircraft.Aircraft::m_wdelay;
       __store__< int  > (s -> airport_state::sdelay,lp);
@@ -284,7 +235,7 @@ void event_handler_forward(airport_state *s,tw_bf *bf,airport_message *msg,tw_lp
       m = ((airport_message *)(tw_event_data(e)));
       m -> airport_message::type = ARRIVAL;
       m -> airport_message::aircraft = (t_aircraft);
-      tw_event_send(e);;
+      tw_event_send(e);
     }
     else {
       __num0 += 2;
@@ -292,7 +243,7 @@ void event_handler_forward(airport_state *s,tw_bf *bf,airport_message *msg,tw_lp
 //cout<<"queuing "<<msg->aircraft.get_id()<<"("<<s->queue.size()<<")"<<endl;
 //vector<Aircraft>::iterator itr = s->queue.begin(); 
       int temp_size = (s -> airport_state::queue. size ());
-      int temp_i = 0;;
+      int temp_i = 0;
       while(temp_i < temp_size){
 //s->queue[temp_i].calculate_wdelay(tw_now(lp));
         double t_now = tw_now(lp);
@@ -302,16 +253,16 @@ void event_handler_forward(airport_state *s,tw_bf *bf,airport_message *msg,tw_lp
         s -> airport_state::queue[temp_i].Aircraft::m_wdelay = t_wdelay;
         s -> airport_state::queue[temp_i].Aircraft::m_wclock = t_wclock;
         s -> airport_state::queue[temp_i].Aircraft::m_sdelay++;
-        temp_i++;;
+        temp_i++;
 //printf("aircraft %d has been waiting %f, %d\n",(*itr).get_id(), (*itr).get_wdelay(), (*itr).get_sdelay());
-      };
+      }
 //cout<<""<<endl;
     }
-    goto LABEL3;;;
+    goto LABEL3;
     LABEL2:
 {
 //printf("LAND aircraft %d arrived \n", msg->aircraft.get_id());
-      s -> airport_state::current_capacity--;
+      ( *(s -> airport_state::controller)). handle_outgoing_forward ();
       evnt_to = (lp -> tw_lp::gid);
       __store__< int  > (s -> airport_state::rn,lp);
       ts = bs_rand_exponential(s -> airport_state::rn,20.0);
@@ -325,65 +276,10 @@ void event_handler_forward(airport_state *s,tw_bf *bf,airport_message *msg,tw_lp
       m -> airport_message::aircraft = (int_aircraft);
       m -> airport_message::aircraft.Aircraft::m_dest = aircraft_dest;
       tw_event_send(e);
-      goto LABEL3;;
-    };
-    LABEL3:;;;
+      goto LABEL3;
+    }
+    LABEL3:;
   }
-  s -> airport_state::rn;
-  s -> airport_state::max_capacity;
-  s -> airport_state::current_capacity;
-  s -> airport_state::dep_processed;
-  s -> airport_state::dep_queued;
-  s -> airport_state::queue;
-  s -> airport_state::wdelay;
-  s -> airport_state::sdelay;
-  bf -> tw_bf::c0;
-  bf -> tw_bf::c1;
-  bf -> tw_bf::c2;
-  bf -> tw_bf::c3;
-  bf -> tw_bf::c4;
-  bf -> tw_bf::c5;
-  bf -> tw_bf::c6;
-  bf -> tw_bf::c7;
-  bf -> tw_bf::c8;
-  bf -> tw_bf::c9;
-  bf -> tw_bf::c10;
-  bf -> tw_bf::c11;
-  bf -> tw_bf::c12;
-  bf -> tw_bf::c13;
-  bf -> tw_bf::c14;
-  bf -> tw_bf::c15;
-  bf -> tw_bf::c16;
-  bf -> tw_bf::c17;
-  bf -> tw_bf::c18;
-  bf -> tw_bf::c19;
-  bf -> tw_bf::c20;
-  bf -> tw_bf::c21;
-  bf -> tw_bf::c22;
-  bf -> tw_bf::c23;
-  bf -> tw_bf::c24;
-  bf -> tw_bf::c25;
-  bf -> tw_bf::c26;
-  bf -> tw_bf::c27;
-  bf -> tw_bf::c28;
-  bf -> tw_bf::c29;
-  bf -> tw_bf::c30;
-  bf -> tw_bf::c31;
-  msg -> airport_message::type;
-  msg -> airport_message::aircraft;
-  msg -> airport_message::msg_from;
-  lp -> tw_lp::id;
-  lp -> tw_lp::gid;
-  lp -> tw_lp::pe;
-  lp -> tw_lp::kp;
-  lp -> tw_lp::cur_state;
-  lp -> tw_lp::state_qh;
-  lp -> tw_lp::type;
-  lp -> tw_lp::rng;
-  lp -> tw_lp::stack_pointer;
-  lp -> tw_lp::current_seed;
-  lp -> tw_lp::seed_head;
-  lp -> tw_lp::seed_tail;;
   __store__< int  > (__num0,lp);
 }
 
@@ -399,8 +295,9 @@ void event_handler_reverse(airport_state *s,tw_bf *bf,airport_message *msg,tw_lp
       __restore__(s -> airport_state::rn,lp);
       __restore__(s -> airport_state::sdelay,lp);
       __restore__(s -> airport_state::wdelay,lp);
-      --s -> airport_state::current_capacity;
       --s -> airport_state::dep_processed;
+      ( *(s -> airport_state::controller)). handle_incoming_reverse ();
+      __restore__(s -> airport_state::controller,lp);
     }
     __restore__(s -> airport_state::queue,lp);
   }
@@ -410,7 +307,7 @@ void event_handler_reverse(airport_state *s,tw_bf *bf,airport_message *msg,tw_lp
     }
     else {
       __restore__(s -> airport_state::rn,lp);
-      ++s -> airport_state::current_capacity;
+      ( *(s -> airport_state::controller)). handle_outgoing_reverse ();
     }
   }
 }
