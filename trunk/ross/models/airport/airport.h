@@ -55,6 +55,7 @@ struct airport_state
 	double wdelay;
 	int sdelay;
 
+	double dummy_test;
 	Controller *controller;
 	
 };
@@ -67,6 +68,7 @@ struct airport_message
     int msg_from;
 };
 
+static double ttl_dummy_test = 0;
 static  double  ttl_wdelay = 0;
 static  long ttl_sdelay = 0;
 static  long ttl_dep_processed = 0;

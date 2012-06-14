@@ -23,6 +23,7 @@ class Controller
 		int m_id;
 		int m_max_capacity;
 		int m_current_capacity;
+		double dummy_test;
 
 		int get_id();
 

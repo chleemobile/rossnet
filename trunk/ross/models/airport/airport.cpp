@@ -34,6 +34,8 @@ void init(airport_state * s, tw_lp * lp)
 	s->wdelay = 0;
 	s->sdelay = 0;
 	s->q = new deque<Aircraft>();
+	s->dummy_test = 0;
+
 
 	if(lp->gid % 2)
 	{
@@ -102,7 +104,6 @@ void event_handler(airport_state * s, tw_bf * bf, airport_message * msg, tw_lp *
 				{
 
 					s->controller->handle_incoming();
-			
 
 					s->dep_processed++;
 
@@ -199,6 +200,7 @@ void event_handler(airport_state * s, tw_bf * bf, airport_message * msg, tw_lp *
 
 void final(airport_state * s, tw_lp * lp)
 {
+	ttl_dummy_test += s->controller->dummy_test;
 	ttl_wdelay += s->wdelay;
 	ttl_sdelay += s->sdelay;
 	ttl_dep_processed += s->dep_processed;
@@ -263,6 +265,7 @@ main(int argc, char **argv, char **env)
 		cout<<"\tAvg wdelay : "<<avg_wdelay<<" in dep queue"<<endl;
 		cout<<"\tAvg sdelay : "<<avg_sdelay<<" in dep queue"<<endl;
 
+		cout<<"\ttotal dummy test : "<<ttl_dummy_test<<" in dep queue"<<endl;
 
 	}
 

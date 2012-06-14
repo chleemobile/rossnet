@@ -9,6 +9,7 @@ Controller::Controller(int in_max_capacity)
 {
 	m_max_capacity = in_max_capacity;
 	m_current_capacity = 0;
+	dummy_test = 0;
 }
 
 Controller::~Controller()
