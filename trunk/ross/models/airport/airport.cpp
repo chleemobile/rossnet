@@ -103,7 +103,7 @@ void event_handler(airport_state * s, tw_bf * bf, airport_message * msg, tw_lp *
 				if(s->controller->m_current_capacity < s->controller->m_max_capacity)
 				{
 
-					s->controller->handle_incoming();
+					s->controller->handle_incoming(lp);
 
 					s->dep_processed++;
 
@@ -175,7 +175,7 @@ void event_handler(airport_state * s, tw_bf * bf, airport_message * msg, tw_lp *
 			{
 				//printf("LAND aircraft %d arrived \n", msg->aircraft.get_id());
 
-				s->controller->handle_outgoing();			
+				s->controller->handle_outgoing(lp);			
 
 				evnt_to = lp->gid;	
 				ts = bs_rand_exponential(s->rn, MEAD_FLIGHT);

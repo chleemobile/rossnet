@@ -5,8 +5,8 @@ SET(airport_srcs
 	airport.cpp airport.h 
 	Aircraft.cpp Aircraft.hpp 
 	Controller.cpp Controller.hpp 
-	rose_RegionController.cpp RegionController.hpp
-	rose_LocalTrafficController.cpp LocalTrafficController.hpp
+	RegionController.cpp RegionController.hpp
+	LocalTrafficController.cpp LocalTrafficController.hpp
 	)
 
 

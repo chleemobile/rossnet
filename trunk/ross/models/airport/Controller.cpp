@@ -17,13 +17,13 @@ Controller::~Controller()
 
 }
 
-void Controller::handle_incoming()
+void Controller::handle_incoming(tw_lp *lp)
 {
 	assert(false);
 	cout<<"CTR handle"<<endl;
 }
 
-void Controller::handle_outgoing()
+void Controller::handle_outgoing(tw_lp *lp)
 {
 	assert(false);
 	cout<<"CTR handle"<<endl;
