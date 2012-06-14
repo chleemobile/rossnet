@@ -33,6 +33,7 @@ void init(airport_state * s, tw_lp * lp)
 	s->dep_queued = 0;
 	s->wdelay = 0;
 	s->sdelay = 0;
+	s->q = new deque<Aircraft>();
 
 	if(lp->gid % 2)
 	{
@@ -91,36 +92,34 @@ void event_handler(airport_state * s, tw_bf * bf, airport_message * msg, tw_lp *
 
 		case DEPARTURE:
 			{
-				cout<<"handling "<<msg->aircraft.get_id()<<endl;
+				//cout<<"handling "<<msg->aircraft.get_id()<<endl;
 
 				msg->aircraft.m_wclock = tw_now(lp);
 				
-				cout<<"before push "<<s->q.size()<<endl;
-				s->q.push_back(msg->aircraft);
-				cout<<"after push "<<s->q.size()<<endl;
+				((deque<Aircraft>*)s->q)->push_back(msg->aircraft);
 
 				if(s->controller->m_current_capacity < s->controller->m_max_capacity)
 				{
 
 					s->controller->handle_incoming();
-					cout<<"after call vfuntion"<<endl;
+			
 
 					s->dep_processed++;
 
 
-					assert(s->q.size() > 0);
+					//assert(s->q.size() > 0);
 
 					//printf("DEP handling %d aircraft \n", t_aircraft.get_id());
 
-					cout<<"before front "<<s->q.size()<<endl;
-					Aircraft t_aircraft = s->q.front();
-					cout<<"after front"<<endl;
+					Aircraft t_aircraft = ((deque<Aircraft>*)s->q)->front();
+					//cout<<"after front"<<endl;
 					
-					s->q.pop_front();
+					((deque<Aircraft>*)s->q)->pop_front();
+
 					//s->q.front();
 					//s->q.erase(s->q.begin());
 					
-					cout<<"after pop_front"<<endl;
+					//cout<<"after pop_front"<<endl;
 					
 
 					s->wdelay += t_aircraft.m_wdelay;
@@ -146,21 +145,22 @@ void event_handler(airport_state * s, tw_bf * bf, airport_message * msg, tw_lp *
 				{
 					s->dep_queued++;
 
-					cout<<"queuing "<<msg->aircraft.get_id()<<"("<<s->q.size()<<")"<<endl;
+					//cout<<"queuing "<<msg->aircraft.get_id()<<"("<<s->q->size()<<")"<<endl;
 
-					int temp_size = s->q.size();
+					int temp_size = ((deque<Aircraft>*)s->q)->size();
 					int temp_i = 0;
 					while(temp_i < temp_size)
 					{
 						double t_now = tw_now(lp);
-						double t_wdelay = s->q[temp_i].m_wdelay;
-						double t_wclock = s->q[temp_i].m_wclock;
+						double t_wdelay = (*((deque<Aircraft>*)s->q))[temp_i].m_wdelay;
+						double t_wclock = (*((deque<Aircraft>*)s->q))[temp_i].m_wclock;
 						t_wdelay = t_wdelay + (t_now - t_wclock );
 
-						s->q[temp_i].m_wdelay = t_wdelay;
-						s->q[temp_i].m_wclock = t_wclock;
+						(*((deque<Aircraft>*)s->q))[temp_i].m_wdelay = t_wdelay;
+						(*((deque<Aircraft>*)s->q))[temp_i].m_wclock = t_wclock;
+						(*((deque<Aircraft>*)s->q))[temp_i].m_sdelay++;
 
-						s->q[temp_i].m_sdelay++;
+
 						temp_i++;
 						//printf("aircraft %d has been waiting %f, %d\n",(*itr).get_id(), (*itr).get_wdelay(), (*itr).get_sdelay());
 					}	

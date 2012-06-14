@@ -36,7 +36,7 @@ typedef enum airport_event_t airport_event_t;
 
 struct airport_state
 {
-	airport_state(): controller(NULL), q(100)
+	airport_state(): controller(NULL)
 	{
 	}
 	~airport_state(){if(this->controller){delete controller;}}
@@ -49,7 +49,8 @@ struct airport_state
 	int dep_queued;
 
 	//vector<Aircraft> q;
-	deque<Aircraft> q;
+	//deque<Aircraft> q;
+	void *q;
 
 	double wdelay;
 	int sdelay;
@@ -79,7 +80,7 @@ static tw_lpid	 nlp_per_pe = NUMBER_OF_LP;
 
 
 static int       opt_mem = 1000000;
-static int		 planes_per_airport = 1;
+static int		 planes_per_airport = 10;
 
 
 #endif
