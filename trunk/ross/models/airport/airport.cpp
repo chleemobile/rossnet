@@ -96,7 +96,7 @@ void event_handler(airport_state * s, tw_bf * bf, airport_message * msg, tw_lp *
 
 				msg->aircraft.m_wclock = tw_now(lp);
 				
-				((deque<Aircraft>*)s->q)->push_back(msg->aircraft);
+				s->q->push_back(msg->aircraft);
 
 				if(s->controller->m_current_capacity < s->controller->m_max_capacity)
 				{
@@ -111,10 +111,10 @@ void event_handler(airport_state * s, tw_bf * bf, airport_message * msg, tw_lp *
 
 					//printf("DEP handling %d aircraft \n", t_aircraft.get_id());
 
-					Aircraft t_aircraft = ((deque<Aircraft>*)s->q)->front();
+					Aircraft t_aircraft =s->q->front();
 					//cout<<"after front"<<endl;
 					
-					((deque<Aircraft>*)s->q)->pop_front();
+					s->q->pop_front();
 
 					//s->q.front();
 					//s->q.erase(s->q.begin());
@@ -147,18 +147,18 @@ void event_handler(airport_state * s, tw_bf * bf, airport_message * msg, tw_lp *
 
 					//cout<<"queuing "<<msg->aircraft.get_id()<<"("<<s->q->size()<<")"<<endl;
 
-					int temp_size = ((deque<Aircraft>*)s->q)->size();
+					int temp_size = s->q->size();
 					int temp_i = 0;
 					while(temp_i < temp_size)
 					{
 						double t_now = tw_now(lp);
-						double t_wdelay = (*((deque<Aircraft>*)s->q))[temp_i].m_wdelay;
-						double t_wclock = (*((deque<Aircraft>*)s->q))[temp_i].m_wclock;
+						double t_wdelay = (*(s->q))[temp_i].m_wdelay;
+						double t_wclock = (*(s->q))[temp_i].m_wclock;
 						t_wdelay = t_wdelay + (t_now - t_wclock );
 
-						(*((deque<Aircraft>*)s->q))[temp_i].m_wdelay = t_wdelay;
-						(*((deque<Aircraft>*)s->q))[temp_i].m_wclock = t_wclock;
-						(*((deque<Aircraft>*)s->q))[temp_i].m_sdelay++;
+						(*(s->q))[temp_i].m_wdelay = t_wdelay;
+						(*(s->q))[temp_i].m_wclock = t_wclock;
+						(*(s->q))[temp_i].m_sdelay++;
 
 
 						temp_i++;

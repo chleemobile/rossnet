@@ -50,7 +50,7 @@ struct airport_state
 
 	//vector<Aircraft> q;
 	//deque<Aircraft> q;
-	void *q;
+	deque<Aircraft> *q;
 
 	double wdelay;
 	int sdelay;

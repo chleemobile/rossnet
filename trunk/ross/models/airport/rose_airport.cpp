@@ -87,15 +87,15 @@ void event_handler(airport_state *s,tw_bf *bf,airport_message *msg,tw_lp *lp)
     LABEL1:
 //cout<<"handling "<<msg->aircraft.get_id()<<endl;
     msg -> airport_message::aircraft.Aircraft::m_wclock = tw_now(lp);
-    ( *((class std::deque< Aircraft  , std::allocator< Aircraft  >  > *)(s -> airport_state::q))). push_back (msg -> airport_message::aircraft);
+    ( *(s -> airport_state::q)). push_back (msg -> airport_message::aircraft);
     if (( *(s -> airport_state::controller)).Controller::m_current_capacity < ( *(s -> airport_state::controller)).Controller::m_max_capacity) {
       ( *(s -> airport_state::controller)). handle_incoming ();
       s -> airport_state::dep_processed++;
 //assert(s->q.size() > 0);
 //printf("DEP handling %d aircraft \n", t_aircraft.get_id());
-      class Aircraft t_aircraft(( *((class std::deque< Aircraft  , std::allocator< Aircraft  >  > *)(s -> airport_state::q))). front ());
+      class Aircraft t_aircraft(( *(s -> airport_state::q)). front ());
 //cout<<"after front"<<endl;
-      ( *((class std::deque< Aircraft  , std::allocator< Aircraft  >  > *)(s -> airport_state::q))). pop_front ();
+      ( *(s -> airport_state::q)). pop_front ();
 //s->q.front();
 //s->q.erase(s->q.begin());
 //cout<<"after pop_front"<<endl;
@@ -115,16 +115,16 @@ void event_handler(airport_state *s,tw_bf *bf,airport_message *msg,tw_lp *lp)
     else {
       s -> airport_state::dep_queued++;
 //cout<<"queuing "<<msg->aircraft.get_id()<<"("<<s->q->size()<<")"<<endl;
-      int temp_size = (( *((class std::deque< Aircraft  , std::allocator< Aircraft  >  > *)(s -> airport_state::q))). size ());
+      int temp_size = (( *(s -> airport_state::q)). size ());
       int temp_i = 0;
       while(temp_i < temp_size){
         double t_now = tw_now(lp);
-        double t_wdelay = ( *((class std::deque< Aircraft  , std::allocator< Aircraft  >  > *)(s -> airport_state::q)))[temp_i].Aircraft::m_wdelay;
-        double t_wclock = ( *((class std::deque< Aircraft  , std::allocator< Aircraft  >  > *)(s -> airport_state::q)))[temp_i].Aircraft::m_wclock;
+        double t_wdelay = ( *(s -> airport_state::q))[temp_i].Aircraft::m_wdelay;
+        double t_wclock = ( *(s -> airport_state::q))[temp_i].Aircraft::m_wclock;
         t_wdelay = (t_wdelay + (t_now - t_wclock));
-        ( *((class std::deque< Aircraft  , std::allocator< Aircraft  >  > *)(s -> airport_state::q)))[temp_i].Aircraft::m_wdelay = t_wdelay;
-        ( *((class std::deque< Aircraft  , std::allocator< Aircraft  >  > *)(s -> airport_state::q)))[temp_i].Aircraft::m_wclock = t_wclock;
-        ( *((class std::deque< Aircraft  , std::allocator< Aircraft  >  > *)(s -> airport_state::q)))[temp_i].Aircraft::m_sdelay++;
+        ( *(s -> airport_state::q))[temp_i].Aircraft::m_wdelay = t_wdelay;
+        ( *(s -> airport_state::q))[temp_i].Aircraft::m_wclock = t_wclock;
+        ( *(s -> airport_state::q))[temp_i].Aircraft::m_sdelay++;
         temp_i++;
 //printf("aircraft %d has been waiting %f, %d\n",(*itr).get_id(), (*itr).get_wdelay(), (*itr).get_sdelay());
       }
@@ -196,16 +196,16 @@ void event_handler_forward(airport_state *s,tw_bf *bf,airport_message *msg,tw_lp
 //cout<<"handling "<<msg->aircraft.get_id()<<endl;
     msg -> airport_message::aircraft.Aircraft::m_wclock = tw_now(lp);
     __store__(s -> airport_state::q,lp);
-    ( *((class std::deque< Aircraft  , std::allocator< Aircraft  >  > *)(s -> airport_state::q))). push_back (msg -> airport_message::aircraft);
+    ( *(s -> airport_state::q)). push_back (msg -> airport_message::aircraft);
     if (( *(s -> airport_state::controller)).Controller::m_current_capacity < ( *(s -> airport_state::controller)).Controller::m_max_capacity) {
       __store__(s -> airport_state::controller,lp);
       ( *(s -> airport_state::controller)). handle_incoming_forward ();
       s -> airport_state::dep_processed++;
 //assert(s->q.size() > 0);
 //printf("DEP handling %d aircraft \n", t_aircraft.get_id());
-      class Aircraft t_aircraft(( *((class std::deque< Aircraft  , std::allocator< Aircraft  >  > *)(s -> airport_state::q))). front ());
+      class Aircraft t_aircraft(( *(s -> airport_state::q)). front ());
 //cout<<"after front"<<endl;
-      ( *((class std::deque< Aircraft  , std::allocator< Aircraft  >  > *)(s -> airport_state::q))). pop_front ();
+      ( *(s -> airport_state::q)). pop_front ();
 //s->q.front();
 //s->q.erase(s->q.begin());
 //cout<<"after pop_front"<<endl;
@@ -229,16 +229,16 @@ void event_handler_forward(airport_state *s,tw_bf *bf,airport_message *msg,tw_lp
       __num0 += 1;
       s -> airport_state::dep_queued++;
 //cout<<"queuing "<<msg->aircraft.get_id()<<"("<<s->q->size()<<")"<<endl;
-      int temp_size = (( *((class std::deque< Aircraft  , std::allocator< Aircraft  >  > *)(s -> airport_state::q))). size ());
+      int temp_size = (( *(s -> airport_state::q)). size ());
       int temp_i = 0;
       while(temp_i < temp_size){
         double t_now = tw_now(lp);
-        double t_wdelay = ( *((class std::deque< Aircraft  , std::allocator< Aircraft  >  > *)(s -> airport_state::q)))[temp_i].Aircraft::m_wdelay;
-        double t_wclock = ( *((class std::deque< Aircraft  , std::allocator< Aircraft  >  > *)(s -> airport_state::q)))[temp_i].Aircraft::m_wclock;
+        double t_wdelay = ( *(s -> airport_state::q))[temp_i].Aircraft::m_wdelay;
+        double t_wclock = ( *(s -> airport_state::q))[temp_i].Aircraft::m_wclock;
         t_wdelay = (t_wdelay + (t_now - t_wclock));
-        ( *((class std::deque< Aircraft  , std::allocator< Aircraft  >  > *)(s -> airport_state::q)))[temp_i].Aircraft::m_wdelay = t_wdelay;
-        ( *((class std::deque< Aircraft  , std::allocator< Aircraft  >  > *)(s -> airport_state::q)))[temp_i].Aircraft::m_wclock = t_wclock;
-        ( *((class std::deque< Aircraft  , std::allocator< Aircraft  >  > *)(s -> airport_state::q)))[temp_i].Aircraft::m_sdelay++;
+        ( *(s -> airport_state::q))[temp_i].Aircraft::m_wdelay = t_wdelay;
+        ( *(s -> airport_state::q))[temp_i].Aircraft::m_wclock = t_wclock;
+        ( *(s -> airport_state::q))[temp_i].Aircraft::m_sdelay++;
         temp_i++;
 //printf("aircraft %d has been waiting %f, %d\n",(*itr).get_id(), (*itr).get_wdelay(), (*itr).get_sdelay());
       }
@@ -282,8 +282,8 @@ void event_handler_reverse(airport_state *s,tw_bf *bf,airport_message *msg,tw_lp
       __restore__(s -> airport_state::sdelay,lp);
       __restore__(s -> airport_state::wdelay,lp);
       --s -> airport_state::dep_processed;
-      ( *(s -> airport_state::controller)). handle_incoming_reverse ();
       __restore__(s -> airport_state::controller,lp);
+      ( *(s -> airport_state::controller)). handle_incoming_reverse ();
     }
     __restore__(s -> airport_state::q,lp);
   }
