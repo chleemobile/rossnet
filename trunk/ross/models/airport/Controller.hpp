@@ -16,10 +16,10 @@ class Controller
 		virtual void handle_incoming(tw_lp *lp);
 		virtual void handle_outgoing(tw_lp *lp);
 
-		//virtual void handle_incoming_forward()=0;
-		//virtual void handle_incoming_reverse()=0;
-		//virtual void handle_outgoing_forward()=0;
-		//virtual void handle_outgoing_reverse()=0;
+		virtual void handle_incoming_forward(tw_lp *lp)=0;
+		virtual void handle_incoming_reverse(tw_lp *lp)=0;
+		virtual void handle_outgoing_forward(tw_lp *lp)=0;
+		virtual void handle_outgoing_reverse(tw_lp *lp)=0;
 	
 	//protected:
 		int m_id;
