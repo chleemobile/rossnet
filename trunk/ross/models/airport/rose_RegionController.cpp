@@ -1,5 +1,7 @@
 #include "RegionController.hpp"
 #include <ross.h>
+#undef max
+#undef min
 #include "rctypes.h" 
 
 RegionController::RegionController(int in_max_capacity)

@@ -307,7 +307,7 @@ void final(airport_state *s,tw_lp *lp)
   avg_wdelay = (ttl_wdelay / ttl_dep_processed);
   avg_sdelay = (((double )ttl_sdelay) / ttl_dep_processed);
 }
-tw_lptype airport_lps[] = {{((init_f )init), ((event_f )event_handler), ((revent_f )event_handler), ((final_f )final), ((map_f )mapping), ((sizeof(airport_state )))}, {(0)}};
+tw_lptype airport_lps[] = {{((init_f )init), ((event_f )event_handler_forward), ((revent_f )event_handler_reverse), ((final_f )final), ((map_f )mapping), ((sizeof(airport_state )))}, {(0)}};
 static const tw_optdef app_opt[] = {{(TWOPTTYPE_GROUP), (0L), ("Airport Model"), (0L)}, 
 //TWOPT_UINT("nairports", nlp_per_pe, "initial # of airports(LPs)"),
 {(TWOPTTYPE_UINT), ("nplanes"), ("initial # of planes per airport(events)"), ((&planes_per_airport))}, {(TWOPTTYPE_UINT), ("memory"), ("optimistic memory"), ((&opt_mem))}, {((tw_opttype )0), (0L), (0L), (0L)}};
