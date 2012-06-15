@@ -9,6 +9,7 @@ public:
 	Aircraft();
 	virtual ~Aircraft();
 	//Aircraft& operator=( Aircraft &src);
+	bool operator<(const Aircraft &rhs) const;
 
 	void set_dest(const int dest);
 	void set_wclock(const double now);
@@ -23,11 +24,11 @@ public:
 //private:
 	static int m_id_generator;
 
-	int m_id;
-	int m_dest;
-	double m_wclock;	
-	double m_wdelay;
+	int 	m_id;
+	int 	m_dep_time;
+	int 	m_dest;
+	double  m_wclock;	
+	double  m_wdelay;
 	int 	m_sdelay;
-	
 
 };
