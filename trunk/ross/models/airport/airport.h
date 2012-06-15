@@ -65,7 +65,7 @@ struct airport_state
 struct airport_message
 {
 	airport_event_t	 type;
-	Aircraft 		 aircraft;
+	Aircraft 		 *aircraft;
 
     int msg_from;
 };

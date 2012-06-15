@@ -55,9 +55,9 @@ void init(airport_state * s, tw_lp * lp)
 		int dep_time = bs_rand_exponential(s->rn, MEAN_DEPARTURE);
 		dep_time += tw_now(lp);
 
-		Aircraft init_aircraft;		
-		init_aircraft.m_dest = aircraft_dest;
-		init_aircraft.m_dep_time = dep_time;
+		Aircraft *init_aircraft = new Aircraft();		
+		init_aircraft->m_dest = aircraft_dest;
+		init_aircraft->m_dep_time = dep_time;
 
 		//cout<<"init "<<init_aircraft.m_id<<","<<init_aircraft.m_dep_time<<endl;
 
@@ -104,10 +104,10 @@ void event_handler(airport_state * s, tw_bf * bf, airport_message * msg, tw_lp *
 			{
 				//cout<<lp->gid<<","<<msg->aircraft.m_id<<","<<msg->aircraft.m_dep_time<<endl;
 				//assert(false);
-				msg->aircraft.m_wclock = tw_now(lp);
+				msg->aircraft->m_wclock = tw_now(lp);
 
 				//s->q->push_back(msg->aircraft);
-				s->q->push(msg->aircraft);
+				s->q->push(*(msg->aircraft));
 
 				//if(lp->gid == 1)				
 				//cout<<"size:"<<s->q->size()<<endl;;
@@ -163,7 +163,7 @@ void event_handler(airport_state * s, tw_bf * bf, airport_message * msg, tw_lp *
 
 					m = (airport_message*)tw_event_data(e);
 					m->type = ARRIVAL;
-					m->aircraft = t_aircraft;
+					m->aircraft = &t_aircraft;
 					tw_event_send(e);
 
 				}
@@ -209,9 +209,9 @@ void event_handler(airport_state * s, tw_bf * bf, airport_message * msg, tw_lp *
 				int dep_time = bs_rand_exponential(s->rn, MEAN_DEPARTURE);
 				dep_time += tw_now(lp);
 
-				Aircraft init_aircraft;		
-				init_aircraft.m_dest = aircraft_dest;
-				init_aircraft.m_dep_time = dep_time;
+				Aircraft *init_aircraft = new Aircraft();		
+				init_aircraft->m_dest = aircraft_dest;
+				init_aircraft->m_dep_time = dep_time;
 
 				//cout<<"init "<<init_aircraft.m_id<<","<<init_aircraft.m_dep_time<<endl;
 

@@ -43,14 +43,14 @@ void init(airport_state *s,tw_lp *lp)
     int aircraft_dest = (bs_rand_integer(s -> airport_state::rn,0,(1024 - 1)));
     int dep_time = (bs_rand_exponential(s -> airport_state::rn,30.0));
     dep_time += tw_now(lp);
-    class Aircraft init_aircraft;
-    init_aircraft.Aircraft::m_dest = aircraft_dest;
-    init_aircraft.Aircraft::m_dep_time = dep_time;
+    class Aircraft *init_aircraft = ::new Aircraft ;
+    init_aircraft -> Aircraft::m_dest = aircraft_dest;
+    init_aircraft -> Aircraft::m_dep_time = dep_time;
 //cout<<"init "<<init_aircraft.m_id<<","<<init_aircraft.m_dep_time<<endl;
     e = tw_event_new(evnt_to,ts,lp);
     m = ((airport_message *)(tw_event_data(e)));
     m -> airport_message::type = DEPARTURE;
-    m -> airport_message::aircraft = (init_aircraft);
+    m -> airport_message::aircraft = init_aircraft;
 //cout<<"msg "<<m->aircraft.m_id<<","<<m->aircraft.m_dep_time<<endl;
     tw_event_send(e);
   }
@@ -93,9 +93,9 @@ void event_handler(airport_state *s,tw_bf *bf,airport_message *msg,tw_lp *lp)
     LABEL1:
 //cout<<lp->gid<<","<<msg->aircraft.m_id<<","<<msg->aircraft.m_dep_time<<endl;
 //assert(false);
-    msg -> airport_message::aircraft.Aircraft::m_wclock = tw_now(lp);
+    ( *(msg -> airport_message::aircraft)).Aircraft::m_wclock = tw_now(lp);
 //s->q->push_back(msg->aircraft);
-    ( *(s -> airport_state::q)). push (msg -> airport_message::aircraft);
+    ( *(s -> airport_state::q)). push ( *(msg -> airport_message::aircraft));
 //if(lp->gid == 1)				
 //cout<<"size:"<<s->q->size()<<endl;;
     if (( *(s -> airport_state::controller)).Controller::m_current_capacity < ( *(s -> airport_state::controller)).Controller::m_max_capacity) {
@@ -130,7 +130,7 @@ void event_handler(airport_state *s,tw_bf *bf,airport_message *msg,tw_lp *lp)
       e = tw_event_new(evnt_to,ts,lp);
       m = ((airport_message *)(tw_event_data(e)));
       m -> airport_message::type = ARRIVAL;
-      m -> airport_message::aircraft = (t_aircraft);
+      m -> airport_message::aircraft = &t_aircraft;
       tw_event_send(e);
     }
     else {
@@ -158,19 +158,19 @@ void event_handler(airport_state *s,tw_bf *bf,airport_message *msg,tw_lp *lp)
       ( *(s -> airport_state::controller)). handle_outgoing (lp);
       evnt_to = (lp -> tw_lp::gid);
       ts = bs_rand_exponential(s -> airport_state::rn,30.0);
-      int __temp2__;
-      __temp2__ = (1024 - 1);
-      int aircraft_dest = (bs_rand_integer(s -> airport_state::rn,0,__temp2__));
+      int __temp1__;
+      __temp1__ = (1024 - 1);
+      int aircraft_dest = (bs_rand_integer(s -> airport_state::rn,0,__temp1__));
       int dep_time = (bs_rand_exponential(s -> airport_state::rn,30.0));
       dep_time += tw_now(lp);
-      class Aircraft init_aircraft;
-      init_aircraft.Aircraft::m_dest = aircraft_dest;
-      init_aircraft.Aircraft::m_dep_time = dep_time;
+      class Aircraft *init_aircraft = ::new Aircraft ;
+      init_aircraft -> Aircraft::m_dest = aircraft_dest;
+      init_aircraft -> Aircraft::m_dep_time = dep_time;
 //cout<<"init "<<init_aircraft.m_id<<","<<init_aircraft.m_dep_time<<endl;
       e = tw_event_new(evnt_to,ts,lp);
       m = ((airport_message *)(tw_event_data(e)));
       m -> airport_message::type = DEPARTURE;
-      m -> airport_message::aircraft = (init_aircraft);
+      m -> airport_message::aircraft = init_aircraft;
       tw_event_send(e);
       goto LABEL3;
     }
@@ -220,10 +220,10 @@ void event_handler_forward(airport_state *s,tw_bf *bf,airport_message *msg,tw_lp
     LABEL1:
 //cout<<lp->gid<<","<<msg->aircraft.m_id<<","<<msg->aircraft.m_dep_time<<endl;
 //assert(false);
-    msg -> airport_message::aircraft.Aircraft::m_wclock = tw_now(lp);
+    ( *(msg -> airport_message::aircraft)).Aircraft::m_wclock = tw_now(lp);
 //s->q->push_back(msg->aircraft);
     __store__( *s -> airport_state::q,lp);
-    ( *(s -> airport_state::q)). push (msg -> airport_message::aircraft);
+    ( *(s -> airport_state::q)). push ( *(msg -> airport_message::aircraft));
 //if(lp->gid == 1)				
 //cout<<"size:"<<s->q->size()<<endl;;
     if (( *(s -> airport_state::controller)).Controller::m_current_capacity < ( *(s -> airport_state::controller)).Controller::m_max_capacity) {
@@ -261,7 +261,7 @@ void event_handler_forward(airport_state *s,tw_bf *bf,airport_message *msg,tw_lp
       e = tw_event_new(evnt_to,ts,lp);
       m = ((airport_message *)(tw_event_data(e)));
       m -> airport_message::type = ARRIVAL;
-      m -> airport_message::aircraft = (t_aircraft);
+      m -> airport_message::aircraft = &t_aircraft;
       tw_event_send(e);
     }
     else {
@@ -291,19 +291,19 @@ void event_handler_forward(airport_state *s,tw_bf *bf,airport_message *msg,tw_lp
       evnt_to = (lp -> tw_lp::gid);
       __store__< int  > (s -> airport_state::rn,lp);
       ts = bs_rand_exponential(s -> airport_state::rn,30.0);
-      int __temp2__;
-      __temp2__ = (1024 - 1);
-      int aircraft_dest = (bs_rand_integer(s -> airport_state::rn,0,__temp2__));
+      int __temp1__;
+      __temp1__ = (1024 - 1);
+      int aircraft_dest = (bs_rand_integer(s -> airport_state::rn,0,__temp1__));
       int dep_time = (bs_rand_exponential(s -> airport_state::rn,30.0));
       dep_time += tw_now(lp);
-      class Aircraft init_aircraft;
-      init_aircraft.Aircraft::m_dest = aircraft_dest;
-      init_aircraft.Aircraft::m_dep_time = dep_time;
+      class Aircraft *init_aircraft = ::new Aircraft ;
+      init_aircraft -> Aircraft::m_dest = aircraft_dest;
+      init_aircraft -> Aircraft::m_dep_time = dep_time;
 //cout<<"init "<<init_aircraft.m_id<<","<<init_aircraft.m_dep_time<<endl;
       e = tw_event_new(evnt_to,ts,lp);
       m = ((airport_message *)(tw_event_data(e)));
       m -> airport_message::type = DEPARTURE;
-      m -> airport_message::aircraft = (init_aircraft);
+      m -> airport_message::aircraft = init_aircraft;
       tw_event_send(e);
       goto LABEL3;
     }

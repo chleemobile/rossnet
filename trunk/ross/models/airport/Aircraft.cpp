@@ -4,6 +4,7 @@ int Aircraft::m_id_generator = 0;
 
 Aircraft::Aircraft()
 {
+	//cout<<"constructor called"<<endl;
 	m_id_generator++;
 
 	m_id = m_id_generator;
