@@ -4,9 +4,10 @@
 #include <ross.h>
 #include <vector>
 #include <deque>
+#include <queue>
+#include <stack>
 
 #include "iostream"
-#include <stack>
 #include "Aircraft.hpp"
 #include "Controller.hpp"
 #include "RegionController.hpp"
@@ -50,7 +51,8 @@ struct airport_state
 
 	//vector<Aircraft> q;
 	//deque<Aircraft> q;
-	deque<Aircraft> *q;
+	//deque<Aircraft> *q;
+	priority_queue < Aircraft, vector<Aircraft>, less<Aircraft> > *q;
 
 	double wdelay;
 	int sdelay;

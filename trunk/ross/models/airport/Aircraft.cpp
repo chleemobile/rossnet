@@ -8,7 +8,8 @@ Aircraft::Aircraft()
 
 	m_id = m_id_generator;
 	m_dest = 0;
-	
+	m_dep_time = 0;
+
 	m_sdelay = 0;
 	m_wclock = 0;
 	m_wdelay = 0;
@@ -29,6 +30,10 @@ Aircraft::~Aircraft()
 //	return *this;
 //}
 
+bool Aircraft::operator<(const Aircraft &rhs) const
+{
+	return (m_dep_time > rhs.m_dep_time);
+}
 
 void Aircraft::set_dest(const int dest)
 {

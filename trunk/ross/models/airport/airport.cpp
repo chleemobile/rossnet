@@ -33,7 +33,7 @@ void init(airport_state * s, tw_lp * lp)
 	s->dep_queued = 0;
 	s->wdelay = 0;
 	s->sdelay = 0;
-	s->q = new deque<Aircraft>();
+	s->q = new priority_queue<Aircraft, vector<Aircraft>, less<Aircraft> >();
 	s->dummy_test = 0;
 
 
@@ -52,14 +52,22 @@ void init(airport_state * s, tw_lp * lp)
 		ts = bs_rand_exponential(s->rn, MEAN_DEPARTURE);
 
 		int aircraft_dest = bs_rand_integer(s->rn, 0, NUMBER_OF_LP-1);	
+		int dep_time = bs_rand_exponential(s->rn, MEAN_DEPARTURE);
+		dep_time += tw_now(lp);
+
+		Aircraft init_aircraft;		
+		init_aircraft.m_dest = aircraft_dest;
+		init_aircraft.m_dep_time = dep_time;
+
+		//cout<<"init "<<init_aircraft.m_id<<","<<init_aircraft.m_dep_time<<endl;
 
 		e = tw_event_new(evnt_to, ts, lp);
 
-		Aircraft int_aircraft;		
 		m = (airport_message*)tw_event_data(e);
 		m->type = DEPARTURE;
-		m->aircraft = int_aircraft;
-		m->aircraft.m_dest = aircraft_dest;
+		m->aircraft = init_aircraft;
+
+		//cout<<"msg "<<m->aircraft.m_id<<","<<m->aircraft.m_dep_time<<endl;
 
 		tw_event_send(e);
 	}
@@ -94,11 +102,15 @@ void event_handler(airport_state * s, tw_bf * bf, airport_message * msg, tw_lp *
 
 		case DEPARTURE:
 			{
-				//cout<<"handling "<<msg->aircraft.get_id()<<endl;
-
+				//cout<<lp->gid<<","<<msg->aircraft.m_id<<","<<msg->aircraft.m_dep_time<<endl;
+				//assert(false);
 				msg->aircraft.m_wclock = tw_now(lp);
-				
-				s->q->push_back(msg->aircraft);
+
+				//s->q->push_back(msg->aircraft);
+				s->q->push(msg->aircraft);
+
+				//if(lp->gid == 1)				
+				//cout<<"size:"<<s->q->size()<<endl;;
 
 				if(s->controller->m_current_capacity < s->controller->m_max_capacity)
 				{
@@ -112,16 +124,29 @@ void event_handler(airport_state * s, tw_bf * bf, airport_message * msg, tw_lp *
 
 					//printf("DEP handling %d aircraft \n", t_aircraft.get_id());
 
-					Aircraft t_aircraft =s->q->front();
+					//Aircraft t_aircraft =s->q->front();
 					//cout<<"after front"<<endl;
-					
-					s->q->pop_front();
+
+					//if(s->q->size() > 3)
+					//{
+					//	cout<<"queue"<<endl;
+					//	while(!s->q->empty())
+					//	{
+					//		cout<<s->q->top().m_dep_time<<endl;
+					//		s->q->pop();
+					//	}
+					//}
+
+					Aircraft t_aircraft = s->q->top();
+					s->q->pop();
+
+					//s->q->pop_front();
 
 					//s->q.front();
 					//s->q.erase(s->q.begin());
-					
+
 					//cout<<"after pop_front"<<endl;
-					
+
 
 					s->wdelay += t_aircraft.m_wdelay;
 					s->sdelay += t_aircraft.m_sdelay;
@@ -153,13 +178,13 @@ void event_handler(airport_state * s, tw_bf * bf, airport_message * msg, tw_lp *
 					while(temp_i < temp_size)
 					{
 						double t_now = tw_now(lp);
-						double t_wdelay = (*(s->q))[temp_i].m_wdelay;
-						double t_wclock = (*(s->q))[temp_i].m_wclock;
-						t_wdelay = t_wdelay + (t_now - t_wclock );
+						//double t_wdelay = (*(s->q))[temp_i].m_wdelay;
+						//double t_wclock = (*(s->q))[temp_i].m_wclock;
+						//t_wdelay = t_wdelay + (t_now - t_wclock );
 
-						(*(s->q))[temp_i].m_wdelay = t_wdelay;
-						(*(s->q))[temp_i].m_wclock = t_wclock;
-						(*(s->q))[temp_i].m_sdelay++;
+						//(*(s->q))[temp_i].m_wdelay = t_wdelay;
+						//(*(s->q))[temp_i].m_wclock = t_wclock;
+						//(*(s->q))[temp_i].m_sdelay++;
 
 
 						temp_i++;
@@ -177,17 +202,24 @@ void event_handler(airport_state * s, tw_bf * bf, airport_message * msg, tw_lp *
 
 				s->controller->handle_outgoing(lp);			
 
-				evnt_to = lp->gid;	
-				ts = bs_rand_exponential(s->rn, MEAD_FLIGHT);
+				evnt_to = lp->gid;
+				ts = bs_rand_exponential(s->rn, MEAN_DEPARTURE);
+
+				int aircraft_dest = bs_rand_integer(s->rn, 0, NUMBER_OF_LP-1);	
+				int dep_time = bs_rand_exponential(s->rn, MEAN_DEPARTURE);
+				dep_time += tw_now(lp);
+
+				Aircraft init_aircraft;		
+				init_aircraft.m_dest = aircraft_dest;
+				init_aircraft.m_dep_time = dep_time;
+
+				//cout<<"init "<<init_aircraft.m_id<<","<<init_aircraft.m_dep_time<<endl;
 
 				e = tw_event_new(evnt_to, ts, lp);
 
-				int aircraft_dest = bs_rand_integer(s->rn, 0, NUMBER_OF_LP-1);		
-				Aircraft int_aircraft;		
 				m = (airport_message*)tw_event_data(e);
 				m->type = DEPARTURE;
-				m->aircraft = int_aircraft;
-				m->aircraft.m_dest = aircraft_dest;
+				m->aircraft = init_aircraft;
 
 				tw_event_send(e);
 
