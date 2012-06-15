@@ -1,11 +1,13 @@
 #ifndef reverse_rctypes_h
 #define reverse_rctypes_h
 
+#include "ross-types.h"
+
 #include <stdlib.h>
 #include <assert.h>
 #include <deque>
 #include <queue>
-#include "ross-types.h"
+#include <stack>
 #include <boost/any.hpp>
 
 #include <iostream>
@@ -19,8 +21,8 @@ using std::cout;
 
 #define DEF_GET_STACK(T) \
 template<> struct StackType<T> { typedef std::stack<T> type; }; \
-template<> StackType<T>::type& data_stack<T>(BSStack *stk) { return stk->T##_stack; } \
-template<> T get_top<T>(const std::stack<T>& stk) { return stk.top(); } 
+template<> inline StackType<T>::type& data_stack<T>(BSStack *stk) { return stk->T##_stack; } \
+template<> inline T get_top<T>(const std::stack<T>& stk) { return stk.top(); } 
 
 typedef unsigned char BS_UCHAR;
 typedef unsigned short BS_USHORT;
@@ -63,7 +65,7 @@ struct StackType
 
 //static std::deque<boost::any> data_stack;
 template<class T> 
-typename StackType<T>::type& data_stack(BSStack *stk) 
+inline typename StackType<T>::type& data_stack(BSStack *stk) 
 {
     return stk->general_stack;
     //assert(false);
@@ -72,14 +74,14 @@ typename StackType<T>::type& data_stack(BSStack *stk)
 
 
 template<class T> 
-T get_top(const std::stack<T>& stk) 
+inline T get_top(const std::stack<T>& stk) 
 {
     assert(false);
     return T();
 }
 
 template<class T> 
-T get_top(const std::stack<boost::any>& stk) 
+inline T get_top(const std::stack<boost::any>& stk) 
 {
     return boost::any_cast<T>(stk.top());
 }

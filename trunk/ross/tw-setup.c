@@ -97,37 +97,37 @@ map_linear(void)
 	// may end up wasting last KP, but guaranteed each KP has == nLPs
 	nlp_per_kp = ceil((double) g_tw_nlp / (double) g_tw_nkp);
 
-    printf("map_linear Map, nlp_per_kp : %d (g_tw_nlp, %d / g_tw_nkp, %d) \n", nlp_per_kp, g_tw_nlp, g_tw_nkp);
+    //printf("map_linear Map, nlp_per_kp : %d (g_tw_nlp, %d / g_tw_nkp, %d) \n", nlp_per_kp, g_tw_nlp, g_tw_nkp);
     
 	if(!nlp_per_kp)
 		tw_error(TW_LOC, "Not enough KPs defined: %d", g_tw_nkp);
 
 	g_tw_lp_offset = g_tw_mynode * g_tw_nlp;
 
-    printf("map_linear, g_tw_lp_offset = %d (g_tw_mynode,%d * g_tw_nlp, %d)\n", g_tw_lp_offset, g_tw_mynode, g_tw_nlp);
+   //printf("map_linear, g_tw_lp_offset = %d (g_tw_mynode,%d * g_tw_nlp, %d)\n", g_tw_lp_offset, g_tw_mynode, g_tw_nlp);
     
 
 	for(kpid = 0, lpid = 0, pe = NULL; (pe = tw_pe_next(pe)); )
 	{
-		printf("\tPE %d\n", pe->id);
+		//printf("\tPE %d\n", pe->id);
 
 		for(i = 0; i < nkp_per_pe; i++, kpid++)
 		{
 			tw_kp_onpe(kpid, pe);
 
-			printf("\t\tKP %d", kpid);
+			//printf("\t\tKP %d", kpid);
 
 			for(j = 0; j < nlp_per_kp && lpid < g_tw_nlp; j++, lpid++)
 			{
 				tw_lp_onpe(lpid, pe, g_tw_lp_offset+lpid);
 				tw_lp_onkp(g_tw_lp[lpid], g_tw_kp[kpid]); 
 
-				if(0 == j % 20)
-					printf("\n\t\t\t");
-				printf("%lld ", lpid+g_tw_lp_offset);
+				//if(0 == j % 20)
+					//printf("\n\t\t\t");
+				//printf("%lld ", lpid+g_tw_lp_offset);
 			}
 
-			printf("\n");
+			//printf("\n");
 		}
 	}
 
@@ -196,7 +196,7 @@ tw_define_lps(tw_lpid nlp, size_t msg_sz, tw_seed * seed)
 	 */
 	g_tw_lp = tw_calloc(TW_LOC, "LPs", sizeof(*g_tw_lp), g_tw_nlp);
 
-    printf("tw_define_lps, g_tw_nkp: %d, g_tw_nlp %d \n", g_tw_nkp, g_tw_nlp);
+    //printf("tw_define_lps, g_tw_nkp: %d, g_tw_nlp %d \n", g_tw_nkp, g_tw_nlp);
     
     
 	switch(g_tw_mapping)

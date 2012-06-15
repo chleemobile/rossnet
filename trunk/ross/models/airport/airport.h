@@ -2,13 +2,25 @@
 #define INC_airport_h
 
 #include <ross.h>
-#include "iostream"
+#include <vector>
+#include <deque>
+#include <queue>
 #include <stack>
 
+#include "iostream"
+#include "Aircraft.hpp"
+#include "Controller.hpp"
+#include "RegionController.hpp"
+#include "LocalTrafficController.hpp"
+
+
+#define NUMBER_OF_LP 1024
 #define MEAN_DEPARTURE 30.0
+#define MEAD_FLIGHT 20.0
 #define MEAN_LAND 10.0
 
-//using std::max;
+#define MAX_CAPACITY 1
+
 using namespace std;
 
 typedef struct airport_state airport_state;
@@ -25,43 +37,54 @@ typedef enum airport_event_t airport_event_t;
 
 struct airport_state
 {
-	int		landings;
-	int		planes_in_the_sky;
-	int		planes_on_the_ground;
+	airport_state(): controller(NULL)
+	{
+	}
+	~airport_state(){if(this->controller){delete controller;}}
 
-	tw_stime	waiting_time;
-	tw_stime	furthest_flight_landing;
-    
     int rn;
+	int max_capacity;
+	int current_capacity;
+
+	int dep_processed;
+	int dep_queued;
+
+	//vector<Aircraft> q;
+	//deque<Aircraft> q;
+	//deque<Aircraft> *q;
+	priority_queue < Aircraft, vector<Aircraft>, less<Aircraft> > *q;
+
+	double wdelay;
+	int sdelay;
+
+	double dummy_test;
+	Controller *controller;
+	
 };
 
 struct airport_message
 {
 	airport_event_t	 type;
+	Aircraft 		 aircraft;
 
-	tw_stime	 waiting_time;
-	tw_stime	 saved_furthest_flight_landing;
     int msg_from;
 };
 
-#define NUMBER_OF_LP 1024
+static  double  ttl_dummy_test = 0;
+static  double  ttl_wdelay = 0;
+static  long ttl_sdelay = 0;
+static  long ttl_dep_processed = 0;
+static  long ttl_dep_queued = 0;
+
+static double avg_wdelay = 0;
+static double avg_sdelay = 0;
 
 static int nlp = NUMBER_OF_LP;
 static tw_lpid	 nlp_per_pe = NUMBER_OF_LP;
 
-static int sqrt_nlp = 0;
-static int sqrt_nlp_1 =0;
 
-static tw_stime	 mean_flight_time = 1;
-static int       opt_mem = 10000;
-static int	 planes_per_airport = 10;
+static int       opt_mem = 1000000;
+static int		 planes_per_airport = 10;
 
-static tw_stime	 wait_time_avg = 0.0;
-
-static stack<int> in_the_sky_stack = stack<int>();
-static stack<int> on_the_ground_stack = stack<int>();
-static stack<int> landing_stack = stack<int>();
-static stack<int> waiting_time_stack = stack<int>();
-static stack<int> furthest_flight_landing_stack = stack<int>();
 
 #endif
