@@ -24,20 +24,7 @@ const int AIRCRAFT_CAPACITY_OF_LARGE_REGION = 200;
 const int AIRCRAFT_CAPACITY_OF_MEDIUM_REGION = 100;
 const int AIRCRAFT_CAPACITY_OF_SMALL_REGION = 50;
 
-static int total_transit_accepted = 0;
-static int total_transit_rejected = 0;
+const int MAX_AIRCRAFT_SPEED = 200;
+const int MIN_AIRCRAFT_SPEED = 100;
 
-static int total_dep_req_accepted = 0;
-static int total_dep_req_rejected = 0;
 
-static int total_landing_req_accepted = 0;
-static int total_landing_req_rejected = 0;
-
-static int nlp = NUMBER_OF_LP;
-static tw_lpid	 nlp_per_pe = NUMBER_OF_LP;
-static int p_run = 1;
-static tw_stime	 mean_flight_time = 1;
-static int       opt_mem = 100000;
-static int       planes_per_airport = NUMBER_OF_PLANES_PER_AIRPORT;
-
-static tw_stime	 wait_time_avg = 0.0;
