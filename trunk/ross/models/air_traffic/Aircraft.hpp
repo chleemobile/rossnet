@@ -11,12 +11,14 @@ public:
 	virtual ~Aircraft();
 	//Aircraft& operator=( Aircraft &src);
 	bool operator<(const Aircraft &rhs) const;
-
+	void print_path() const;
 	
 	static int m_id_generator;
 
 	int 	m_id;
 	int 	m_dep_time;
+	int 	m_src_airport;
+	int		m_src_region;
 	int 	m_dest_region;
 	int 	m_dest_airport;
 
@@ -24,7 +26,7 @@ public:
 	double	m_speed;
 	double  m_remaining_dist;
 	
-	deque<int> m_path;
+	//deque<int> m_path;
 
 
 	//simulaiton time

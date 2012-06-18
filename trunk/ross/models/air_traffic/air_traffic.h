@@ -79,7 +79,7 @@ struct air_traffic_message
 {
 	air_traffic_event_t	 type;
 
-	Aircraft *aircraft;
+	Aircraft aircraft;
 
 	int msg_from;
 };

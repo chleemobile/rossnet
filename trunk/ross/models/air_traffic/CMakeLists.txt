@@ -2,7 +2,7 @@ INCLUDE_DIRECTORIES(${ROSS_SOURCE_DIR})
 INCLUDE_DIRECTORIES("/opt/local/include")
 
 SET(air_traffic_srcs
-	air_traffic.cpp air_traffic.h 
+	rose_air_traffic.cpp air_traffic.h 
 	Aircraft.cpp Aircraft.hpp
 	Graph.cpp Graph.hpp 
 	Constants.hpp
