@@ -196,7 +196,6 @@ void init(airport_state * s, tw_lp * lp)
 			int event_send_to = lp->gid;
 			ts = bs_rand_exponential(s->rn, MEAN_DEQ);
 
-			//Aircraft *aircraft = new Aircraft();
 			Aircraft aircraft;
 			double dep_time = bs_rand_exponential(s->rn, MEAN_DEQ);
 			dep_time += tw_now(lp);
@@ -205,7 +204,6 @@ void init(airport_state * s, tw_lp * lp)
 			int dest_region = get_region(dest_airport);
 			int max_speed = bs_rand_integer(s->rn, MIN_AIRCRAFT_SPEED, MAX_AIRCRAFT_SPEED);
 			int src_region = get_region(lp->gid);
-			//std::deque<int> path = graph->get_shortest_path(src_region, dest_region);
 
 			aircraft.m_src_airport = lp->gid;
 			aircraft.m_src_region = src_region;
@@ -214,9 +212,6 @@ void init(airport_state * s, tw_lp * lp)
 			aircraft.m_dest_region = dest_region;
 			aircraft.m_max_speed = max_speed;
 			aircraft.m_speed = max_speed;
-			//aircraft->m_path = path;
-
-			//aircraft->print_path();
 
 			e = tw_event_new(event_send_to, ts, lp);            
 			m = (air_traffic_message*)tw_event_data(e);
@@ -244,17 +239,16 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 			{
 
 				assert(lp->gid > NUMBER_OF_REGION_CONTROLLER-1);
-				int weather = bs_rand_integer(s->rn, 0, 3);
 
 				//if (s->runway_in_use < s->max_runway) 
 				{
 					s->runway_in_use++;
 					s->dep_req_accepted++;
 
+					int to = lp->gid;
 					ts = bs_rand_exponential(s->rn, MEAN_DEQ);
-					ts += weather;
 
-					e = tw_event_new(lp->gid, ts, lp);
+					e = tw_event_new(to, ts, lp);
 
 					m = (air_traffic_message*)tw_event_data(e);
 					m->type = TAXI_OUT;
@@ -273,9 +267,10 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 
 				//assert(msg->aircraft->m_dest_region < NUMBER_OF_REGION_CONTROLLER);
 
+				int to = lp->gid;				
 				ts = bs_rand_exponential(s->rn, MEAN_TAXI);
 
-				e = tw_event_new(lp->gid, ts, lp);
+				e = tw_event_new(to, ts, lp);
 
 				m = (air_traffic_message*)tw_event_data(e);
 				m->type = TAKE_OFF;
@@ -307,9 +302,10 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 //					assert(next_region == msg->aircraft->m_dest_region);
 				}
 
+				int to = next_region;
 				ts = bs_rand_exponential(s->rn, MEAN_TAKE_OFF);
 
-				e = tw_event_new(next_region, ts, lp);
+				e = tw_event_new(to, ts, lp);
 
 				m = (air_traffic_message*)tw_event_data(e);
 				m->type = TRANSIT_REQ;
@@ -329,9 +325,10 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 					s->airplane_in_region++;
 					s->transit_req_accepted++;
 
+					int to = lp->gid;
 					ts = bs_rand_exponential(s->rn, MEAN_FLIGHT);
 
-					e = tw_event_new(lp->gid, ts, lp);
+					e = tw_event_new(to, ts, lp);
 
 					m = (air_traffic_message*)tw_event_data(e);
 					m->type = ON_THE_AIR;
@@ -351,7 +348,6 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 
 				assert(lp->gid < NUMBER_OF_REGION_CONTROLLER);
 
-				//int next_region = bs_rand_integer(s->rn, 0, NUMBER_OF_REGION_CONTROLLER-1);
 				int next_region = 0;
 				std::deque<int> path = graph->get_shortest_path(lp->gid, msg->aircraft.m_dest_region);
 
@@ -370,8 +366,9 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 
 				if (next_region == msg->aircraft.m_dest_region)
 				{
+					int to = msg->aircraft.m_dest_airport;
 					ts = bs_rand_exponential(s->rn, MEAN_LAND);
-					e = tw_event_new(msg->aircraft.m_dest_airport, ts, lp);
+					e = tw_event_new(to, ts, lp);
 
 					m = (air_traffic_message*)tw_event_data(e);
 					m->type = LANDING_REQ;
@@ -380,9 +377,10 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 				}
 				else
 				{
+					int to = next_region;
 					ts = bs_rand_exponential(s->rn, MEAN_REQ);
 
-					e = tw_event_new(next_region, ts, lp);
+					e = tw_event_new(to, ts, lp);
 
 					m = (air_traffic_message*)tw_event_data(e);
 					m->type = TRANSIT_REQ;
@@ -397,17 +395,15 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 
 		case LANDING_REQ:
 			{
-				int weather = bs_rand_integer(s->rn, 0, 3);
-
 				//if (s->runway_in_use < s->max_runway)
 				{
 					s->runway_in_use++;
 					s->landing_req_accepted++;
 
+					int to = lp->gid;
 					ts = bs_rand_exponential(s->rn, MEAN_LAND);
-					ts += weather;
 
-					e = tw_event_new(lp->gid, ts, lp);
+					e = tw_event_new(to, ts, lp);
 
 					m = (air_traffic_message*)tw_event_data(e);
 					m->type = LANDING;
@@ -423,9 +419,10 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 
 		case LANDING:
 			{
+				int to = lp->gid;
 				ts = bs_rand_exponential(s->rn, MEAN_TAXI);
 
-				e = tw_event_new(lp->gid, ts, lp);
+				e = tw_event_new(to, ts, lp);
 
 				m = (air_traffic_message*)tw_event_data(e);
 				m->type = TAXI_IN;
@@ -439,9 +436,10 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 
 		case TAXI_IN:
 			{
+				int to = lp->gid;
 				ts = bs_rand_exponential(s->rn, MEAN_ARRIVAL);
 
-				e = tw_event_new(lp->gid, ts, lp);
+				e = tw_event_new(to, ts, lp);
 
 				m = (air_traffic_message*)tw_event_data(e);
 				m->type = ARRIVAL;
@@ -457,11 +455,9 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 			{
 				s->runway_in_use--;
 
-				int event_send_to = lp->gid;
+				int to = lp->gid;
 				ts = bs_rand_exponential(s->rn, MEAN_DEQ);
 
-				//delete msg->aircraft;s
-				//Aircraft *aircraft = new Aircraft();
 				Aircraft aircraft;
 
 				double dep_time = bs_rand_exponential(s->rn, MEAN_DEQ);
@@ -471,7 +467,6 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 				int dest_region = get_region(dest_airport);
 				int max_speed = bs_rand_integer(s->rn, MIN_AIRCRAFT_SPEED, MAX_AIRCRAFT_SPEED);
 				int src_region = get_region(lp->gid);
-				//std::deque<int> path = graph->get_shortest_path(src_region, dest_region);
 
 				aircraft.m_src_airport = lp->gid;
 				aircraft.m_src_region = src_region;
@@ -480,11 +475,8 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 				aircraft.m_dest_region = dest_region;
 				aircraft.m_max_speed = max_speed;
 				aircraft.m_speed = max_speed;
-				//aircraft->m_path = path;
 
-				//aircraft->print_path();
-
-				e = tw_event_new(event_send_to, ts, lp);            
+				e = tw_event_new(to, ts, lp);            
 				m = (air_traffic_message*)tw_event_data(e);
 				m->type = DEP_REQ;
 				m->aircraft = aircraft;
