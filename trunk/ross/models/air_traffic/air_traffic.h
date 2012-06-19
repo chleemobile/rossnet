@@ -26,17 +26,17 @@ typedef struct air_traffic_message air_traffic_message;
 
 enum air_traffic_event_t
 {
-	DEP_REQ, //0
+	DEP_REQ,
 	DEP,
-	TAXI_OUT, //2
-	TAKE_OFF, //3
-	TRANSIT_REQ, //4
+	TAXI_OUT,
+	TAKE_OFF,
+	TRANSIT_REQ,
 	TRANSIT,
-	ON_THE_AIR, //5
-	LANDING_REQ, //7
-	LANDING, //9
-	TAXI_IN, //10
-	ARRIVAL //11
+	ON_THE_AIR,
+	LANDING_REQ,
+	LANDING,
+	TAXI_IN,
+	ARRIVAL 
 };
 
 typedef enum air_traffic_event_t air_traffic_event_t;

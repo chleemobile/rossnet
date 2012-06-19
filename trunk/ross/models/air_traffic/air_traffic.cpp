@@ -89,7 +89,7 @@ void init(airport_state * s, tw_lp * lp)
 	s->incoming_queue = new priority_queue<Aircraft, vector<Aircraft>, less<Aircraft> >();
 	assert(	s->incoming_queue->empty());
 
-	//s->aircraft_counter = new vector<int>(350);
+	s->aircraft_counter = new vector<int>(656);
 	s->max_queue_size_airport = 0;
 	s->max_queue_size_region = 0;
 
@@ -145,7 +145,7 @@ void init(airport_state * s, tw_lp * lp)
 			s->max_runway = NUMBER_OF_RUNWAY_LARGE_AIRPORT;
 		}
 		else if (lp->gid == 21 ||
-				lp->gid == 39 ||
+				lp->gid == 39  ||
 				lp->gid == 110 ||
 				lp->gid == 116 ||
 				lp->gid == 168 ||
@@ -403,7 +403,7 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 		case TAXI_OUT:
 			{
 				//cout<<s->aircraft_counters->size()<<","<<msg->aircraft.m_id<<endl;
-				//(*(s->aircraft_counters))[msg->aircraft.m_id]++;
+				(*(s->aircraft_counter))[msg->aircraft.m_id]++;
 
 				int to = lp->gid;				
 				ts = bs_rand_exponential(s->rn, MEAN_TAXI);
@@ -498,7 +498,7 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 						s->transit_processed++;
 
 						s->incoming_queue->pop();
-						
+
 						s->delay_region += tw_now(lp) - aircraft.m_clock;
 						s->cdelay_region += aircraft.m_cdelay;
 
@@ -575,9 +575,9 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 					if(s->incoming_queue->size() > 0)
 					{
 						s->transit_processed++;
-						
+
 						Aircraft aircraft = s->incoming_queue->top();
-	
+
 						if(aircraft.m_remaining_dist <= 0)
 						{
 							s->incoming_queue->pop();
@@ -693,7 +693,7 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 					   Schedule Transit Event
 					 */
 
-					
+
 					int to2 = lp->gid;
 					ts = bs_rand_exponential(s->rn, MEAN_FLIGHT);
 
@@ -704,7 +704,7 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 					m->aircraft = msg->aircraft;
 
 					tw_event_send(e);
-					
+
 
 				}
 				else
@@ -876,6 +876,8 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 
 		case TAXI_IN:
 			{
+				(*(s->aircraft_counter))[msg->aircraft.m_id]++;
+				
 				int to = lp->gid;
 				ts = bs_rand_exponential(s->rn, MEAN_ARRIVAL);
 
@@ -922,9 +924,9 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 				m->aircraft = aircraft;
 
 				tw_event_send(e);
-				
+
 				/*
-				  Schedule another event
+				   Schedule another event
 				 */
 				int to2 = lp->gid;
 				ts = bs_rand_exponential(s->rn, MEAN_FLIGHT);
