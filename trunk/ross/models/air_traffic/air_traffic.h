@@ -47,12 +47,17 @@ struct airport_state
 	priority_queue < Aircraft, vector<Aircraft>, less<Aircraft> > *incoming_queue;
 	vector<int> *aircraft_counter;
 
-	double  delay_airport;
-	int     cdelay_airport;
-	int     max_queue_size_airport;
+	double  delay_airport_dep;
+	double  delay_airport_land;
+	
+	int     cdelay_airport_dep;
+	int 	cdelay_airport_land;
+
 
 	double  delay_region;
 	int     cdelay_region;
+
+	int     max_queue_size_airport;
 	int     max_queue_size_region;
 
 
@@ -65,18 +70,19 @@ struct airport_state
 
 	int transit_req_accepted;
 	int transit_req_rejected;
-
+	int transit_processed;
 	/*
 	   Traffic Controller State Variable
 	 */
 	int max_runway;
 	int runway_in_use;
 
-	int landing;
+	int landing_processed;
 	int landing_req_accepted;
 	int landing_req_rejected;
 
 	int dep_processed;
+	int dep_req_accepted;
 	int dep_req_rejected;
 };
 
@@ -104,15 +110,6 @@ typedef std::map<int, inner_map> outer_map;
 static outer_map counters;
 static Graph *graph;
 
-static int total_transit_accepted = 0;
-static int total_transit_rejected = 0;
-
-static int total_dep_processed= 0;
-static int total_dep_req_rejected = 0;
-
-static int total_landing_req_accepted = 0;
-static int total_landing_req_rejected = 0;
-
 static int nlp = NUMBER_OF_LP;
 static tw_lpid	 nlp_per_pe = NUMBER_OF_LP;
 static int p_run = 1;
@@ -120,15 +117,30 @@ static tw_stime	 mean_flight_time = 1;
 static int       opt_mem = 1000000;
 static int       planes_per_airport = NUMBER_OF_PLANES_PER_AIRPORT;
 
-static tw_stime	 wait_time_avg = 0.0;
+
+static int total_transit_req_accepted = 0;
+static int total_transit_req_rejected = 0;
+static int total_transit_processed = 0;
+
+static int total_dep_req_accepted= 0;
+static int total_dep_req_rejected = 0;
+static int total_dep_processed= 0;
+
+static int total_landing_req_accepted = 0;
+static int total_landing_req_rejected = 0;
+static int total_landing_processed = 0;
 
 static int max_queue_size_airport = 0;
 static int max_queue_size_region = 0;
 
-static int total_cdelay_airport = 0;
+static int total_cdelay_airport_dep = 0;
+static int total_cdelay_airport_land = 0;
 static int total_cdelay_region = 0;
 
-static double total_delay_airport = 0;
+static double total_delay_airport_dep = 0;
+static double total_delay_airport_land = 0;
 static double total_delay_region = 0;
+
+
 
 #endif

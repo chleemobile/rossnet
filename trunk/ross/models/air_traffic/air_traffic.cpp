@@ -93,8 +93,11 @@ void init(airport_state * s, tw_lp * lp)
 	s->max_queue_size_airport = 0;
 	s->max_queue_size_region = 0;
 
-	s->delay_airport = 0;
-	s->cdelay_airport = 0;
+	s->delay_airport_dep = 0;
+	s->delay_airport_land = 0;
+
+	s->cdelay_airport_dep = 0;
+	s->cdelay_airport_dep = 0;
 
 	s->delay_region = 0;
 	s->cdelay_region = 0;
@@ -115,6 +118,7 @@ void init(airport_state * s, tw_lp * lp)
 
 		s->transit_req_accepted = 0;
 		s->transit_req_rejected = 0;
+		s->transit_processed = 0;
 
 	}
 	else
@@ -192,11 +196,12 @@ void init(airport_state * s, tw_lp * lp)
 
 		s->runway_in_use=0;
 
-		s->landing=0;
-
+		s->landing_processed = 0;
 		s->landing_req_accepted=0;
 		s->landing_req_rejected=0;
+
 		s->dep_processed=0;
+		s->dep_req_accepted = 0;
 		s->dep_req_rejected=0;
 
 
@@ -259,13 +264,14 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 				if (s->runway_in_use < s->max_runway) 
 				{
 					s->runway_in_use++;
+					s->dep_req_accepted++;
 					s->dep_processed++;
 
 					Aircraft aircraft = s->incoming_queue->top();
 					s->incoming_queue->pop();
 
-					s->delay_airport += tw_now(lp) - aircraft.m_clock;
-					s->cdelay_airport += aircraft.m_cdelay;
+					s->delay_airport_dep += tw_now(lp) - aircraft.m_clock;
+					s->cdelay_airport_dep += aircraft.m_cdelay;
 
 					aircraft.m_clock = 0;
 					aircraft.m_cdelay = 0;
@@ -336,8 +342,8 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 						Aircraft aircraft = s->incoming_queue->top();
 						s->incoming_queue->pop();
 
-						s->delay_airport += tw_now(lp) - aircraft.m_clock;
-						s->cdelay_airport += aircraft.m_cdelay;
+						s->delay_airport_dep += tw_now(lp) - aircraft.m_clock;
+						s->cdelay_airport_dep += aircraft.m_cdelay;
 
 						aircraft.m_clock = 0;
 						aircraft.m_cdelay = 0;
@@ -355,6 +361,40 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 						tw_event_send(e);
 
 					}
+				}
+
+				if(s->incoming_queue->size() > 0)
+				{
+					priority_queue < Aircraft, vector<Aircraft>, less<Aircraft> > *temp_q = new priority_queue < Aircraft, vector<Aircraft>, less<Aircraft> >();
+
+					Aircraft old_top = s->incoming_queue->top();
+					int old_size = s->incoming_queue->size();
+
+					while(!s->incoming_queue->empty())
+					{
+						Aircraft temp = s->incoming_queue->top();
+						s->incoming_queue->pop();
+						temp.m_cdelay++;
+						//cout<<temp.m_cdelay<<endl;
+						temp_q->push(temp);
+					}
+
+					while(!temp_q->empty())
+					{
+						Aircraft temp =temp_q->top();
+						temp_q->pop();
+
+						s->incoming_queue->push(temp);
+					}
+
+					Aircraft new_top = s->incoming_queue->top();
+					int new_size = s->incoming_queue->size();
+
+					delete temp_q;
+
+					assert(old_top.m_id == new_top.m_id);
+					assert(old_size == new_size);
+
 				}
 
 				break;
@@ -421,7 +461,7 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 				 */
 
 				int to2 = lp->gid;
-				ts = bs_rand_exponential(s->rn, MEAN_TAKE_OFF);
+				ts = bs_rand_exponential(s->rn, MEAN_DEQ);
 
 				e = tw_event_new(to2, ts, lp);
 
@@ -453,13 +493,18 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 
 					if(aircraft.m_remaining_dist <= 0)
 					{
-						s->incoming_queue->pop();
-
 						s->airplane_in_region++;
 						s->transit_req_accepted++;
+						s->transit_processed++;
 
+						s->incoming_queue->pop();
+						
 						s->delay_region += tw_now(lp) - aircraft.m_clock;
 						s->cdelay_region += aircraft.m_cdelay;
+
+						aircraft.m_clock = 0;
+						aircraft.m_cdelay = 0;
+						aircraft.m_delay = 0;
 
 						int to = lp->gid;
 						ts = bs_rand_exponential(s->rn, MEAN_FLIGHT);
@@ -493,6 +538,7 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 						Aircraft temp = s->incoming_queue->top();
 						s->incoming_queue->pop();
 
+						temp.m_process_time -= temp.m_speed;
 						temp.m_remaining_dist -= temp.m_speed;
 						//if(temp.m_remaining_dist < 0) temp.m_remaining_dist = 0;
 
@@ -513,7 +559,7 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 
 					delete temp_q;
 
-					assert(old_top.m_id == new_top.m_id);
+					//assert(old_top.m_id == new_top.m_id);
 					assert(old_size == new_size);
 				}
 
@@ -522,10 +568,14 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 
 		case TRANSIT:
 			{
+				//assert(false);
+
 				if (s->airplane_in_region < s->max_capacity) 
 				{
 					if(s->incoming_queue->size() > 0)
 					{
+						s->transit_processed++;
+						
 						Aircraft aircraft = s->incoming_queue->top();
 	
 						if(aircraft.m_remaining_dist <= 0)
@@ -533,10 +583,13 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 							s->incoming_queue->pop();
 
 							s->airplane_in_region++;
-							//s->transit_req_accepted++;
 
 							s->delay_region += tw_now(lp) - aircraft.m_clock;
 							s->cdelay_region += aircraft.m_cdelay;
+
+							aircraft.m_clock = 0;
+							aircraft.m_cdelay = 0;
+							aircraft.m_delay = 0;
 
 							int to = lp->gid;
 							ts = bs_rand_exponential(s->rn, MEAN_FLIGHT);
@@ -552,11 +605,6 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 						}
 					}
 				}
-				else
-				{
-					//s->transit_req_rejected++;
-				}
-				//update remaining distance, process time, delays
 
 				if(s->incoming_queue->size() > 0)
 				{
@@ -570,6 +618,7 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 						Aircraft temp = s->incoming_queue->top();
 						s->incoming_queue->pop();
 
+						temp.m_process_time -= temp.m_speed;						
 						temp.m_remaining_dist -= temp.m_speed;
 						//if(temp.m_remaining_dist < 0) temp.m_remaining_dist = 0;
 
@@ -579,7 +628,7 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 
 					while(!temp_q->empty())
 					{
-						Aircraft temp =temp_q->top();
+						Aircraft temp = temp_q->top();
 						temp_q->pop();
 
 						s->incoming_queue->push(temp);
@@ -590,10 +639,9 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 
 					delete temp_q;
 
-					assert(old_top.m_id == new_top.m_id);
+					//assert(old_top.m_id == new_top.m_id);
 					assert(old_size == new_size);
 				}					
-
 
 				break;
 			}
@@ -645,6 +693,7 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 					   Schedule Transit Event
 					 */
 
+					
 					int to2 = lp->gid;
 					ts = bs_rand_exponential(s->rn, MEAN_FLIGHT);
 
@@ -655,6 +704,7 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 					m->aircraft = msg->aircraft;
 
 					tw_event_send(e);
+					
 
 				}
 				else
@@ -671,6 +721,7 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 					m->type = TRANSIT_REQ;
 					m->aircraft = msg->aircraft;
 					m->aircraft.m_process_time = distance;
+					m->aircraft.m_remaining_dist = distance;
 					m->msg_from = lp->gid;
 
 					tw_event_send(e);
@@ -682,35 +733,79 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 
 		case LANDING_REQ:
 			{
+
+				assert(lp->gid > NUMBER_OF_REGION_CONTROLLER-1);
+
 				Aircraft aircraft = msg->aircraft;
 				aircraft.m_clock = tw_now(lp);
 				s->incoming_queue->push(aircraft);
-				s->max_queue_size_airport = s->incoming_queue->size() > s->max_queue_size_airport  ? s->incoming_queue->size() : s->max_queue_size_airport ;
 
-				if (s->runway_in_use < s->max_runway)
+				if(s->incoming_queue->size() > s->max_queue_size_airport)
+					s->max_queue_size_airport = s->incoming_queue->size();
+
+				if (s->runway_in_use < s->max_runway) 
 				{
 					s->runway_in_use++;
 					s->landing_req_accepted++;
+					s->landing_processed++;
 
 					Aircraft aircraft = s->incoming_queue->top();
 					s->incoming_queue->pop();
 
+					s->delay_airport_land += tw_now(lp) - aircraft.m_clock;
+					s->cdelay_airport_land += aircraft.m_cdelay;
+
+					aircraft.m_clock = 0;
+					aircraft.m_cdelay = 0;
+					aircraft.m_delay = 0;
+
 					int to = lp->gid;
-					ts = bs_rand_exponential(s->rn, MEAN_LAND);
+					ts = bs_rand_exponential(s->rn, MEAN_DEQ);
 
 					e = tw_event_new(to, ts, lp);
 
 					m = (air_traffic_message*)tw_event_data(e);
-					m->type = LANDING;
+					m->type = TAXI_IN;
 					m->aircraft = aircraft;
-					m->msg_from = lp->gid;
-					tw_event_send(e);				
 
+					tw_event_send(e);
 				}
 				else
 				{
 					s->landing_req_rejected++;
-					//update delays
+				}
+
+				if(s->incoming_queue->size() > 0)
+				{
+					priority_queue < Aircraft, vector<Aircraft>, less<Aircraft> > *temp_q = new priority_queue < Aircraft, vector<Aircraft>, less<Aircraft> >();
+
+					Aircraft old_top = s->incoming_queue->top();
+					int old_size = s->incoming_queue->size();
+
+					while(!s->incoming_queue->empty())
+					{
+						Aircraft temp = s->incoming_queue->top();
+						s->incoming_queue->pop();
+						temp.m_cdelay++;
+						//cout<<temp.m_cdelay<<endl;
+						temp_q->push(temp);
+					}
+
+					while(!temp_q->empty())
+					{
+						Aircraft temp =temp_q->top();
+						temp_q->pop();
+
+						s->incoming_queue->push(temp);
+					}
+
+					Aircraft new_top = s->incoming_queue->top();
+					int new_size = s->incoming_queue->size();
+
+					delete temp_q;
+
+					assert(old_top.m_id == new_top.m_id);
+					assert(old_size == new_size);
 
 				}
 
@@ -719,17 +814,62 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 
 		case LANDING:
 			{
-				int to = lp->gid;
-				ts = bs_rand_exponential(s->rn, MEAN_TAXI);
+				if (s->runway_in_use < s->max_runway)
+				{
+					if( s->incoming_queue->size() > 0)
+					{
+						s->runway_in_use++;
+						s->landing_processed++;
 
-				e = tw_event_new(to, ts, lp);
+						Aircraft aircraft = s->incoming_queue->top();
+						s->incoming_queue->pop();
 
-				m = (air_traffic_message*)tw_event_data(e);
-				m->type = TAXI_IN;
-				m->aircraft = msg->aircraft;
-				m->msg_from = lp->gid;
+						int to = lp->gid;
+						ts = bs_rand_exponential(s->rn, MEAN_LAND);
 
-				tw_event_send(e);
+						e = tw_event_new(to, ts, lp);
+
+						m = (air_traffic_message*)tw_event_data(e);
+						m->type = TAXI_IN;
+						m->aircraft = aircraft;
+						m->msg_from = lp->gid;
+						tw_event_send(e);				
+					}
+				}
+
+				if(s->incoming_queue->size() > 0)
+				{
+					priority_queue < Aircraft, vector<Aircraft>, less<Aircraft> > *temp_q = new priority_queue < Aircraft, vector<Aircraft>, less<Aircraft> >();
+
+					Aircraft old_top = s->incoming_queue->top();
+					int old_size = s->incoming_queue->size();
+
+					while(!s->incoming_queue->empty())
+					{
+						Aircraft temp = s->incoming_queue->top();
+						s->incoming_queue->pop();
+						temp.m_cdelay++;
+						//cout<<temp.m_cdelay<<endl;
+						temp_q->push(temp);
+					}
+
+					while(!temp_q->empty())
+					{
+						Aircraft temp =temp_q->top();
+						temp_q->pop();
+
+						s->incoming_queue->push(temp);
+					}
+
+					Aircraft new_top = s->incoming_queue->top();
+					int new_size = s->incoming_queue->size();
+
+					delete temp_q;
+
+					assert(old_top.m_id == new_top.m_id);
+					assert(old_size == new_size);
+
+				}
 
 				break;
 			}	
@@ -782,758 +922,52 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 				m->aircraft = aircraft;
 
 				tw_event_send(e);
+				
+				/*
+				  Schedule another event
+				 */
+				int to2 = lp->gid;
+				ts = bs_rand_exponential(s->rn, MEAN_FLIGHT);
 
-				break;
-			}
-
-	}
-}
-
-
-
-
-/*******************
-  Parallel
- ******************/
-/*
-   void p_init(airport_state * s, tw_lp * lp)
-   {
-   BSStack* stack = new BSStack();
-   lp->stack_pointer = stack;
-
-   int i;
-   tw_event *e;
-   air_traffic_message *m;
-
-   s->rn=lp->gid;
-
-   if(lp->gid <NUMBER_OF_REGION_CONTROLLER)
-   {
-   if (lp->gid == 4 || lp->gid == 5 || lp->gid == 8 || lp->gid == 11 || lp->gid == 13 || lp->gid == 16 ) {
-   s->max_capacity = AIRCRAFT_CAPACITY_OF_SMALL_REGION;			
-   }
-   else if(lp->gid == 0 || lp->gid == 1 || lp->gid == 3 || lp->gid == 7 || lp->gid == 10 || lp->gid == 12 || lp->gid == 14 || lp->gid == 18 || lp->gid == 19 ) {
-   s->max_capacity = AIRCRAFT_CAPACITY_OF_MEDIUM_REGION;			
-   }
-   else {
-   s->max_capacity = AIRCRAFT_CAPACITY_OF_LARGE_REGION;			
-   }
-
-   s->airplane_in_region = 0;
-
-   s->transit_req_accepted = 0;
-   s->transit_req_rejected = 0;
-
-   }
-   else
-   {
-   if (lp->gid == 20 ||
-   lp->gid == 39 ||
-   lp->gid == 73 ||
-   lp->gid == 93 ||            
-   lp->gid == 115||
-   lp->gid == 149||            
-   lp->gid == 167||
-   lp->gid == 181||            
-   lp->gid == 227||            
-   lp->gid == 244||                        
-   lp->gid == 319||                        
-   (lp->gid >= 54 && lp->gid <= 56)   ||
-   (lp->gid >= 202 && lp->gid <= 203) ||            
-   (lp->gid >= 255 && lp->gid <= 256) ||                        
-   (lp->gid >= 270 && lp->gid <= 272) ||    
-   (lp->gid >= 295 && lp->gid <= 296) ||                
-   (lp->gid >= 303 && lp->gid <= 305) ||                
-   (lp->gid >= 338 && lp->gid <= 340) )
-   {
-   s->max_runway = NUMBER_OF_RUNWAY_LARGE_AIRPORT;
-   }
-   else if (lp->gid == 21 ||
-   lp->gid == 39 ||
-   lp->gid == 110 ||
-   lp->gid == 116 ||
-   lp->gid == 168 ||
-   lp->gid == 204 ||
-   lp->gid == 320 ||                 
-   (lp->gid >= 40 && lp->gid <= 43)   ||
-   (lp->gid >= 57 && lp->gid <= 59)   ||                 
-   (lp->gid >= 150 && lp->gid <= 152) ||
-   (lp->gid >= 182 && lp->gid <= 185) ||
-   (lp->gid >= 215 && lp->gid <= 216) ||                 
-   (lp->gid >= 228 && lp->gid <= 230) ||                                  
-   (lp->gid >= 245 && lp->gid <= 246) ||                 
-   (lp->gid >= 273 && lp->gid <= 275) ||                                  
-   (lp->gid >= 306 && lp->gid <= 307) ||                                                   
-   (lp->gid >= 341 && lp->gid <= 342))                                                                       
-   {
-s->max_runway = NUMBER_OF_RUNWAY_MEDIUM_AIRPORT;
-}
-else if (lp->gid == 22 ||
-		lp->gid == 44 ||
-		lp->gid == 94 ||
-		lp->gid == 343||            
-		(lp->gid >= 60 && lp->gid <= 62)   ||
-		(lp->gid >= 74 && lp->gid <= 75) ||
-		(lp->gid >= 111 && lp->gid <= 112) ||
-		(lp->gid >= 117 && lp->gid <= 120) ||                                  
-		(lp->gid >= 153 && lp->gid <= 155) ||                                  
-		(lp->gid >= 169 && lp->gid <= 171) ||                 
-		(lp->gid >= 186 && lp->gid <= 188) ||                 
-		(lp->gid >= 205 && lp->gid <= 207) ||
-		(lp->gid >= 217 && lp->gid <= 219) ||                 
-		(lp->gid >= 231 && lp->gid <= 234) ||                 
-		(lp->gid >= 247 && lp->gid <= 250) ||                                  
-		(lp->gid >= 257 && lp->gid <= 261) ||                                  
-		(lp->gid >= 276 && lp->gid <= 281) ||                                                   
-		(lp->gid >= 297 && lp->gid <= 298) ||                                                   
-		(lp->gid >= 308 && lp->gid <= 310) ||                                                   
-		(lp->gid >= 321 && lp->gid <= 327))
-{
-	s->max_runway = NUMBER_OF_RUNWAY_SMALL_AIRPORT;
-}
-else
-{
-	s->max_runway = NUMBER_OF_RUNWAY_NH_AIRPORT;
-
-}
-
-s->runway_in_use=0;
-
-s->landing=0;
-
-s->landing_req_accepted=0;
-s->landing_req_rejected=0;
-s->dep_req_accepted=0;
-s->dep_req_rejected=0;
-
-for(i = 0; i < planes_per_airport; i++)
-{
-	tw_stime ts = bs_rand_exponential2(s->rn, MEAN_DEQ, lp);
-	e = tw_event_new(lp->gid, ts, lp);            
-	m = (air_traffic_message*)tw_event_data(e);
-	m->type = DEP_REQ;            
-	tw_event_send(e);
-}
-
-}
-}
-
-void event_handler_fw(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * lp)
-{    	
-	tw_stime ts;
-	tw_event *e;
-	air_traffic_message *m;
-
-	if(COUNT_EVENT) increase_counter(lp->gid, msg->type);
-
-	switch(msg->type)
-	{
-		//        *(int *)bf = (int)0;
-
-		case DEP_REQ:
-			{
-				assert(lp->gid > NUMBER_OF_REGION_CONTROLLER-1);
-
-				if(PADDING_LOOP)
-					for (unsigned volatile long var = 0; var < loop_size;var++){}
-
-				int weather = bs_rand_integer2(s->rn, 0, 3, lp);
-
-				int path = 0;
-
-				if ((path = (s->runway_in_use < s->max_runway))) 
-				{
-					__store__(s->runway_in_use, lp);
-					__store__(s->dep_req_accepted, lp);
-
-					s->runway_in_use++;
-					s->dep_req_accepted++;
-
-
-					int dest_airport = bs_rand_integer2(s->rn, NUMBER_OF_REGION_CONTROLLER, NUMBER_OF_LP-1, lp);
-					int dest_region = get_region(dest_airport);
-
-					ts = bs_rand_exponential2(s->rn, MEAN_DEQ, lp);
-					ts += weather;
-
-					e = tw_event_new(lp->gid, ts, lp);
-
-					m = (air_traffic_message*)tw_event_data(e);
-					m->type = TAXI_OUT;
-					m->dest_region = dest_region;
-					m->dest_airport = dest_airport;
-
-					tw_event_send(e);
-
-
-				}
-				else
-				{
-					__store__(s->dep_req_rejected, lp);
-					s->dep_req_rejected++;
-
-					ts = bs_rand_exponential2(s->rn, MEAN_DELAY, lp);
-					ts += weather;
-
-					e = tw_event_new(lp->gid, ts, lp);
-
-					m = (air_traffic_message*)tw_event_data(e);
-					m->type = DEP_DELAY;
-					m->msg_from = lp->gid;
-
-					tw_event_send(e);
-
-				}
-
-				__store__(path,lp);
-
-				break;
-			}
-
-		case DEP_DELAY:
-			{
-
-				if(PADDING_LOOP)
-					for (unsigned volatile long var = 0; var < loop_size;var++){}
-
-
-				ts = bs_rand_exponential2(s->rn, MEAN_DELAY, lp);
-
-				e = tw_event_new(lp->gid, ts, lp);
+				e = tw_event_new(to2, ts, lp);
 
 				m = (air_traffic_message*)tw_event_data(e);
-				m->type = DEP_REQ;
-				tw_event_send(e);
-
-				break;
-			}
-
-		case TAXI_OUT:
-			{
-				if(PADDING_LOOP)
-					for (unsigned volatile long var = 0; var < loop_size;var++){}
-
-
-				assert(msg->dest_region < NUMBER_OF_REGION_CONTROLLER);
-
-				ts = bs_rand_exponential2(s->rn, MEAN_TAXI, lp);
-
-				e = tw_event_new(lp->gid, ts, lp);
-
-				m = (air_traffic_message*)tw_event_data(e);
-				m->type = TAKE_OFF;
-				m->dest_region = msg->dest_region;
-				m->dest_airport = msg->dest_airport;
+				m->type = LANDING;
+				m->aircraft = msg->aircraft;
 
 				tw_event_send(e);
-
-				break;
-			}
-
-		case TAKE_OFF:
-			{            
-				if(PADDING_LOOP)
-					for (unsigned volatile long var = 0; var < loop_size;var++){}
-
-				__store__(s->runway_in_use, lp);
-				s->runway_in_use--;
-
-				int src_region = get_region(lp->gid);
-				int next_region =-1;
-				std::deque<int> p = graph->get_shortest_path(src_region, msg->dest_region);
-				if (p.size() != 1) 
-				{
-					p.pop_front();
-					next_region = p.front();
-				}
-				else 
-				{
-					next_region = msg->dest_region;
-				}
-
-
-				ts = bs_rand_exponential2(s->rn, MEAN_TAKE_OFF, lp);
-
-				e = tw_event_new(next_region, ts, lp);
-
-				m = (air_traffic_message*)tw_event_data(e);
-				m->type = TRANSIT_REQ;
-				m->dest_region = msg->dest_region;
-				m->dest_airport = msg->dest_airport;
-
-				tw_event_send(e);
-
-				break;
-			}
-
-		case TRANSIT_REQ:
-			{
-				if(PADDING_LOOP)
-					for (unsigned volatile long var = 0; var < loop_size;var++){}
-
-				int path = 0;
-
-				if ((path = (s->airplane_in_region < s->max_capacity)))
-				{
-
-					__store__(s->airplane_in_region, lp);
-					__store__(s->transit_req_accepted, lp);
-
-					s->airplane_in_region++;
-					s->transit_req_accepted++;
-
-					ts = bs_rand_exponential2(s->rn, MEAN_FLIGHT, lp);
-
-					e = tw_event_new(lp->gid, ts, lp);
-
-					m = (air_traffic_message*)tw_event_data(e);
-					m->type = ON_THE_AIR;
-					m->dest_region = msg->dest_region;
-					m->dest_airport = msg->dest_airport;
-					m->msg_from = lp->gid;
-
-					tw_event_send(e);
-
-				}
-				else
-				{
-					__store__(s->transit_req_rejected, lp);
-					s->transit_req_rejected++;
-
-					ts = bs_rand_exponential2(s->rn, MEAN_DELAY, lp);
-
-					e = tw_event_new(lp->gid, ts, lp);
-
-					m = (air_traffic_message*)tw_event_data(e);
-					m->type = TRANSIT_DELAY;
-					m->dest_region = msg->dest_region;
-					m->dest_airport = msg->dest_airport;
-					m->msg_from = lp->gid;
-
-					tw_event_send(e);
-
-				}
-
-
-				__store__(path,lp);
-
-				break;
-			}
-
-		case ON_THE_AIR:
-			{
-				if(PADDING_LOOP)
-					for (unsigned volatile long var = 0; var < loop_size;var++){}
-
-				assert(lp->gid < NUMBER_OF_REGION_CONTROLLER);
-
-				int next_region = bs_rand_integer2(s->rn, 0, NUMBER_OF_REGION_CONTROLLER-1, lp);
-
-				std::deque<int> p = graph->get_shortest_path(lp->gid, msg->dest_region);
-
-				if (p.size() != 1) 
-				{
-					p.pop_front();
-					next_region = p.front();
-				}
-				else 
-				{
-					next_region = msg->dest_region;
-				}
-
-				__store__(s->airplane_in_region, lp);
-				s->airplane_in_region--;
-
-				int path = 0;
-				if ((path = (next_region == msg->dest_region)))
-				{
-					ts = bs_rand_exponential2(s->rn, MEAN_LAND, lp);
-					e = tw_event_new(msg->dest_airport, ts, lp);
-
-					m = (air_traffic_message*)tw_event_data(e);
-					m->type = LANDING_REQ;
-					m->dest_region = msg->dest_region;
-					m->dest_airport = msg->dest_airport;
-					m->msg_from = lp->gid;
-				}
-				else
-				{
-					ts = bs_rand_exponential2(s->rn, MEAN_REQ, lp);
-
-					e = tw_event_new(next_region, ts, lp);
-
-					m = (air_traffic_message*)tw_event_data(e);
-					m->type = TRANSIT_REQ;
-					m->dest_region = msg->dest_region;
-					m->dest_airport = msg->dest_airport;
-					m->msg_from = lp->gid;
-				}
-
-				tw_event_send(e);
-
-				__store__(path,lp);
-
-				break;
-			}
-
-		case TRANSIT_DELAY:
-			{
-				if(PADDING_LOOP)
-					for (unsigned volatile long var = 0; var < loop_size;var++){}
-
-				ts = bs_rand_exponential2(s->rn, MEAN_DELAY, lp);
-
-				e = tw_event_new(lp->gid, ts, lp);
-
-				m = (air_traffic_message*)tw_event_data(e);
-				m->type = TRANSIT_REQ;
-				m->dest_region = msg->dest_region;
-				m->dest_airport = msg->dest_airport;
-				m->msg_from = lp->gid;
-
-				tw_event_send(e);
-
-				break;
-			}
-
-		case LANDING_REQ:
-			{
-				if(PADDING_LOOP)
-					for (unsigned volatile long var = 0; var < loop_size;var++){}
-
-				int weather = bs_rand_integer2(s->rn, 0, 3, lp);
-
-				int path = 0;
-
-				if ((path = (s->runway_in_use < s->max_runway))) 
-				{
-					__store__(s->runway_in_use, lp);
-					__store__(s->landing_req_accepted, lp);
-
-					s->runway_in_use++;
-					s->landing_req_accepted++;
-
-					ts = bs_rand_exponential2(s->rn, MEAN_LAND, lp);
-					ts += weather;
-
-					e = tw_event_new(lp->gid, ts, lp);
-
-					m = (air_traffic_message*)tw_event_data(e);
-					m->type = LANDING;
-					m->dest_region = msg->dest_region;
-					m->dest_airport = msg->dest_airport;
-					m->msg_from = lp->gid;
-
-					tw_event_send(e);
-
-				}
-				else
-				{
-					__store__(s->landing_req_rejected, lp);
-
-					s->landing_req_rejected++;
-
-					ts = bs_rand_exponential2(s->rn, MEAN_DELAY, lp);
-					ts += weather;
-
-					e = tw_event_new(lp->gid, ts, lp);
-
-					m = (air_traffic_message*)tw_event_data(e);
-					m->type = LANDING_DELAY;
-					m->dest_region = msg->dest_region;
-					m->dest_airport = msg->dest_airport;
-					m->msg_from = lp->gid;
-
-					tw_event_send(e);
-
-				}
-
-
-				__store__(path,lp);
-
-				break;
-			}
-
-		case LANDING_DELAY:
-			{	
-				if(PADDING_LOOP)
-					for (unsigned volatile long var = 0; var < loop_size;var++){}
-
-				ts = bs_rand_exponential2(s->rn, MEAN_DELAY, lp);
-
-				e = tw_event_new(lp->gid, ts, lp);
-
-				m = (air_traffic_message*)tw_event_data(e);
-				m->type = LANDING_REQ;
-				m->dest_region = msg->dest_region;
-				m->dest_airport = msg->dest_airport;
-				m->msg_from = lp->gid;
-
-				tw_event_send(e);
-
-				break;
-			}
-
-		case LANDING:
-			{
-				if(PADDING_LOOP)
-					for (unsigned volatile long var = 0; var < loop_size;var++){}
-
-				ts = bs_rand_exponential2(s->rn, MEAN_TAXI, lp);
-
-				e = tw_event_new(lp->gid, ts, lp);
-
-				m = (air_traffic_message*)tw_event_data(e);
-				m->type = TAXI_IN;
-				m->dest_region = msg->dest_region;
-				m->dest_airport = msg->dest_airport;
-				m->msg_from = lp->gid;
-
-				tw_event_send(e);
-
-				break;
-			}	
-
-		case TAXI_IN:
-			{
-				if(PADDING_LOOP)
-					for (unsigned volatile long var = 0; var < loop_size;var++){}
-
-				ts = bs_rand_exponential2(s->rn, MEAN_ARRIVAL, lp);
-
-				e = tw_event_new(lp->gid, ts, lp);
-
-				m = (air_traffic_message*)tw_event_data(e);
-				m->type = ARRIVAL;
-				m->dest_region = msg->dest_region;
-				m->dest_airport = msg->dest_airport;
-				m->msg_from = lp->gid;
-
-				tw_event_send(e);
-
-				break;
-			}
-
-		case ARRIVAL:
-			{
-				if(PADDING_LOOP)
-					for (unsigned volatile long var = 0; var < loop_size;var++){}
-
-				__store__(s->runway_in_use, lp);
-				s->runway_in_use--;
-
-				int dest = bs_rand_integer2(s->rn, NUMBER_OF_REGION_CONTROLLER, NUMBER_OF_LP-1, lp);
-
-				ts = bs_rand_exponential2(s->rn, MEAN_LAND, lp);
-
-				e = tw_event_new(dest, ts, lp);
-
-				m = (air_traffic_message*)tw_event_data(e);
-				m->type = DEP_REQ;
-
-				tw_event_send(e);
-
-				break;
-			}
-
-
-	}
-}
-
-
-void event_handler_rc(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * lp)
-{    	
-	if(COUNT_EVENT) decrease_counter(lp->gid, msg->type);
-
-	switch(msg->type)
-	{
-		case DEP_REQ:
-			{
-				//cout<<"RE-DEP_REQ"<<endl;
-
-				int path = -1;
-				__restore__(path, lp);
-				assert(path >= 0);
-
-				if (path) {
-
-					bs_rand_rvs(s->rn, lp);
-					bs_rand_rvs(s->rn, lp);
-
-					__restore__(s->dep_req_accepted, lp);
-					__restore__(s->runway_in_use, lp);
-
-				}
-				else {
-
-					bs_rand_rvs(s->rn, lp);
-					__restore__(s->dep_req_rejected, lp);
-				}
-
-				bs_rand_rvs(s->rn, lp);
-
-				break;
-			}
-
-		case DEP_DELAY:
-			{
-				//cout<<"RE-DEP_DELAY"<<endl;
-
-				bs_rand_rvs(s->rn, lp);
-
-				break;
-			}
-
-		case TAXI_OUT:
-			{
-				//cout<<"RE-TAXI_OUT"<<endl;
-
-				bs_rand_rvs(s->rn, lp);
-
-				break;
-			}
-
-		case TAKE_OFF:
-			{
-				//cout<<"RE-TAKE_OFF"<<endl;
-
-				bs_rand_rvs(s->rn, lp);
-				__restore__(s->runway_in_use, lp);
-
-				break;
-			}  
-
-		case TRANSIT_REQ:
-			{
-				//cout<<"RE-TRANSIT_REQ"<<endl;
-
-				int path = -1;
-				__restore__(path, lp);
-				assert(path >= 0);
-
-				if (path) 
-				{
-					bs_rand_rvs(s->rn, lp);
-					__restore__(s->transit_req_accepted, lp);
-					__restore__(s->airplane_in_region, lp);
-				}
-				else 
-				{
-					bs_rand_rvs(s->rn, lp);
-
-					__restore__(s->transit_req_rejected, lp);
-				}
-
-				break;
-			}
-
-		case ON_THE_AIR:
-			{
-				int path = -1;
-				__restore__(path, lp);
-				assert(path >= 0);
-
-				if (path)
-				{
-					bs_rand_rvs(s->rn, lp);
-
-				}
-				else
-				{
-					bs_rand_rvs(s->rn, lp);
-
-				}
-
-				__restore__(s->airplane_in_region, lp);
-				bs_rand_rvs(s->rn, lp);
-
-				break;
-			}
-
-		case TRANSIT_DELAY:
-			{			
-				bs_rand_rvs(s->rn, lp);
-
-				break;
-			} 
-
-		case LANDING_REQ:
-			{
-				int path = -1;
-				__restore__(path, lp);
-				assert(path >= 0);
-
-				if (path)
-				{
-					bs_rand_rvs(s->rn, lp);
-					__restore__(s->landing_req_accepted, lp);
-					__restore__(s->runway_in_use, lp);
-
-				}
-				else
-				{
-					bs_rand_rvs(s->rn, lp);
-					__restore__(s->landing_req_rejected, lp);
-
-				}
-
-				bs_rand_rvs(s->rn, lp);
-
-				break;
-			}
-
-		case LANDING_DELAY:
-			{			
-				bs_rand_rvs(s->rn, lp);
-
-				break;
-			} 
-
-		case LANDING:
-			{			
-				bs_rand_rvs(s->rn, lp);
-
-				break;
-			} 
-
-		case TAXI_IN:
-			{			
-				bs_rand_rvs(s->rn, lp);
-
-				break;
-			}
-
-		case ARRIVAL:
-			{			
-				bs_rand_rvs(s->rn, lp);
-				bs_rand_rvs(s->rn, lp);
-
-				__restore__(s->runway_in_use, lp);
 
 				break;
 			}
 	}
 }
-*/
+
+
 
 void final(airport_state * s, tw_lp * lp)
 
 {
 	//wait_time_avg += ((s->waiting_time / (double) s->landings) / nlp_per_pe);
-	total_transit_accepted += s->transit_req_accepted;
-	total_transit_rejected += s->transit_req_rejected;
+	total_transit_req_accepted += s->transit_req_accepted;
+	total_transit_req_rejected += s->transit_req_rejected;
+	total_transit_processed += s->transit_processed;
 
 	total_dep_processed += s->dep_processed;
+	total_dep_req_accepted += s->dep_req_accepted;
 	total_dep_req_rejected += s->dep_req_rejected;
 
+	total_landing_processed += s->landing_processed;
 	total_landing_req_accepted += s->landing_req_accepted;
 	total_landing_req_rejected += s->landing_req_rejected;
 
 	max_queue_size_airport = s->max_queue_size_airport > max_queue_size_airport ? s->max_queue_size_airport : max_queue_size_airport;
 	max_queue_size_region = s->max_queue_size_region > max_queue_size_region ? s->max_queue_size_region : max_queue_size_region;
 
-	total_cdelay_airport += s->cdelay_airport;
-	total_delay_airport += s->delay_airport;
+	total_cdelay_airport_dep += s->cdelay_airport_dep;
+	total_delay_airport_dep += s->delay_airport_dep;
+
+	total_cdelay_airport_land += s->cdelay_airport_land;
+	total_delay_airport_land += s->delay_airport_land;
 
 	total_cdelay_region += s->cdelay_region;
 	total_delay_region += s->delay_region;
@@ -1842,20 +1276,33 @@ int main(int argc, char **argv, char **env)
 		printf("\t%-50s %11lld\n", "Number of planes", 
 				planes_per_airport * nlp_per_pe * g_tw_npe * tw_nnodes());
 
-		std::cout<<"\tTotal Transit Accepted : "<<total_transit_accepted<<std::endl;
-		std::cout<<"\tTotal Transit Rejected : "<<total_transit_rejected<<std::endl;
+		std::cout<<"\tTotal Transit Req Accepted : "<<total_transit_req_accepted<<std::endl;
+		std::cout<<"\tTotal Transit Req Rejected : "<<total_transit_req_rejected<<std::endl;
+		std::cout<<"\tTotal Transit Processed : "<<total_transit_processed<<std::endl;
+		std::cout<<""<<endl;
 
-		std::cout<<"\tTotal Departure Processed : "<<total_dep_processed<<std::endl;
+
+		std::cout<<"\tTotal Departure Req Accepted : "<<total_dep_req_accepted<<std::endl;
 		std::cout<<"\tTotal Departure Req Rejected : "<<total_dep_req_rejected<<std::endl;
+		std::cout<<"\tTotal Departure Processed : "<<total_dep_processed<<std::endl;
+		std::cout<<""<<endl;
 
-		std::cout<<"\tTotal Arrival Req Accepted : "<<total_landing_req_accepted<<std::endl;
-		std::cout<<"\tTotal Arrival Req Rejected : "<<total_landing_req_rejected<<std::endl;
+		std::cout<<"\tTotal Landing Req Accepted : "<<total_landing_req_accepted<<std::endl;
+		std::cout<<"\tTotal Landing Req Rejected : "<<total_landing_req_rejected<<std::endl;
+		std::cout<<"\tTotal Landing Processed : "<<total_landing_processed<<std::endl;
+		std::cout<<""<<endl;
 
-		std::cout<<"\tAvg Airport cdelay : "<<(double)total_cdelay_airport/total_dep_processed<<std::endl;		
-		std::cout<<"\tAvg Airport delay : "<<(double)total_delay_airport/total_dep_processed<<std::endl;		
+		std::cout<<"\tAvg Airport Dep cdelay : "<<(double)total_cdelay_airport_dep/total_dep_processed<<std::endl;		
+		std::cout<<"\tAvg Airport Dep delay : "<<(double)total_delay_airport_dep/total_dep_processed<<std::endl;		
+		std::cout<<""<<endl;
 
-		std::cout<<"\tAvg Region cdelay : "<<(double)total_cdelay_region/total_transit_accepted<<std::endl;		
-		std::cout<<"\tAvg Region delay : "<<(double)total_delay_region/total_transit_accepted<<std::endl;		
+		std::cout<<"\tAvg Airport Land cdelay : "<<(double)total_cdelay_airport_land/total_landing_processed<<std::endl;		
+		std::cout<<"\tAvg Airport Land delay : "<<(double)total_delay_airport_land/total_landing_processed<<std::endl;		
+		std::cout<<""<<endl;
+
+		std::cout<<"\tAvg Region cdelay : "<<(double)total_cdelay_region/total_transit_processed<<std::endl;		
+		std::cout<<"\tAvg Region delay : "<<(double)total_delay_region/total_transit_processed<<std::endl;		
+		std::cout<<""<<endl;
 
 		std::cout<<"\tMax Airport Queue Size : "<<max_queue_size_airport<<std::endl;
 		std::cout<<"\tMax Region Queue Size : "<<max_queue_size_region<<std::endl;
