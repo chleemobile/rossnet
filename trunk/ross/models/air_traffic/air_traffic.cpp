@@ -89,7 +89,7 @@ void init(airport_state * s, tw_lp * lp)
 	s->incoming_queue = new priority_queue<Aircraft, vector<Aircraft>, less<Aircraft> >();
 	assert(	s->incoming_queue->empty());
 
-	s->aircraft_counter = new vector<int>(350);
+	//s->aircraft_counter = new vector<int>(350);
 	s->max_queue_size_airport = 0;
 	s->max_queue_size_region = 0;
 
@@ -252,7 +252,7 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 				Aircraft aircraft = msg->aircraft;
 				aircraft.m_clock = tw_now(lp);
 				s->incoming_queue->push(aircraft);
-				
+
 				if(s->incoming_queue->size() > s->max_queue_size_airport)
 					s->max_queue_size_airport = s->incoming_queue->size();
 
@@ -314,6 +314,8 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 					Aircraft new_top = s->incoming_queue->top();
 					int new_size = s->incoming_queue->size();
 
+					delete temp_q;
+
 					assert(old_top.m_id == new_top.m_id);
 					assert(old_size == new_size);
 
@@ -324,31 +326,35 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 
 		case DEP:
 			{
-				if (s->runway_in_use < s->max_runway && s->incoming_queue->size() > 0) 
+				if (s->runway_in_use < s->max_runway)
 				{
-					s->runway_in_use++;
-					s->dep_processed++;
+					if(s->incoming_queue->size() > 0)
+					{
+						s->runway_in_use++;
+						s->dep_processed++;
 
-					Aircraft aircraft = s->incoming_queue->top();
-					s->incoming_queue->pop();
+						Aircraft aircraft = s->incoming_queue->top();
+						s->incoming_queue->pop();
 
-					s->delay_airport += tw_now(lp) - aircraft.m_clock;
-					s->cdelay_airport += aircraft.m_cdelay;
+						s->delay_airport += tw_now(lp) - aircraft.m_clock;
+						s->cdelay_airport += aircraft.m_cdelay;
 
-					aircraft.m_clock = 0;
-					aircraft.m_cdelay = 0;
-					aircraft.m_delay = 0;
+						aircraft.m_clock = 0;
+						aircraft.m_cdelay = 0;
+						aircraft.m_delay = 0;
 
-					int to = lp->gid;
-					ts = bs_rand_exponential(s->rn, MEAN_DEQ);
+						int to = lp->gid;
+						ts = bs_rand_exponential(s->rn, MEAN_DEQ);
 
-					e = tw_event_new(to, ts, lp);
+						e = tw_event_new(to, ts, lp);
 
-					m = (air_traffic_message*)tw_event_data(e);
-					m->type = TAXI_OUT;
-					m->aircraft = aircraft;
+						m = (air_traffic_message*)tw_event_data(e);
+						m->type = TAXI_OUT;
+						m->aircraft = aircraft;
 
-					tw_event_send(e);
+						tw_event_send(e);
+
+					}
 				}
 
 				break;
@@ -505,6 +511,8 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 					Aircraft new_top = s->incoming_queue->top();
 					int new_size = s->incoming_queue->size();
 
+					delete temp_q;
+
 					assert(old_top.m_id == new_top.m_id);
 					assert(old_size == new_size);
 				}
@@ -514,31 +522,34 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 
 		case TRANSIT:
 			{
-				if (s->airplane_in_region < s->max_capacity && s->incoming_queue->size() > 0) 
+				if (s->airplane_in_region < s->max_capacity) 
 				{
-					Aircraft aircraft = s->incoming_queue->top();
-
-					if(aircraft.m_remaining_dist <= 0)
+					if(s->incoming_queue->size() > 0)
 					{
-						s->incoming_queue->pop();
+						Aircraft aircraft = s->incoming_queue->top();
+	
+						if(aircraft.m_remaining_dist <= 0)
+						{
+							s->incoming_queue->pop();
 
-						s->airplane_in_region++;
-						//s->transit_req_accepted++;
+							s->airplane_in_region++;
+							//s->transit_req_accepted++;
 
-						s->delay_region += tw_now(lp) - aircraft.m_clock;
-						s->cdelay_region += aircraft.m_cdelay;
+							s->delay_region += tw_now(lp) - aircraft.m_clock;
+							s->cdelay_region += aircraft.m_cdelay;
 
-						int to = lp->gid;
-						ts = bs_rand_exponential(s->rn, MEAN_FLIGHT);
+							int to = lp->gid;
+							ts = bs_rand_exponential(s->rn, MEAN_FLIGHT);
 
-						e = tw_event_new(to, ts, lp);
+							e = tw_event_new(to, ts, lp);
 
-						m = (air_traffic_message*)tw_event_data(e);
-						m->type = ON_THE_AIR;
-						m->aircraft = aircraft;
-						m->msg_from = lp->gid;
+							m = (air_traffic_message*)tw_event_data(e);
+							m->type = ON_THE_AIR;
+							m->aircraft = aircraft;
+							m->msg_from = lp->gid;
 
-						tw_event_send(e);
+							tw_event_send(e);
+						}
 					}
 				}
 				else
@@ -582,7 +593,7 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 					assert(old_top.m_id == new_top.m_id);
 					assert(old_size == new_size);
 				}					
-				
+
 
 				break;
 			}
@@ -629,9 +640,9 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 					m->msg_from = lp->gid;
 
 					tw_event_send(e);
-					
+
 					/*
-					 Schedule Transit Event
+					   Schedule Transit Event
 					 */
 
 					int to2 = lp->gid;
@@ -644,7 +655,7 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 					m->aircraft = msg->aircraft;
 
 					tw_event_send(e);
-					
+
 				}
 				else
 				{
@@ -663,12 +674,12 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 					m->msg_from = lp->gid;
 
 					tw_event_send(e);
-					
+
 				}
 
 				break;
 			}
-		
+
 		case LANDING_REQ:
 			{
 				Aircraft aircraft = msg->aircraft;
