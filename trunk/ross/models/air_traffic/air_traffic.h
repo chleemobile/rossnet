@@ -27,14 +27,13 @@ typedef struct air_traffic_message air_traffic_message;
 enum air_traffic_event_t
 {
 	DEP_REQ, //0
-	DEP_DELAY, //1
+	DEP,
 	TAXI_OUT, //2
 	TAKE_OFF, //3
 	TRANSIT_REQ, //4
+	TRANSIT,
 	ON_THE_AIR, //5
-	TRANSIT_DELAY, //6
 	LANDING_REQ, //7
-	LANDING_DELAY, //8
 	LANDING, //9
 	TAXI_IN, //10
 	ARRIVAL //11
@@ -44,9 +43,18 @@ typedef enum air_traffic_event_t air_traffic_event_t;
 
 struct airport_state
 {
-	int rn;
+	int 	rn;
+	priority_queue < Aircraft, vector<Aircraft>, less<Aircraft> > *incoming_queue;
+	vector<int> *aircraft_counter;
 
-	priority_queue < Aircraft, vector<Aircraft>, less<Aircraft> > *q;
+	double  delay_airport;
+	int     cdelay_airport;
+	int     max_queue_size_airport;
+
+	double  delay_region;
+	int     cdelay_region;
+	int     max_queue_size_region;
+
 
 	/*
 	   Region Controller State Variable
@@ -68,11 +76,8 @@ struct airport_state
 	int landing_req_accepted;
 	int landing_req_rejected;
 
-	int dep_req_accepted;
+	int dep_processed;
 	int dep_req_rejected;
-
-	double delay;
-	int    cdelay;
 };
 
 struct air_traffic_message
@@ -102,7 +107,7 @@ static Graph *graph;
 static int total_transit_accepted = 0;
 static int total_transit_rejected = 0;
 
-static int total_dep_req_accepted = 0;
+static int total_dep_processed= 0;
 static int total_dep_req_rejected = 0;
 
 static int total_landing_req_accepted = 0;
@@ -112,9 +117,18 @@ static int nlp = NUMBER_OF_LP;
 static tw_lpid	 nlp_per_pe = NUMBER_OF_LP;
 static int p_run = 1;
 static tw_stime	 mean_flight_time = 1;
-static int       opt_mem = 100000;
+static int       opt_mem = 1000000;
 static int       planes_per_airport = NUMBER_OF_PLANES_PER_AIRPORT;
 
 static tw_stime	 wait_time_avg = 0.0;
+
+static int max_queue_size_airport = 0;
+static int max_queue_size_region = 0;
+
+static int total_cdelay_airport = 0;
+static int total_cdelay_region = 0;
+
+static double total_delay_airport = 0;
+static double total_delay_region = 0;
 
 #endif

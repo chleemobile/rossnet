@@ -3,7 +3,7 @@
 int Aircraft::m_id_generator = 0;
 
 Aircraft::Aircraft():m_src_airport(0), m_src_region(0),
-					 m_dep_time(0), m_dest_region(0), m_dest_airport(0),
+					 m_process_time(0), m_dest_region(0), m_dest_airport(0),
 					 m_max_speed(0), m_speed(0), m_remaining_dist(0),
 					 //m_path(10),
 					 m_clock(0), m_delay(0), m_cdelay(0)
@@ -29,7 +29,7 @@ Aircraft::~Aircraft()
 
 bool Aircraft::operator<(const Aircraft &rhs) const
 {
-	return (m_dep_time > rhs.m_dep_time);
+	return (m_process_time > rhs.m_process_time);
 }
 
 /*

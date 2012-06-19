@@ -16,7 +16,7 @@ public:
 	static int m_id_generator;
 
 	int 	m_id;
-	int 	m_dep_time;
+	int 	m_process_time;
 	int 	m_src_airport;
 	int		m_src_region;
 	int 	m_dest_region;
