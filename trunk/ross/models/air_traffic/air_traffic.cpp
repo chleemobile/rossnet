@@ -488,14 +488,14 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 				Aircraft msg_aircraft = msg->aircraft;
 				msg_aircraft.m_clock = tw_now(lp);
 				//s->incoming_queue->push(aircraft);
-				s->controller->m_in_q->push(msg_aircraft);
+				s->controller->m_in_q.push(msg_aircraft);
 
-				if(s->controller->m_in_q->size() > s->controller->m_max_q_size )
-					s->controller->m_max_q_size = s->controller->m_in_q->size();
+				if(s->controller->m_in_q.size() > s->controller->m_max_q_size )
+					s->controller->m_max_q_size = s->controller->m_in_q.size();
 
 				if (s->controller->m_current_capacity < s->controller->m_max_capacity)
 				{
-					Aircraft aircraft = s->controller->m_in_q->top();
+					Aircraft aircraft = s->controller->m_in_q.top();
 
 					if(aircraft.m_remaining_dist <= 0)
 					{
@@ -503,7 +503,7 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 						s->controller->m_req_accepted++;
 						s->controller->m_aircraft_processed++;
 
-						s->controller->m_in_q->pop();
+						s->controller->m_in_q.pop();
 
 						s->controller->m_delay += tw_now(lp) - aircraft.m_clock;
 						s->controller->m_cdelay += aircraft.m_cdelay;
@@ -532,7 +532,7 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 				}
 				//update remaining distance, process time, delays
 
-				if(s->controller->m_in_q->size() > 0)
+				if(s->controller->m_in_q.size() > 0)
 				{
 					s->controller->handle_aircraft(lp);
 				}
@@ -546,9 +546,9 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 
 				if (s->controller->m_current_capacity < s->controller->m_max_capacity)
 				{
-					if(s->controller->m_in_q->size() > 0)
+					if(s->controller->m_in_q.size() > 0)
 					{
-						Aircraft aircraft = s->controller->m_in_q->top();
+						Aircraft aircraft = s->controller->m_in_q.top();
 
 						if(aircraft.m_remaining_dist <= 0)
 						{
@@ -556,7 +556,7 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 							s->controller->m_req_accepted++;
 							s->controller->m_aircraft_processed++;
 
-							s->controller->m_in_q->pop();
+							s->controller->m_in_q.pop();
 
 							s->controller->m_delay += tw_now(lp) - aircraft.m_clock;
 							s->controller->m_cdelay += aircraft.m_cdelay;
@@ -586,7 +586,7 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 				}
 				//update remaining distance, process time, delays
 
-				if(s->controller->m_in_q->size() > 0)
+				if(s->controller->m_in_q.size() > 0)
 				{
 					s->controller->handle_aircraft(lp);
 				}

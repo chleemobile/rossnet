@@ -23,8 +23,8 @@ Controller::Controller(int in_max_capacity, int in_num_aircraft)
 	m_delay = 0;
 	m_cdelay = 0;
 
-	m_in_q = new priority_queue<Aircraft, vector<Aircraft>, less<Aircraft> >();
-	m_counter = new vector<int> (in_num_aircraft);
+	//m_in_q = new priority_queue<Aircraft, vector<Aircraft>, less<Aircraft> >();
+	//m_counter = new vector<int> (in_num_aircraft);
 
 }
 

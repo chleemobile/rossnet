@@ -27,35 +27,37 @@ void RegionController::handle_outgoing(tw_lp *lp)
 void RegionController::handle_aircraft(tw_lp *lp)
 {
 
-	priority_queue < Aircraft, vector<Aircraft>, less<Aircraft> > *temp_q = new priority_queue < Aircraft, vector<Aircraft>, less<Aircraft> >();
+	//priority_queue < Aircraft, vector<Aircraft>, less<Aircraft> > *temp_q = new priority_queue < Aircraft, vector<Aircraft>, less<Aircraft> >();
 
-	int old_size = m_in_q->size();
+	priority_queue < Aircraft, vector<Aircraft>, less<Aircraft> > temp_q;
 
-	while(!m_in_q->empty())
+	int old_size = m_in_q.size();
+
+	while(!m_in_q.empty())
 	{
-		Aircraft temp = m_in_q->top();
-		m_in_q->pop();
+		Aircraft temp = m_in_q.top();
+		m_in_q.pop();
 
 		temp.m_process_time -= temp.m_speed;
 		temp.m_remaining_dist -= temp.m_speed;
 		//if(temp.m_remaining_dist < 0) temp.m_remaining_dist = 0;
 
 		temp.m_cdelay++;
-		temp_q->push(temp);
+		temp_q.push(temp);
 	}
 
-	while(!temp_q->empty())
+	while(!temp_q.empty())
 	{
-		Aircraft temp =temp_q->top();
-		temp_q->pop();
+		Aircraft temp =temp_q.top();
+		temp_q.pop();
 
-		m_in_q->push(temp);
+		m_in_q.push(temp);
 	}
 
-	Aircraft new_top = m_in_q->top();
-	int new_size = m_in_q->size();
+	Aircraft new_top = m_in_q.top();
+	int new_size = m_in_q.size();
 
-	delete temp_q;
+	//delete temp_q;
 
 	assert(old_size == new_size);
 

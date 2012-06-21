@@ -41,8 +41,8 @@ class Controller
 		double m_delay;
 		int m_cdelay;
 
-		priority_queue < Aircraft, vector<Aircraft>, less<Aircraft> > *m_in_q;
-		vector<int> *m_counter;
+		priority_queue < Aircraft, vector<Aircraft>, less<Aircraft> > m_in_q;
+		vector<int> m_counter;
 
 };
 

@@ -437,19 +437,19 @@ void event_handler(airport_state *s,tw_bf *bf,air_traffic_message *msg,tw_lp *lp
       class Aircraft msg_aircraft(msg -> air_traffic_message::aircraft);
       msg_aircraft.Aircraft::m_clock = tw_now(lp);
 //s->incoming_queue->push(aircraft);
-      ( *( *(s -> airport_state::controller)).Controller::m_in_q). push (msg_aircraft);
-      if (( *( *(s -> airport_state::controller)).Controller::m_in_q). size () > ( *(s -> airport_state::controller)).Controller::m_max_q_size) {
-        ( *(s -> airport_state::controller)).Controller::m_max_q_size = (( *( *(s -> airport_state::controller)).Controller::m_in_q). size ());
+      ( *(s -> airport_state::controller)).Controller::m_in_q. push (msg_aircraft);
+      if (( *(s -> airport_state::controller)).Controller::m_in_q. size () > ( *(s -> airport_state::controller)).Controller::m_max_q_size) {
+        ( *(s -> airport_state::controller)).Controller::m_max_q_size = (( *(s -> airport_state::controller)).Controller::m_in_q. size ());
       }
       else {
       }
       if (( *(s -> airport_state::controller)).Controller::m_current_capacity < ( *(s -> airport_state::controller)).Controller::m_max_capacity) {
-        class Aircraft aircraft(( *( *(s -> airport_state::controller)).Controller::m_in_q). top ());
+        class Aircraft aircraft(( *(s -> airport_state::controller)).Controller::m_in_q. top ());
         if (aircraft.Aircraft::m_remaining_dist <= 0) {
           ( *(s -> airport_state::controller)).Controller::m_current_capacity++;
           ( *(s -> airport_state::controller)).Controller::m_req_accepted++;
           ( *(s -> airport_state::controller)).Controller::m_aircraft_processed++;
-          ( *( *(s -> airport_state::controller)).Controller::m_in_q). pop ();
+          ( *(s -> airport_state::controller)).Controller::m_in_q. pop ();
           ( *(s -> airport_state::controller)).Controller::m_delay += (tw_now(lp) - aircraft.Aircraft::m_clock);
           ( *(s -> airport_state::controller)).Controller::m_cdelay += aircraft.Aircraft::m_cdelay;
           aircraft.Aircraft::m_clock = 0;
@@ -472,7 +472,7 @@ void event_handler(airport_state *s,tw_bf *bf,air_traffic_message *msg,tw_lp *lp
         ( *(s -> airport_state::controller)).Controller::m_req_rejected++;
       }
 //update remaining distance, process time, delays
-      if (( *( *(s -> airport_state::controller)).Controller::m_in_q). size () > 0) {
+      if (( *(s -> airport_state::controller)).Controller::m_in_q. size () > 0) {
         ( *(s -> airport_state::controller)). handle_aircraft (lp);
       }
       else {
@@ -482,13 +482,13 @@ void event_handler(airport_state *s,tw_bf *bf,air_traffic_message *msg,tw_lp *lp
     LABEL5:
 //assert(false);
     if (( *(s -> airport_state::controller)).Controller::m_current_capacity < ( *(s -> airport_state::controller)).Controller::m_max_capacity) {
-      if (( *( *(s -> airport_state::controller)).Controller::m_in_q). size () > 0) {
-        class Aircraft aircraft(( *( *(s -> airport_state::controller)).Controller::m_in_q). top ());
+      if (( *(s -> airport_state::controller)).Controller::m_in_q. size () > 0) {
+        class Aircraft aircraft(( *(s -> airport_state::controller)).Controller::m_in_q. top ());
         if (aircraft.Aircraft::m_remaining_dist <= 0) {
           ( *(s -> airport_state::controller)).Controller::m_current_capacity++;
           ( *(s -> airport_state::controller)).Controller::m_req_accepted++;
           ( *(s -> airport_state::controller)).Controller::m_aircraft_processed++;
-          ( *( *(s -> airport_state::controller)).Controller::m_in_q). pop ();
+          ( *(s -> airport_state::controller)).Controller::m_in_q. pop ();
           ( *(s -> airport_state::controller)).Controller::m_delay += (tw_now(lp) - aircraft.Aircraft::m_clock);
           ( *(s -> airport_state::controller)).Controller::m_cdelay += aircraft.Aircraft::m_cdelay;
           aircraft.Aircraft::m_clock = 0;
@@ -514,7 +514,7 @@ void event_handler(airport_state *s,tw_bf *bf,air_traffic_message *msg,tw_lp *lp
       ( *(s -> airport_state::controller)).Controller::m_req_rejected++;
     }
 //update remaining distance, process time, delays
-    if (( *( *(s -> airport_state::controller)).Controller::m_in_q). size () > 0) {
+    if (( *(s -> airport_state::controller)).Controller::m_in_q. size () > 0) {
       ( *(s -> airport_state::controller)). handle_aircraft (lp);
     }
     else {
@@ -1109,17 +1109,17 @@ void event_handler_forward(airport_state *s,tw_bf *bf,air_traffic_message *msg,t
       class Aircraft msg_aircraft(msg -> air_traffic_message::aircraft);
       msg_aircraft.Aircraft::m_clock = tw_now(lp);
 //s->incoming_queue->push(aircraft);
-      __store__( *s -> airport_state::controller -> Controller::m_in_q,lp);
-      ( *( *(s -> airport_state::controller)).Controller::m_in_q). push (msg_aircraft);
-      if (( *( *(s -> airport_state::controller)).Controller::m_in_q). size () > ( *(s -> airport_state::controller)).Controller::m_max_q_size) {
+      __store__(s -> airport_state::controller -> Controller::m_in_q,lp);
+      ( *(s -> airport_state::controller)).Controller::m_in_q. push (msg_aircraft);
+      if (( *(s -> airport_state::controller)).Controller::m_in_q. size () > ( *(s -> airport_state::controller)).Controller::m_max_q_size) {
         __store__< int  > (s -> airport_state::controller -> Controller::m_max_q_size,lp);
-        ( *(s -> airport_state::controller)).Controller::m_max_q_size = (( *( *(s -> airport_state::controller)).Controller::m_in_q). size ());
+        ( *(s -> airport_state::controller)).Controller::m_max_q_size = (( *(s -> airport_state::controller)).Controller::m_in_q. size ());
       }
       else {
         __num0 += 8;
       }
       if (( *(s -> airport_state::controller)).Controller::m_current_capacity < ( *(s -> airport_state::controller)).Controller::m_max_capacity) {
-        class Aircraft aircraft(( *( *(s -> airport_state::controller)).Controller::m_in_q). top ());
+        class Aircraft aircraft(( *(s -> airport_state::controller)).Controller::m_in_q. top ());
         if (aircraft.Aircraft::m_remaining_dist <= 0) {
           __store__< int  > (s -> airport_state::controller -> Controller::m_current_capacity,lp);
           ( *(s -> airport_state::controller)).Controller::m_current_capacity++;
@@ -1127,7 +1127,7 @@ void event_handler_forward(airport_state *s,tw_bf *bf,air_traffic_message *msg,t
           ( *(s -> airport_state::controller)).Controller::m_req_accepted++;
           __store__< int  > (s -> airport_state::controller -> Controller::m_aircraft_processed,lp);
           ( *(s -> airport_state::controller)).Controller::m_aircraft_processed++;
-          ( *( *(s -> airport_state::controller)).Controller::m_in_q). pop ();
+          ( *(s -> airport_state::controller)).Controller::m_in_q. pop ();
           __store__(s -> airport_state::controller -> Controller::m_delay,lp);
           ( *(s -> airport_state::controller)).Controller::m_delay += (tw_now(lp) - aircraft.Aircraft::m_clock);
           __store__< int  > (s -> airport_state::controller -> Controller::m_cdelay,lp);
@@ -1156,7 +1156,7 @@ void event_handler_forward(airport_state *s,tw_bf *bf,air_traffic_message *msg,t
         ( *(s -> airport_state::controller)).Controller::m_req_rejected++;
       }
 //update remaining distance, process time, delays
-      if (( *( *(s -> airport_state::controller)).Controller::m_in_q). size () > 0) {
+      if (( *(s -> airport_state::controller)).Controller::m_in_q. size () > 0) {
         ( *(s -> airport_state::controller)). handle_aircraft_forward (lp);
       }
       else {
@@ -1167,8 +1167,8 @@ void event_handler_forward(airport_state *s,tw_bf *bf,air_traffic_message *msg,t
     LABEL5:
 //assert(false);
     if (( *(s -> airport_state::controller)).Controller::m_current_capacity < ( *(s -> airport_state::controller)).Controller::m_max_capacity) {
-      if (( *( *(s -> airport_state::controller)).Controller::m_in_q). size () > 0) {
-        class Aircraft aircraft(( *( *(s -> airport_state::controller)).Controller::m_in_q). top ());
+      if (( *(s -> airport_state::controller)).Controller::m_in_q. size () > 0) {
+        class Aircraft aircraft(( *(s -> airport_state::controller)).Controller::m_in_q. top ());
         if (aircraft.Aircraft::m_remaining_dist <= 0) {
           __store__< int  > (s -> airport_state::controller -> Controller::m_current_capacity,lp);
           ( *(s -> airport_state::controller)).Controller::m_current_capacity++;
@@ -1176,8 +1176,8 @@ void event_handler_forward(airport_state *s,tw_bf *bf,air_traffic_message *msg,t
           ( *(s -> airport_state::controller)).Controller::m_req_accepted++;
           __store__< int  > (s -> airport_state::controller -> Controller::m_aircraft_processed,lp);
           ( *(s -> airport_state::controller)).Controller::m_aircraft_processed++;
-          __store__( *s -> airport_state::controller -> Controller::m_in_q,lp);
-          ( *( *(s -> airport_state::controller)).Controller::m_in_q). pop ();
+          __store__(s -> airport_state::controller -> Controller::m_in_q,lp);
+          ( *(s -> airport_state::controller)).Controller::m_in_q. pop ();
           __store__(s -> airport_state::controller -> Controller::m_delay,lp);
           ( *(s -> airport_state::controller)).Controller::m_delay += (tw_now(lp) - aircraft.Aircraft::m_clock);
           __store__< int  > (s -> airport_state::controller -> Controller::m_cdelay,lp);
@@ -1210,7 +1210,7 @@ void event_handler_forward(airport_state *s,tw_bf *bf,air_traffic_message *msg,t
       ( *(s -> airport_state::controller)).Controller::m_req_rejected++;
     }
 //update remaining distance, process time, delays
-    if (( *( *(s -> airport_state::controller)).Controller::m_in_q). size () > 0) {
+    if (( *(s -> airport_state::controller)).Controller::m_in_q. size () > 0) {
       ( *(s -> airport_state::controller)). handle_aircraft_forward (lp);
     }
     else {
@@ -1519,14 +1519,14 @@ void event_handler_reverse(airport_state *s,tw_bf *bf,air_traffic_message *msg,t
 {
   int __num0;
   __restore__(__num0,lp);
-  if ((__num0 & 130944) == 130816) {
+  if ((__num0 & 114688) == 98304) {
     __restore__(s -> airport_state::rn,lp);
     __restore__( *s -> airport_state::aircraft_counter,lp);
   }
   else {
-    if ((__num0 & 131008) == 130944) {
+    if ((__num0 & 130944) == 130816) {
       __restore__(s -> airport_state::rn,lp);
-      ++s -> airport_state::runway_in_use;
+      __restore__( *s -> airport_state::aircraft_counter,lp);
     }
     else {
       if ((__num0 & 122880) == 114688) {
@@ -1551,7 +1551,7 @@ void event_handler_reverse(airport_state *s,tw_bf *bf,air_traffic_message *msg,t
             __restore__(s -> airport_state::rn,lp);
             __restore__(s -> airport_state::controller -> Controller::m_cdelay,lp);
             __restore__(s -> airport_state::controller -> Controller::m_delay,lp);
-            __restore__( *s -> airport_state::controller -> Controller::m_in_q,lp);
+            __restore__(s -> airport_state::controller -> Controller::m_in_q,lp);
             __restore__(s -> airport_state::controller -> Controller::m_aircraft_processed,lp);
             __restore__(s -> airport_state::controller -> Controller::m_req_accepted,lp);
             __restore__(s -> airport_state::controller -> Controller::m_current_capacity,lp);
@@ -1636,7 +1636,7 @@ void event_handler_reverse(airport_state *s,tw_bf *bf,air_traffic_message *msg,t
                   }
                   else {
                   }
-                  __restore__( *s -> airport_state::controller -> Controller::m_in_q,lp);
+                  __restore__(s -> airport_state::controller -> Controller::m_in_q,lp);
                 }
                 else {
                   if ((__num0 & 130560) == 130048) {
@@ -1680,7 +1680,7 @@ void event_handler_reverse(airport_state *s,tw_bf *bf,air_traffic_message *msg,t
                     }
                     else {
                       __restore__(s -> airport_state::rn,lp);
-                      __restore__( *s -> airport_state::aircraft_counter,lp);
+                      ++s -> airport_state::runway_in_use;
                     }
                   }
                 }
