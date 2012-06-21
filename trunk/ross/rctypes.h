@@ -1,13 +1,12 @@
 #ifndef reverse_rctypes_h
 #define reverse_rctypes_h
 
-#include "ross-types.h"
-
 #include <stdlib.h>
 #include <assert.h>
 #include <deque>
 #include <queue>
 #include <stack>
+#include "ross-types.h"
 #include <boost/any.hpp>
 
 #include <iostream>
@@ -188,3 +187,4 @@ inline void __restore__(T& obj, tw_lp* lp)
 }
 
 #endif
+

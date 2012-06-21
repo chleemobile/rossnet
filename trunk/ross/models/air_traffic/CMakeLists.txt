@@ -5,6 +5,8 @@ SET(air_traffic_srcs
 	rose_air_traffic.cpp air_traffic.h 
 	Aircraft.cpp Aircraft.hpp
 	Graph.cpp Graph.hpp 
+	Controller.cpp Controller.hpp
+	rose_RegionController.cpp RegionController.hpp
 	Constants.hpp
 	)
 

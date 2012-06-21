@@ -18,6 +18,9 @@
 #include "Constants.hpp"
 #include "Aircraft.hpp"
 
+#include "Controller.hpp"
+#include "RegionController.hpp"
+
 //using std::max;
 //using namespace std;
 
@@ -44,6 +47,8 @@ typedef enum air_traffic_event_t air_traffic_event_t;
 struct airport_state
 {
 	int 	rn;
+	Controller *controller;
+
 	priority_queue < Aircraft, vector<Aircraft>, less<Aircraft> > *incoming_queue;
 	vector<int> *aircraft_counter;
 
