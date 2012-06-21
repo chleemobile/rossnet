@@ -28,7 +28,6 @@ void write_map();
 
 tw_peid mapping_to_pe(tw_lpid gid)
 {    
-
 	if(tw_nnodes() == 1)
 	{
 		return gid/nlp_per_pe;
@@ -105,13 +104,19 @@ void init(airport_state * s, tw_lp * lp)
 	if(lp->gid <NUMBER_OF_REGION_CONTROLLER)
 	{
 		if (lp->gid == 4 || lp->gid == 5 || lp->gid == 8 || lp->gid == 11 || lp->gid == 13 || lp->gid == 16 ) {
-			s->max_capacity = AIRCRAFT_CAPACITY_OF_SMALL_REGION;			
+			s->max_capacity = AIRCRAFT_CAPACITY_OF_SMALL_REGION;
+			s->controller = new RegionController(AIRCRAFT_CAPACITY_OF_SMALL_REGION);
+			
 		}
 		else if(lp->gid == 0 || lp->gid == 1 || lp->gid == 3 || lp->gid == 7 || lp->gid == 10 || lp->gid == 12 || lp->gid == 14 || lp->gid == 18 || lp->gid == 19 ) {
-			s->max_capacity = AIRCRAFT_CAPACITY_OF_MEDIUM_REGION;			
+			s->max_capacity = AIRCRAFT_CAPACITY_OF_MEDIUM_REGION;	
+			s->controller = new RegionController(AIRCRAFT_CAPACITY_OF_MEDIUM_REGION);
+			
 		}
 		else {
-			s->max_capacity = AIRCRAFT_CAPACITY_OF_LARGE_REGION;			
+			s->max_capacity = AIRCRAFT_CAPACITY_OF_LARGE_REGION;
+			s->controller = new RegionController(AIRCRAFT_CAPACITY_OF_LARGE_REGION);
+			
 		}
 
 		s->airplane_in_region = 0;
@@ -163,6 +168,7 @@ void init(airport_state * s, tw_lp * lp)
 				(lp->gid >= 341 && lp->gid <= 342))                                                                       
 		{
 			s->max_runway = NUMBER_OF_RUNWAY_MEDIUM_AIRPORT;
+			
 		}
 		else if (lp->gid == 22 ||
 				lp->gid == 44 ||
@@ -186,10 +192,11 @@ void init(airport_state * s, tw_lp * lp)
 				(lp->gid >= 321 && lp->gid <= 327))
 		{
 			s->max_runway = NUMBER_OF_RUNWAY_SMALL_AIRPORT;
+			
 		}
 		else
 		{
-			s->max_runway = NUMBER_OF_RUNWAY_NH_AIRPORT;
+			s->max_runway = NUMBER_OF_RUNWAY_NH_AIRPORT;	
 
 		}
 
@@ -480,19 +487,27 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 			{
 				assert(lp->gid < NUMBER_OF_REGION_CONTROLLER);
 
+				
 				Aircraft aircraft = msg->aircraft;
+				
 				aircraft.m_clock = tw_now(lp);
+				
 				s->incoming_queue->push(aircraft);
 
 				if(s->incoming_queue->size() > s->max_queue_size_region )
 					s->max_queue_size_region = s->incoming_queue->size();
 
-				if (s->airplane_in_region < s->max_capacity)
+//				if (s->airplane_in_region < s->max_capacity)
+				if(s->controller->m_current_capacity < s->controller->m_max_capacity)
 				{
+
 					Aircraft aircraft = s->incoming_queue->top();
 
 					if(aircraft.m_remaining_dist <= 0)
 					{
+						s->controller->m_current_capacity++;
+						
+
 						s->airplane_in_region++;
 						s->transit_req_accepted++;
 						s->transit_processed++;
@@ -521,6 +536,7 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 				}
 				else
 				{
+					
 					assert(s->incoming_queue->size() > 0);
 					s->transit_req_rejected++;
 				}
@@ -570,7 +586,8 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 			{
 				//assert(false);
 
-				if (s->airplane_in_region < s->max_capacity) 
+				if(s->controller->m_current_capacity < s->controller->m_max_capacity)				
+				//if (s->airplane_in_region < s->max_capacity) 
 				{
 					if(s->incoming_queue->size() > 0)
 					{
@@ -580,6 +597,8 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 
 						if(aircraft.m_remaining_dist <= 0)
 						{
+							s->controller->m_current_capacity++;
+							
 							s->incoming_queue->pop();
 
 							s->airplane_in_region++;
@@ -655,6 +674,9 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 				assert(lp->gid < NUMBER_OF_REGION_CONTROLLER);
 
 				s->airplane_in_region--;
+
+				s->controller->m_current_capacity--;
+				
 
 				int src_region = lp->gid;
 				int next_region = 0;

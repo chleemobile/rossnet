@@ -18,6 +18,9 @@
 #include "Constants.hpp"
 #include "Aircraft.hpp"
 
+#include "Controller.hpp"
+#include "RegionController.hpp"
+
 //using std::max;
 //using namespace std;
 
@@ -46,6 +49,8 @@ struct airport_state
 	int 	rn;
 	priority_queue < Aircraft, vector<Aircraft>, less<Aircraft> > *incoming_queue;
 	vector<int> *aircraft_counter;
+
+	Controller *controller;
 
 	double  delay_airport_dep;
 	double  delay_airport_land;
