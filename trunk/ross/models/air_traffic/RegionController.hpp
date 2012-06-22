@@ -3,7 +3,7 @@
 class RegionController : public Controller
 {
 	public:
-		RegionController(int in_max_capacity);
+		RegionController(int in_max_capacity, int in_num_aircraft);
 		virtual ~RegionController();
 
 		void handle_incoming(tw_lp *lp);

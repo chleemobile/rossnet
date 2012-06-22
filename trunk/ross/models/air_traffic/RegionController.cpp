@@ -1,10 +1,8 @@
 #include "RegionController.hpp"
 
-RegionController::RegionController(int in_max_capacity)
+RegionController::RegionController(int in_max_capacity, int in_num_aircraft):Controller(in_max_capacity, in_num_aircraft)
 {
-	m_max_capacity = in_max_capacity;
-	m_current_capacity = 0;
-	dummy_test = 1.2345;
+
 }
 
 RegionController::~RegionController()
@@ -15,6 +13,8 @@ void RegionController::handle_incoming(tw_lp *lp)
 {
 	//cout<<"RC handle"<<endl;
 	m_current_capacity++;
+	m_aircraft_processed++;
+
 	//dm_num_aircrafts++;
 }
 

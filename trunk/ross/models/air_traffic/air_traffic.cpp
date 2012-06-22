@@ -101,21 +101,23 @@ void init(airport_state * s, tw_lp * lp)
 	s->delay_region = 0;
 	s->cdelay_region = 0;
 
+	int num_aircraft = (NUMBER_OF_LP - NUMBER_OF_REGION_CONTROLLER) * NUMBER_OF_PLANES_PER_AIRPORT;
+
 	if(lp->gid <NUMBER_OF_REGION_CONTROLLER)
 	{
 		if (lp->gid == 4 || lp->gid == 5 || lp->gid == 8 || lp->gid == 11 || lp->gid == 13 || lp->gid == 16 ) {
 			s->max_capacity = AIRCRAFT_CAPACITY_OF_SMALL_REGION;
-			s->controller = new RegionController(AIRCRAFT_CAPACITY_OF_SMALL_REGION);
+			s->controller = new RegionController(AIRCRAFT_CAPACITY_OF_SMALL_REGION, num_aircraft);
 			
 		}
 		else if(lp->gid == 0 || lp->gid == 1 || lp->gid == 3 || lp->gid == 7 || lp->gid == 10 || lp->gid == 12 || lp->gid == 14 || lp->gid == 18 || lp->gid == 19 ) {
 			s->max_capacity = AIRCRAFT_CAPACITY_OF_MEDIUM_REGION;	
-			s->controller = new RegionController(AIRCRAFT_CAPACITY_OF_MEDIUM_REGION);
+			s->controller = new RegionController(AIRCRAFT_CAPACITY_OF_MEDIUM_REGION, num_aircraft);
 			
 		}
 		else {
 			s->max_capacity = AIRCRAFT_CAPACITY_OF_LARGE_REGION;
-			s->controller = new RegionController(AIRCRAFT_CAPACITY_OF_LARGE_REGION);
+			s->controller = new RegionController(AIRCRAFT_CAPACITY_OF_LARGE_REGION, num_aircraft);
 			
 		}
 
@@ -486,35 +488,22 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 		case TRANSIT_REQ:
 			{
 				assert(lp->gid < NUMBER_OF_REGION_CONTROLLER);
-
 				
 				Aircraft msg_aircraft = msg->aircraft;
-				
 				msg_aircraft.m_clock = tw_now(lp);
 				
-				//s->incoming_queue->push(msg_aircraft);
 				s->controller->m_q.push(msg_aircraft);
 
-				//if(s->incoming_queue->size() > s->max_queue_size_region )
-					//s->max_queue_size_region = s->incoming_queue->size();
 
-//				if (s->airplane_in_region < s->max_capacity)
 				if(s->controller->m_current_capacity < s->controller->m_max_capacity)
 				{
 
-					//Aircraft aircraft = s->incoming_queue->top();
 					Aircraft aircraft = s->controller->m_q.top();
 
 					if(aircraft.m_remaining_dist <= 0)
 					{
-						//s->transit_processed++;						
-						//s->controller->m_current_capacity++;
-						s->controller->handle_incoming(lp);
-
-						//s->airplane_in_region++;
 						s->transit_req_accepted++;
-
-						//s->incoming_queue->pop();
+						s->controller->handle_incoming(lp);
 						s->controller->m_q.pop();
 
 						s->delay_region += tw_now(lp) - aircraft.m_clock;
@@ -539,51 +528,12 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 				}
 				else
 				{
-					
-					//assert(s->incoming_queue->size() > 0);
 					s->transit_req_rejected++;
 				}
-				//update remaining distance, process time, delays
 
-				//if(s->incoming_queue->size() > 0)
 				if(s->controller->m_q.size() > 0)
 				{
 					s->controller->handle_aircraft(lp);
-					/*
-					priority_queue < Aircraft, vector<Aircraft>, less<Aircraft> > *temp_q = new priority_queue < Aircraft, vector<Aircraft>, less<Aircraft> >();
-
-					Aircraft old_top = s->controller->m_q.top();
-					int old_size = s->controller->m_q.size();
-
-					while(!s->controller->m_q.empty())
-					{
-						Aircraft temp = s->controller->m_q.top();
-						s->controller->m_q.pop();
-
-						temp.m_process_time -= temp.m_speed;
-						temp.m_remaining_dist -= temp.m_speed;
-						//if(temp.m_remaining_dist < 0) temp.m_remaining_dist = 0;
-
-						temp.m_cdelay++;
-						temp_q->push(temp);
-					}
-
-					while(!temp_q->empty())
-					{
-						Aircraft temp =temp_q->top();
-						temp_q->pop();
-
-						s->controller->m_q.push(temp);
-					}
-
-					Aircraft new_top = s->controller->m_q.top();
-					int new_size = s->controller->m_q.size();
-
-					delete temp_q;
-
-					//assert(old_top.m_id == new_top.m_id);
-					assert(old_size == new_size);
-					*/
 				}
 
 				break;
@@ -593,15 +543,62 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 			   Region Controller Handles This Event
 			 */
 
+		case TRANSIT:
+			{
+				if(s->controller->m_current_capacity < s->controller->m_max_capacity)
+				{
+					if(s->controller->m_q.size() > 0)
+					{
+						Aircraft aircraft = s->controller->m_q.top();
+
+						if(aircraft.m_remaining_dist <= 0)
+						{
+							s->controller->handle_incoming(lp);
+
+							s->transit_req_accepted++;
+
+							s->controller->m_q.pop();
+
+							s->delay_region += tw_now(lp) - aircraft.m_clock;
+							s->cdelay_region += aircraft.m_cdelay;
+
+							aircraft.m_clock = 0;
+							aircraft.m_cdelay = 0;
+							aircraft.m_delay = 0;
+
+							int to = lp->gid;
+							ts = bs_rand_exponential(s->rn, MEAN_FLIGHT);
+
+							e = tw_event_new(to, ts, lp);
+
+							m = (air_traffic_message*)tw_event_data(e);
+							m->type = ON_THE_AIR;
+							m->aircraft = aircraft;
+							m->msg_from = lp->gid;
+
+							tw_event_send(e);
+						}
+					}
+				}
+				else
+				{
+					s->transit_req_rejected++;
+				}
+
+				if(s->controller->m_q.size() > 0)
+				{
+					s->controller->handle_aircraft(lp);
+				}
+
+				break;
+
+			}
 		case ON_THE_AIR:
 			{
 				assert(lp->gid < NUMBER_OF_REGION_CONTROLLER);
 
-				//s->airplane_in_region--;
-
-				//s->controller->m_current_capacity--;
 				s->controller->handle_outgoing(lp);
-				
+				s->controller->m_counter[msg->aircraft.m_id]++;
 
 				int src_region = lp->gid;
 				int next_region = 0;
@@ -640,9 +637,6 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 					   Schedule Transit Event
 					 */
 
-						
-					/*
-
 					int to2 = lp->gid;
 					ts = bs_rand_exponential(s->rn, MEAN_FLIGHT);
 
@@ -653,8 +647,7 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 					m->aircraft = msg->aircraft;
 
 					tw_event_send(e);
-					*/
-
+					
 				}
 				else
 				{
@@ -877,6 +870,7 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 				/*
 				   Schedule another event
 				 */
+				
 				int to2 = lp->gid;
 				ts = bs_rand_exponential(s->rn, MEAN_FLIGHT);
 
