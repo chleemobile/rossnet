@@ -48,8 +48,6 @@ typedef enum air_traffic_event_t air_traffic_event_t;
 struct airport_state
 {
 	int 	rn;
-	priority_queue < Aircraft, vector<Aircraft>, less<Aircraft> > *incoming_queue;
-	vector<int> *aircraft_counter;
 
 	Controller *controller;
 
@@ -71,17 +69,14 @@ struct airport_state
 	   Region Controller State Variable
 	 */
 
-	int max_capacity;
-	int airplane_in_region;
 
 	int transit_req_accepted;
 	int transit_req_rejected;
 	int transit_processed;
+
 	/*
 	   Traffic Controller State Variable
 	 */
-	int max_runway;
-	int runway_in_use;
 
 	int landing_processed;
 	int landing_req_accepted;
