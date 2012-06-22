@@ -289,12 +289,14 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 					Aircraft aircraft = s->controller->m_q.top();
 					s->controller->m_q.pop();
 
+					/*
 					s->delay_airport_dep += tw_now(lp) - aircraft.m_clock;
 					s->cdelay_airport_dep += aircraft.m_cdelay;
 
 					aircraft.m_clock = 0;
 					aircraft.m_cdelay = 0;
 					aircraft.m_delay = 0;
+					*/
 
 					int to = lp->gid;
 					ts = bs_rand_exponential(s->rn, MEAN_DEQ);
@@ -366,12 +368,14 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 						Aircraft aircraft = s->controller->m_q.top();
 						s->controller->m_q.pop();
 
+						/*
 						s->delay_airport_dep += tw_now(lp) - aircraft.m_clock;
 						s->cdelay_airport_dep += aircraft.m_cdelay;
-
+						
 						aircraft.m_clock = 0;
 						aircraft.m_cdelay = 0;
 						aircraft.m_delay = 0;
+						*/
 
 						int to = lp->gid;
 						ts = bs_rand_exponential(s->rn, MEAN_DEQ);
@@ -717,12 +721,14 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 					Aircraft aircraft = s->controller->m_q.top();
 					s->controller->m_q.pop();
 
+					/*
 					s->delay_airport_land += tw_now(lp) - aircraft.m_clock;
 					s->cdelay_airport_land += aircraft.m_cdelay;
 
 					aircraft.m_clock = 0;
 					aircraft.m_cdelay = 0;
 					aircraft.m_delay = 0;
+					*/
 
 					int to = lp->gid;
 					ts = bs_rand_exponential(s->rn, MEAN_DEQ);
