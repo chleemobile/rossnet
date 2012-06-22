@@ -88,16 +88,16 @@ void init(airport_state *s,tw_lp *lp)
   if ((lp -> tw_lp::gid) < NUMBER_OF_REGION_CONTROLLER) {
     if (((((((lp -> tw_lp::gid) == 4) || ((lp -> tw_lp::gid) == 5)) || ((lp -> tw_lp::gid) == 8)) || ((lp -> tw_lp::gid) == 11)) || ((lp -> tw_lp::gid) == 13)) || ((lp -> tw_lp::gid) == 16)) {
       s -> airport_state::max_capacity = AIRCRAFT_CAPACITY_OF_SMALL_REGION;
-      s -> airport_state::controller = (::new RegionController (AIRCRAFT_CAPACITY_OF_SMALL_REGION));
+      s -> airport_state::controller = new RegionController (AIRCRAFT_CAPACITY_OF_SMALL_REGION);
     }
     else {
       if ((((((((((lp -> tw_lp::gid) == 0) || ((lp -> tw_lp::gid) == 1)) || ((lp -> tw_lp::gid) == 3)) || ((lp -> tw_lp::gid) == 7)) || ((lp -> tw_lp::gid) == 10)) || ((lp -> tw_lp::gid) == 12)) || ((lp -> tw_lp::gid) == 14)) || ((lp -> tw_lp::gid) == 18)) || ((lp -> tw_lp::gid) == 19)) {
         s -> airport_state::max_capacity = AIRCRAFT_CAPACITY_OF_MEDIUM_REGION;
-        s -> airport_state::controller = (::new RegionController (AIRCRAFT_CAPACITY_OF_MEDIUM_REGION));
+        s -> airport_state::controller = new RegionController (AIRCRAFT_CAPACITY_OF_MEDIUM_REGION);
       }
       else {
         s -> airport_state::max_capacity = AIRCRAFT_CAPACITY_OF_LARGE_REGION;
-        s -> airport_state::controller = (::new RegionController (AIRCRAFT_CAPACITY_OF_LARGE_REGION));
+        s -> airport_state::controller = new RegionController (AIRCRAFT_CAPACITY_OF_LARGE_REGION);
       }
     }
     s -> airport_state::airplane_in_region = 0;
@@ -471,35 +471,33 @@ void event_handler(airport_state *s,tw_bf *bf,air_traffic_message *msg,tw_lp *lp
 //update remaining distance, process time, delays
 //if(s->incoming_queue->size() > 0)
       if (( *(s -> airport_state::controller)).Controller::m_q. size () > 0) {
-        class std::priority_queue< Aircraft  , std::vector< Aircraft  , std::allocator< Aircraft  >  >  , std::less< Aircraft  >  > *temp_q = ::new class std::priority_queue< Aircraft  , std::vector< Aircraft  , std::allocator< Aircraft  >  >  , std::less< Aircraft  >  > ;
-        class Aircraft old_top(( *(s -> airport_state::controller)).Controller::m_q. top ());
-        int old_size = (( *(s -> airport_state::controller)).Controller::m_q. size ());
-        while(!( *(s -> airport_state::controller)).Controller::m_q. empty ()){
-          class Aircraft temp(( *(s -> airport_state::controller)).Controller::m_q. top ());
-          ( *(s -> airport_state::controller)).Controller::m_q. pop ();
-          temp.Aircraft::m_process_time -= temp.Aircraft::m_speed;
-          temp.Aircraft::m_remaining_dist -= temp.Aircraft::m_speed;
-//if(temp.m_remaining_dist < 0) temp.m_remaining_dist = 0;
-          temp.Aircraft::m_cdelay++;
-          temp_q ->  push (temp);
-        }
-        while(!temp_q ->  empty ()){
-          class Aircraft temp(temp_q ->  top ());
-          temp_q ->  pop ();
-          ( *(s -> airport_state::controller)).Controller::m_q. push (temp);
-        }
-        class Aircraft new_top(( *(s -> airport_state::controller)).Controller::m_q. top ());
-        int new_size = (( *(s -> airport_state::controller)).Controller::m_q. size ());
-        delete temp_q;
-//assert(old_top.m_id == new_top.m_id);
-        bool __temp11__;
-        __temp11__ = !(old_size == new_size);
-        if ((__builtin_expect(__temp11__,0))) {
-          __assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/air_traffic/air_traffic.cpp",583,"old_size == new_size");
-        }
-        else {
-          (void )0;
-        }
+        ( *(s -> airport_state::controller)). handle_aircraft (lp);
+/*
+					priority_queue < Aircraft, vector<Aircraft>, less<Aircraft> > *temp_q = new priority_queue < Aircraft, vector<Aircraft>, less<Aircraft> >();
+					Aircraft old_top = s->controller->m_q.top();
+					int old_size = s->controller->m_q.size();
+					while(!s->controller->m_q.empty())
+					{
+						Aircraft temp = s->controller->m_q.top();
+						s->controller->m_q.pop();
+						temp.m_process_time -= temp.m_speed;
+						temp.m_remaining_dist -= temp.m_speed;
+						//if(temp.m_remaining_dist < 0) temp.m_remaining_dist = 0;
+						temp.m_cdelay++;
+						temp_q->push(temp);
+					}
+					while(!temp_q->empty())
+					{
+						Aircraft temp =temp_q->top();
+						temp_q->pop();
+						s->controller->m_q.push(temp);
+					}
+					Aircraft new_top = s->controller->m_q.top();
+					int new_size = s->controller->m_q.size();
+					delete temp_q;
+					//assert(old_top.m_id == new_top.m_id);
+					assert(old_size == new_size);
+					*/
       }
       else {
       }
@@ -507,10 +505,10 @@ void event_handler(airport_state *s,tw_bf *bf,air_traffic_message *msg,tw_lp *lp
     }
     LABEL5:
 {
-      bool __temp12__;
-      __temp12__ = !((lp -> tw_lp::gid) < NUMBER_OF_REGION_CONTROLLER);
-      if ((__builtin_expect(__temp12__,0))) {
-        __assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/air_traffic/air_traffic.cpp",595,"lp->gid < NUMBER_OF_REGION_CONTROLLER");
+      bool __temp11__;
+      __temp11__ = !((lp -> tw_lp::gid) < NUMBER_OF_REGION_CONTROLLER);
+      if ((__builtin_expect(__temp11__,0))) {
+        __assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/air_traffic/air_traffic.cpp",598,"lp->gid < NUMBER_OF_REGION_CONTROLLER");
       }
       else {
         (void )0;
@@ -527,10 +525,10 @@ void event_handler(airport_state *s,tw_bf *bf,air_traffic_message *msg,tw_lp *lp
       }
       else {
         next_region = path. front ();
-        bool __temp13__;
-        __temp13__ = !(next_region == msg -> air_traffic_message::aircraft.Aircraft::m_dest_region);
-        if ((__builtin_expect(__temp13__,0))) {
-          __assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/air_traffic/air_traffic.cpp",615,"next_region == msg->aircraft.m_dest_region");
+        bool __temp12__;
+        __temp12__ = !(next_region == msg -> air_traffic_message::aircraft.Aircraft::m_dest_region);
+        if ((__builtin_expect(__temp12__,0))) {
+          __assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/air_traffic/air_traffic.cpp",618,"next_region == msg->aircraft.m_dest_region");
         }
         else {
           (void )0;
@@ -583,10 +581,10 @@ void event_handler(airport_state *s,tw_bf *bf,air_traffic_message *msg,tw_lp *lp
     }
     LABEL6:
 {
-      bool __temp14__;
-      __temp14__ = !((lp -> tw_lp::gid) > (NUMBER_OF_REGION_CONTROLLER - 1));
-      if ((__builtin_expect(__temp14__,0))) {
-        __assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/air_traffic/air_traffic.cpp",683,"lp->gid > NUMBER_OF_REGION_CONTROLLER-1");
+      bool __temp13__;
+      __temp13__ = !((lp -> tw_lp::gid) > (NUMBER_OF_REGION_CONTROLLER - 1));
+      if ((__builtin_expect(__temp13__,0))) {
+        __assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/air_traffic/air_traffic.cpp",686,"lp->gid > NUMBER_OF_REGION_CONTROLLER-1");
       }
       else {
         (void )0;
@@ -640,18 +638,18 @@ void event_handler(airport_state *s,tw_bf *bf,air_traffic_message *msg,tw_lp *lp
         class Aircraft new_top(( *(s -> airport_state::incoming_queue)). top ());
         int new_size = (( *(s -> airport_state::incoming_queue)). size ());
         delete temp_q;
-        bool __temp15__;
-        __temp15__ = !(old_top.Aircraft::m_id == new_top.Aircraft::m_id);
-        if ((__builtin_expect(__temp15__,0))) {
-          __assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/air_traffic/air_traffic.cpp",753,"old_top.m_id == new_top.m_id");
+        bool __temp14__;
+        __temp14__ = !(old_top.Aircraft::m_id == new_top.Aircraft::m_id);
+        if ((__builtin_expect(__temp14__,0))) {
+          __assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/air_traffic/air_traffic.cpp",756,"old_top.m_id == new_top.m_id");
         }
         else {
           (void )0;
         }
-        bool __temp16__;
-        __temp16__ = !(old_size == new_size);
-        if ((__builtin_expect(__temp16__,0))) {
-          __assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/air_traffic/air_traffic.cpp",754,"old_size == new_size");
+        bool __temp15__;
+        __temp15__ = !(old_size == new_size);
+        if ((__builtin_expect(__temp15__,0))) {
+          __assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/air_traffic/air_traffic.cpp",757,"old_size == new_size");
         }
         else {
           (void )0;
@@ -701,18 +699,18 @@ void event_handler(airport_state *s,tw_bf *bf,air_traffic_message *msg,tw_lp *lp
       class Aircraft new_top(( *(s -> airport_state::incoming_queue)). top ());
       int new_size = (( *(s -> airport_state::incoming_queue)). size ());
       delete temp_q;
-      bool __temp17__;
-      __temp17__ = !(old_top.Aircraft::m_id == new_top.Aircraft::m_id);
-      if ((__builtin_expect(__temp17__,0))) {
-        __assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/air_traffic/air_traffic.cpp",815,"old_top.m_id == new_top.m_id");
+      bool __temp16__;
+      __temp16__ = !(old_top.Aircraft::m_id == new_top.Aircraft::m_id);
+      if ((__builtin_expect(__temp16__,0))) {
+        __assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/air_traffic/air_traffic.cpp",818,"old_top.m_id == new_top.m_id");
       }
       else {
         (void )0;
       }
-      bool __temp18__;
-      __temp18__ = !(old_size == new_size);
-      if ((__builtin_expect(__temp18__,0))) {
-        __assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/air_traffic/air_traffic.cpp",816,"old_size == new_size");
+      bool __temp17__;
+      __temp17__ = !(old_size == new_size);
+      if ((__builtin_expect(__temp17__,0))) {
+        __assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/air_traffic/air_traffic.cpp",819,"old_size == new_size");
       }
       else {
         (void )0;
@@ -742,9 +740,9 @@ void event_handler(airport_state *s,tw_bf *bf,air_traffic_message *msg,tw_lp *lp
       class Aircraft aircraft(msg -> air_traffic_message::aircraft);
       double dep_time = bs_rand_exponential(s -> airport_state::rn,MEAN_DEQ);
       dep_time += tw_now(lp);
-      int __temp19__;
-      __temp19__ = (NUMBER_OF_LP - 1);
-      int dest_airport = (bs_rand_integer(s -> airport_state::rn,NUMBER_OF_REGION_CONTROLLER,__temp19__));
+      int __temp18__;
+      __temp18__ = (NUMBER_OF_LP - 1);
+      int dest_airport = (bs_rand_integer(s -> airport_state::rn,NUMBER_OF_REGION_CONTROLLER,__temp18__));
       int dest_region = get_region(dest_airport);
       int max_speed = (bs_rand_integer(s -> airport_state::rn,MIN_AIRCRAFT_SPEED,MAX_AIRCRAFT_SPEED));
       int src_region = get_region((lp -> tw_lp::gid));
@@ -1086,7 +1084,7 @@ void event_handler_forward(airport_state *s,tw_bf *bf,air_traffic_message *msg,t
         __assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/air_traffic/air_traffic.cpp",488,"lp->gid < NUMBER_OF_REGION_CONTROLLER");
       }
       else {
-        __num0 += 16;
+        __num0 += 8;
         (void )0;
       }
       class Aircraft msg_aircraft(msg -> air_traffic_message::aircraft);
@@ -1126,59 +1124,56 @@ void event_handler_forward(airport_state *s,tw_bf *bf,air_traffic_message *msg,t
           tw_event_send(e);
         }
         else {
-          __num0 += 4;
+          __num0 += 2;
         }
       }
       else {
-        __num0 += 8;
+        __num0 += 4;
 //assert(s->incoming_queue->size() > 0);
         s -> airport_state::transit_req_rejected++;
       }
 //update remaining distance, process time, delays
 //if(s->incoming_queue->size() > 0)
       if (( *(s -> airport_state::controller)).Controller::m_q. size () > 0) {
-        class std::priority_queue< Aircraft  , std::vector< Aircraft  , std::allocator< Aircraft  >  >  , std::less< Aircraft  >  > *temp_q = ::new class std::priority_queue< Aircraft  , std::vector< Aircraft  , std::allocator< Aircraft  >  >  , std::less< Aircraft  >  > ;
-        class Aircraft old_top(( *(s -> airport_state::controller)).Controller::m_q. top ());
-        int old_size = (( *(s -> airport_state::controller)).Controller::m_q. size ());
-        while(!( *(s -> airport_state::controller)).Controller::m_q. empty ()){
-          class Aircraft temp(( *(s -> airport_state::controller)).Controller::m_q. top ());
-          ( *(s -> airport_state::controller)).Controller::m_q. pop ();
-          temp.Aircraft::m_process_time -= temp.Aircraft::m_speed;
-          temp.Aircraft::m_remaining_dist -= temp.Aircraft::m_speed;
-//if(temp.m_remaining_dist < 0) temp.m_remaining_dist = 0;
-          temp.Aircraft::m_cdelay++;
-          temp_q ->  push (temp);
-        }
-        while(!temp_q ->  empty ()){
-          class Aircraft temp(temp_q ->  top ());
-          temp_q ->  pop ();
-          ( *(s -> airport_state::controller)).Controller::m_q. push (temp);
-        }
-        class Aircraft new_top(( *(s -> airport_state::controller)).Controller::m_q. top ());
-        int new_size = (( *(s -> airport_state::controller)).Controller::m_q. size ());
-        delete temp_q;
-//assert(old_top.m_id == new_top.m_id);
-        bool __temp11__;
-        __temp11__ = !(old_size == new_size);
-        if ((__builtin_expect(__temp11__,0))) {
-          __assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/air_traffic/air_traffic.cpp",583,"old_size == new_size");
-        }
-        else {
-          __num0 += 1;
-          (void )0;
-        }
+        ( *(s -> airport_state::controller)). handle_aircraft_forward (lp);
+/*
+					priority_queue < Aircraft, vector<Aircraft>, less<Aircraft> > *temp_q = new priority_queue < Aircraft, vector<Aircraft>, less<Aircraft> >();
+					Aircraft old_top = s->controller->m_q.top();
+					int old_size = s->controller->m_q.size();
+					while(!s->controller->m_q.empty())
+					{
+						Aircraft temp = s->controller->m_q.top();
+						s->controller->m_q.pop();
+						temp.m_process_time -= temp.m_speed;
+						temp.m_remaining_dist -= temp.m_speed;
+						//if(temp.m_remaining_dist < 0) temp.m_remaining_dist = 0;
+						temp.m_cdelay++;
+						temp_q->push(temp);
+					}
+					while(!temp_q->empty())
+					{
+						Aircraft temp =temp_q->top();
+						temp_q->pop();
+						s->controller->m_q.push(temp);
+					}
+					Aircraft new_top = s->controller->m_q.top();
+					int new_size = s->controller->m_q.size();
+					delete temp_q;
+					//assert(old_top.m_id == new_top.m_id);
+					assert(old_size == new_size);
+					*/
       }
       else {
-        __num0 += 2;
+        __num0 += 1;
       }
       goto LABEL10;
     }
     LABEL5:
 {
-      bool __temp12__;
-      __temp12__ = !((lp -> tw_lp::gid) < NUMBER_OF_REGION_CONTROLLER);
-      if ((__builtin_expect(__temp12__,0))) {
-        __assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/air_traffic/air_traffic.cpp",595,"lp->gid < NUMBER_OF_REGION_CONTROLLER");
+      bool __temp11__;
+      __temp11__ = !((lp -> tw_lp::gid) < NUMBER_OF_REGION_CONTROLLER);
+      if ((__builtin_expect(__temp11__,0))) {
+        __assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/air_traffic/air_traffic.cpp",598,"lp->gid < NUMBER_OF_REGION_CONTROLLER");
       }
       else {
         __num0 += 16;
@@ -1197,10 +1192,10 @@ void event_handler_forward(airport_state *s,tw_bf *bf,air_traffic_message *msg,t
       else {
         __num0 += 8;
         next_region = path. front ();
-        bool __temp13__;
-        __temp13__ = !(next_region == msg -> air_traffic_message::aircraft.Aircraft::m_dest_region);
-        if ((__builtin_expect(__temp13__,0))) {
-          __assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/air_traffic/air_traffic.cpp",615,"next_region == msg->aircraft.m_dest_region");
+        bool __temp12__;
+        __temp12__ = !(next_region == msg -> air_traffic_message::aircraft.Aircraft::m_dest_region);
+        if ((__builtin_expect(__temp12__,0))) {
+          __assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/air_traffic/air_traffic.cpp",618,"next_region == msg->aircraft.m_dest_region");
         }
         else {
           __num0 += 4;
@@ -1258,10 +1253,10 @@ void event_handler_forward(airport_state *s,tw_bf *bf,air_traffic_message *msg,t
     }
     LABEL6:
 {
-      bool __temp14__;
-      __temp14__ = !((lp -> tw_lp::gid) > (NUMBER_OF_REGION_CONTROLLER - 1));
-      if ((__builtin_expect(__temp14__,0))) {
-        __assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/air_traffic/air_traffic.cpp",683,"lp->gid > NUMBER_OF_REGION_CONTROLLER-1");
+      bool __temp13__;
+      __temp13__ = !((lp -> tw_lp::gid) > (NUMBER_OF_REGION_CONTROLLER - 1));
+      if ((__builtin_expect(__temp13__,0))) {
+        __assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/air_traffic/air_traffic.cpp",686,"lp->gid > NUMBER_OF_REGION_CONTROLLER-1");
       }
       else {
         __num0 += 32;
@@ -1323,19 +1318,19 @@ void event_handler_forward(airport_state *s,tw_bf *bf,air_traffic_message *msg,t
         class Aircraft new_top(( *(s -> airport_state::incoming_queue)). top ());
         int new_size = (( *(s -> airport_state::incoming_queue)). size ());
         delete temp_q;
-        bool __temp15__;
-        __temp15__ = !(old_top.Aircraft::m_id == new_top.Aircraft::m_id);
-        if ((__builtin_expect(__temp15__,0))) {
-          __assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/air_traffic/air_traffic.cpp",753,"old_top.m_id == new_top.m_id");
+        bool __temp14__;
+        __temp14__ = !(old_top.Aircraft::m_id == new_top.Aircraft::m_id);
+        if ((__builtin_expect(__temp14__,0))) {
+          __assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/air_traffic/air_traffic.cpp",756,"old_top.m_id == new_top.m_id");
         }
         else {
           __num0 += 2;
           (void )0;
         }
-        bool __temp16__;
-        __temp16__ = !(old_size == new_size);
-        if ((__builtin_expect(__temp16__,0))) {
-          __assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/air_traffic/air_traffic.cpp",754,"old_size == new_size");
+        bool __temp15__;
+        __temp15__ = !(old_size == new_size);
+        if ((__builtin_expect(__temp15__,0))) {
+          __assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/air_traffic/air_traffic.cpp",757,"old_size == new_size");
         }
         else {
           __num0 += 1;
@@ -1392,19 +1387,19 @@ void event_handler_forward(airport_state *s,tw_bf *bf,air_traffic_message *msg,t
       class Aircraft new_top(( *(s -> airport_state::incoming_queue)). top ());
       int new_size = (( *(s -> airport_state::incoming_queue)). size ());
       delete temp_q;
-      bool __temp17__;
-      __temp17__ = !(old_top.Aircraft::m_id == new_top.Aircraft::m_id);
-      if ((__builtin_expect(__temp17__,0))) {
-        __assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/air_traffic/air_traffic.cpp",815,"old_top.m_id == new_top.m_id");
+      bool __temp16__;
+      __temp16__ = !(old_top.Aircraft::m_id == new_top.Aircraft::m_id);
+      if ((__builtin_expect(__temp16__,0))) {
+        __assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/air_traffic/air_traffic.cpp",818,"old_top.m_id == new_top.m_id");
       }
       else {
         __num0 += 2;
         (void )0;
       }
-      bool __temp18__;
-      __temp18__ = !(old_size == new_size);
-      if ((__builtin_expect(__temp18__,0))) {
-        __assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/air_traffic/air_traffic.cpp",816,"old_size == new_size");
+      bool __temp17__;
+      __temp17__ = !(old_size == new_size);
+      if ((__builtin_expect(__temp17__,0))) {
+        __assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/air_traffic/air_traffic.cpp",819,"old_size == new_size");
       }
       else {
         __num0 += 1;
@@ -1439,9 +1434,9 @@ void event_handler_forward(airport_state *s,tw_bf *bf,air_traffic_message *msg,t
       class Aircraft aircraft(msg -> air_traffic_message::aircraft);
       double dep_time = bs_rand_exponential(s -> airport_state::rn,MEAN_DEQ);
       dep_time += tw_now(lp);
-      int __temp19__;
-      __temp19__ = (NUMBER_OF_LP - 1);
-      int dest_airport = (bs_rand_integer(s -> airport_state::rn,NUMBER_OF_REGION_CONTROLLER,__temp19__));
+      int __temp18__;
+      __temp18__ = (NUMBER_OF_LP - 1);
+      int dest_airport = (bs_rand_integer(s -> airport_state::rn,NUMBER_OF_REGION_CONTROLLER,__temp18__));
       int dest_region = get_region(dest_airport);
       int max_speed = (bs_rand_integer(s -> airport_state::rn,MIN_AIRCRAFT_SPEED,MAX_AIRCRAFT_SPEED));
       int src_region = get_region((lp -> tw_lp::gid));
@@ -1478,9 +1473,9 @@ void event_handler_reverse(airport_state *s,tw_bf *bf,air_traffic_message *msg,t
 {
   int __num0;
   __restore__(__num0,lp);
-  if ((__num0 & 65472) == 65408) {
+  if ((__num0 & 57344) == 49152) {
     __restore__(s -> airport_state::rn,lp);
-    ++s -> airport_state::runway_in_use;
+    __restore__( *s -> airport_state::aircraft_counter,lp);
   }
   else {
     if ((__num0 & 65408) == 65280) {
@@ -1493,41 +1488,44 @@ void event_handler_reverse(airport_state *s,tw_bf *bf,air_traffic_message *msg,t
         ++s -> airport_state::runway_in_use;
       }
       else {
-        if ((__num0 & 49152) == 32768) {
-          if ((__num0 & 49156) == 32768) {
-            __restore__( *s -> airport_state::incoming_queue,lp);
+        if ((__num0 & 63488) == 61440) {
+          if ((__num0 & 63489) == 61440) {
+            ( *(s -> airport_state::controller)). handle_aircraft_reverse (lp);
           }
           else {
           }
-          if ((__num0 & 49168) == 32768) {
-            if ((__num0 & 49176) == 32776) {
+          if ((__num0 & 63492) == 61440) {
+            if ((__num0 & 63494) == 61442) {
             }
             else {
               __restore__(s -> airport_state::rn,lp);
-              __restore__(s -> airport_state::cdelay_airport_dep,lp);
-              __restore__(s -> airport_state::delay_airport_dep,lp);
-              __restore__( *s -> airport_state::incoming_queue,lp);
-              --s -> airport_state::dep_processed;
-              --s -> airport_state::runway_in_use;
+              __restore__(s -> airport_state::cdelay_region,lp);
+              __restore__(s -> airport_state::delay_region,lp);
+              --s -> airport_state::transit_req_accepted;
+              ( *(s -> airport_state::controller)). handle_incoming_reverse (lp);
             }
           }
           else {
+            --s -> airport_state::transit_req_rejected;
           }
+          __restore__(s -> airport_state::controller -> Controller::m_q,lp);
         }
         else {
-          if ((__num0 & 65280) == 65024) {
-            if ((__num0 & 65284) == 65024) {
+          if ((__num0 & 49152) == 32768) {
+            if ((__num0 & 49156) == 32768) {
               __restore__( *s -> airport_state::incoming_queue,lp);
             }
             else {
             }
-            if ((__num0 & 65296) == 65024) {
-              if ((__num0 & 65304) == 65032) {
+            if ((__num0 & 49168) == 32768) {
+              if ((__num0 & 49176) == 32776) {
               }
               else {
                 __restore__(s -> airport_state::rn,lp);
+                __restore__(s -> airport_state::cdelay_airport_dep,lp);
+                __restore__(s -> airport_state::delay_airport_dep,lp);
                 __restore__( *s -> airport_state::incoming_queue,lp);
-                --s -> airport_state::landing_processed;
+                --s -> airport_state::dep_processed;
                 --s -> airport_state::runway_in_use;
               }
             }
@@ -1535,32 +1533,34 @@ void event_handler_reverse(airport_state *s,tw_bf *bf,air_traffic_message *msg,t
             }
           }
           else {
-            if ((__num0 & 64512) == 63488) {
-              if ((__num0 & 64514) == 63488) {
-                __restore__(s -> airport_state::rn,lp);
+            if ((__num0 & 65280) == 65024) {
+              if ((__num0 & 65284) == 65024) {
+                __restore__( *s -> airport_state::incoming_queue,lp);
               }
               else {
-                __restore__(s -> airport_state::rn,lp);
               }
-              ( *(s -> airport_state::controller)). handle_outgoing_reverse (lp);
-            }
-            else {
-              if ((__num0 & 63488) == 61440) {
-                if ((__num0 & 63496) == 61440) {
-                  if ((__num0 & 63500) == 61444) {
-                  }
-                  else {
-                    __restore__(s -> airport_state::rn,lp);
-                    __restore__(s -> airport_state::cdelay_region,lp);
-                    __restore__(s -> airport_state::delay_region,lp);
-                    --s -> airport_state::transit_req_accepted;
-                    ( *(s -> airport_state::controller)). handle_incoming_reverse (lp);
-                  }
+              if ((__num0 & 65296) == 65024) {
+                if ((__num0 & 65304) == 65032) {
                 }
                 else {
-                  --s -> airport_state::transit_req_rejected;
+                  __restore__(s -> airport_state::rn,lp);
+                  __restore__( *s -> airport_state::incoming_queue,lp);
+                  --s -> airport_state::landing_processed;
+                  --s -> airport_state::runway_in_use;
                 }
-                __restore__(s -> airport_state::controller -> Controller::m_q,lp);
+              }
+              else {
+              }
+            }
+            else {
+              if ((__num0 & 64512) == 63488) {
+                if ((__num0 & 64514) == 63488) {
+                  __restore__(s -> airport_state::rn,lp);
+                }
+                else {
+                  __restore__(s -> airport_state::rn,lp);
+                }
+                ( *(s -> airport_state::controller)). handle_outgoing_reverse (lp);
               }
               else {
                 if ((__num0 & 65024) == 64512) {
@@ -1604,7 +1604,7 @@ void event_handler_reverse(airport_state *s,tw_bf *bf,air_traffic_message *msg,t
                   }
                   else {
                     __restore__(s -> airport_state::rn,lp);
-                    __restore__( *s -> airport_state::aircraft_counter,lp);
+                    ++s -> airport_state::runway_in_use;
                   }
                 }
               }
@@ -1652,7 +1652,7 @@ tw_lp *mapping_to_lp(tw_lpid lpid)
   if (tw_nnodes() == 2) {
     if (g_tw_mynode == 0) {
       if (lpid >= 20) {
-        (__builtin_expect((!(lpid < 184)),0))?__assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/air_traffic/air_traffic.cpp",967,"lpid < 184") : ((void )0);
+        (__builtin_expect((!(lpid < 184)),0))?__assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/air_traffic/air_traffic.cpp",970,"lpid < 184") : ((void )0);
         ret = (ret - 10);
       }
       else {
@@ -1757,7 +1757,7 @@ tw_lp *mapping_to_lp(tw_lpid lpid)
     }
     else {
       ( *(&std::cout)<<"Only support upto 4 cores ") << std::endl< char  , std::char_traits< char  >  > ;;
-      (__builtin_expect((!false),0))?__assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/air_traffic/air_traffic.cpp",1031,"false") : ((void )0);
+      (__builtin_expect((!false),0))?__assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/air_traffic/air_traffic.cpp",1034,"false") : ((void )0);
     }
   }
   return g_tw_lp[ret];
@@ -1770,7 +1770,7 @@ int mapping_to_local_index(int lpid)
   if (tw_nnodes() == 2) {
     if (g_tw_mynode == 0) {
       if (lpid >= 20) {
-        (__builtin_expect((!(lpid < 184)),0))?__assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/air_traffic/air_traffic.cpp",1048,"lpid < 184") : ((void )0);
+        (__builtin_expect((!(lpid < 184)),0))?__assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/air_traffic/air_traffic.cpp",1051,"lpid < 184") : ((void )0);
         ret = (ret - 10);
       }
       else {
@@ -1875,7 +1875,7 @@ int mapping_to_local_index(int lpid)
     }
     else {
       ( *(&std::cout)<<"Only support upto 4 cores ") << std::endl< char  , std::char_traits< char  >  > ;;
-      (__builtin_expect((!false),0))?__assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/air_traffic/air_traffic.cpp",1112,"false") : ((void )0);
+      (__builtin_expect((!false),0))?__assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/air_traffic/air_traffic.cpp",1115,"false") : ((void )0);
     }
   }
 //printf("%d -> %d \n", lpid, ret);
@@ -1896,7 +1896,7 @@ void air_traffic_mapping()
 // MUST COME AFTER!! DO NOT PRE-INCREMENT ELSE KPID is WRONG!!
       local_lp_count++;
       if (kpid >= g_tw_nkp) {
-        tw_error("/Users/lee1017/dev/rossnet/trunk/ross/models/air_traffic/air_traffic.cpp",1139,"Attempting to mapping a KPid (%llu) for Global LPid %llu that is beyond g_tw_nkp (%llu)\n",kpid,lpid,g_tw_nkp);
+        tw_error("/Users/lee1017/dev/rossnet/trunk/ross/models/air_traffic/air_traffic.cpp",1142,"Attempting to mapping a KPid (%llu) for Global LPid %llu that is beyond g_tw_nkp (%llu)\n",kpid,lpid,g_tw_nkp);
       }
       else {
       }
@@ -2194,13 +2194,13 @@ int get_region(int airport)
                                           return 19;;
                                         }
                                         else {
-                                          class std::basic_ostream< char  , std::char_traits< char  >  > *__temp20__;
-                                          __temp20__ = &( *(&std::cout)<<"airport region failed");
-                                          ( *__temp20__) << std::endl< char  , std::char_traits< char  >  > ;;
-                                          bool __temp21__;
-                                          __temp21__ = !false;
-                                          if ((__builtin_expect(__temp21__,0))) {
-                                            __assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/air_traffic/air_traffic.cpp",1457,"false");;
+                                          class std::basic_ostream< char  , std::char_traits< char  >  > *__temp19__;
+                                          __temp19__ = &( *(&std::cout)<<"airport region failed");
+                                          ( *__temp19__) << std::endl< char  , std::char_traits< char  >  > ;;
+                                          bool __temp20__;
+                                          __temp20__ = !false;
+                                          if ((__builtin_expect(__temp20__,0))) {
+                                            __assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/air_traffic/air_traffic.cpp",1460,"false");;
                                           }
                                           else {
                                             (void )0;;

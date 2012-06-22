@@ -17,6 +17,7 @@ Controller::~Controller()
 
 }
 
+/*
 void Controller::handle_incoming(tw_lp *lp)
 {
 	assert(false);
@@ -29,3 +30,9 @@ void Controller::handle_outgoing(tw_lp *lp)
 	cout<<"CTR handle"<<endl;
 }
 
+
+void Controller::handle_aircraft(tw_lp *lp)
+{
+	assert(false);
+}
+*/

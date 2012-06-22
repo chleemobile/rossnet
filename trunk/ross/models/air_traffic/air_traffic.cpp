@@ -548,6 +548,8 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 				//if(s->incoming_queue->size() > 0)
 				if(s->controller->m_q.size() > 0)
 				{
+					s->controller->handle_aircraft(lp);
+					/*
 					priority_queue < Aircraft, vector<Aircraft>, less<Aircraft> > *temp_q = new priority_queue < Aircraft, vector<Aircraft>, less<Aircraft> >();
 
 					Aircraft old_top = s->controller->m_q.top();
@@ -581,6 +583,7 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 
 					//assert(old_top.m_id == new_top.m_id);
 					assert(old_size == new_size);
+					*/
 				}
 
 				break;
