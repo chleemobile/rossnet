@@ -67,17 +67,17 @@ void LocalTrafficController::handle_aircraft(struct tw_lp *lp)
   class Aircraft new_top((this) -> m_q. top ());
   int new_size = ((this) -> m_q. size ());
   delete temp_q;
-  bool __temp25__;
-  __temp25__ = !(old_top.Aircraft::m_id == new_top.Aircraft::m_id);
-  if ((__builtin_expect(__temp25__,0))) {
+  bool __temp39__;
+  __temp39__ = !(old_top.Aircraft::m_id == new_top.Aircraft::m_id);
+  if ((__builtin_expect(__temp39__,0))) {
     __assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/air_traffic/LocalTrafficController.cpp",56,"old_top.m_id == new_top.m_id");
   }
   else {
     (void )0;
   }
-  bool __temp26__;
-  __temp26__ = !(old_size == new_size);
-  if ((__builtin_expect(__temp26__,0))) {
+  bool __temp40__;
+  __temp40__ = !(old_size == new_size);
+  if ((__builtin_expect(__temp40__,0))) {
     __assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/air_traffic/LocalTrafficController.cpp",57,"old_size == new_size");
   }
   else {
@@ -106,17 +106,17 @@ void LocalTrafficController::handle_aircraft_forward(struct tw_lp *lp)
   class Aircraft new_top((this) -> m_q. top ());
   int new_size = ((this) -> m_q. size ());
   delete temp_q;
-  bool __temp25__;
-  __temp25__ = !(old_top.Aircraft::m_id == new_top.Aircraft::m_id);
-  if ((__builtin_expect(__temp25__,0))) {
+  bool __temp39__;
+  __temp39__ = !(old_top.Aircraft::m_id == new_top.Aircraft::m_id);
+  if ((__builtin_expect(__temp39__,0))) {
     __assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/air_traffic/LocalTrafficController.cpp",56,"old_top.m_id == new_top.m_id");
   }
   else {
     (void )0;
   }
-  bool __temp26__;
-  __temp26__ = !(old_size == new_size);
-  if ((__builtin_expect(__temp26__,0))) {
+  bool __temp40__;
+  __temp40__ = !(old_size == new_size);
+  if ((__builtin_expect(__temp40__,0))) {
     __assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/air_traffic/LocalTrafficController.cpp",57,"old_size == new_size");
   }
   else {

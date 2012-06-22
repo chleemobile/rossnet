@@ -74,9 +74,9 @@ void RegionController::handle_aircraft(struct tw_lp *lp)
   int new_size = ((this) -> m_q. size ());
   delete temp_q;
 //assert(old_top.m_id == new_top.m_id);
-  bool __temp18__;
-  __temp18__ = !(old_size == new_size);
-  if ((__builtin_expect(__temp18__,0))) {
+  bool __temp30__;
+  __temp30__ = !(old_size == new_size);
+  if ((__builtin_expect(__temp30__,0))) {
     __assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/air_traffic/RegionController.cpp",62,"old_size == new_size");
   }
   else {
@@ -108,9 +108,9 @@ void RegionController::handle_aircraft_forward(struct tw_lp *lp)
   int new_size = ((this) -> m_q. size ());
   delete temp_q;
 //assert(old_top.m_id == new_top.m_id);
-  bool __temp18__;
-  __temp18__ = !(old_size == new_size);
-  if ((__builtin_expect(__temp18__,0))) {
+  bool __temp30__;
+  __temp30__ = !(old_size == new_size);
+  if ((__builtin_expect(__temp30__,0))) {
     __assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/air_traffic/RegionController.cpp",62,"old_size == new_size");
   }
   else {

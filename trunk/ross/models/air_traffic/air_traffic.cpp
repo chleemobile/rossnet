@@ -344,7 +344,9 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 		case TAXI_OUT:
 			{
 				//cout<<s->aircraft_counters->size()<<","<<msg->aircraft.m_id<<endl;
-				//s->controller->m_counter[msg->aircraft.m_id]++;
+				
+				s->controller->m_counter[msg->aircraft.m_id]++;
+
 				int to = lp->gid;				
 				ts = bs_rand_exponential(s->rn, MEAN_TAXI);
 
@@ -534,7 +536,7 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 				assert(lp->gid < NUMBER_OF_REGION_CONTROLLER);
 
 				s->controller->handle_outgoing(lp);
-				//s->controller->m_counter[msg->aircraft.m_id]++;
+				s->controller->m_counter[msg->aircraft.m_id]++;
 
 				int src_region = lp->gid;
 				int next_region = 0;
@@ -698,7 +700,7 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 
 		case TAXI_IN:
 			{
-				//s->controller->m_counter[msg->aircraft.m_id]++;
+				s->controller->m_counter[msg->aircraft.m_id]++;
 				
 				int to = lp->gid;
 				ts = bs_rand_exponential(s->rn, MEAN_ARRIVAL);
