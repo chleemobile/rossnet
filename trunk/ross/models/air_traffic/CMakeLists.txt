@@ -7,6 +7,7 @@ SET(air_traffic_srcs
 	Graph.cpp Graph.hpp 
 	Controller.cpp Controller.hpp
 	rose_RegionController.cpp RegionController.hpp
+	rose_LocalTrafficController.cpp LocalTrafficController.hpp
 	Constants.hpp
 	)
 

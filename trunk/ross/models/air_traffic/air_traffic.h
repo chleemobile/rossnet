@@ -20,6 +20,7 @@
 
 #include "Controller.hpp"
 #include "RegionController.hpp"
+#include "LocalTrafficController.hpp"
 
 //using std::max;
 //using namespace std;

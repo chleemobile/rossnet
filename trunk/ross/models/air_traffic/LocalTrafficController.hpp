@@ -1,11 +1,11 @@
 #include "Controller.hpp"
 
-class RegionController : public Controller
+
+class LocalTrafficController : public Controller
 {
 	public:
-		RegionController(int in_max_capacity, int in_num_aircraft);
-		virtual ~RegionController();
-
+		LocalTrafficController(int in_max_capacity, int in_num_aircraft);
+		virtual ~LocalTrafficController();
 		void handle_incoming(tw_lp *lp);
 		void handle_outgoing(tw_lp *lp);
 		void handle_aircraft(tw_lp *lp);
@@ -17,5 +17,6 @@ class RegionController : public Controller
 		void handle_aircraft_forward(tw_lp *lp);
 		void handle_aircraft_reverse(tw_lp *lp);
 
-		
+
 };
+

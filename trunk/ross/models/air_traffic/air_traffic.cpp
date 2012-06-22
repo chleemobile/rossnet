@@ -150,6 +150,7 @@ void init(airport_state * s, tw_lp * lp)
 				(lp->gid >= 338 && lp->gid <= 340) )
 		{
 			s->max_runway = NUMBER_OF_RUNWAY_LARGE_AIRPORT;
+			s->controller = new LocalTrafficController(NUMBER_OF_RUNWAY_LARGE_AIRPORT, num_aircraft);
 		}
 		else if (lp->gid == 21 ||
 				lp->gid == 39  ||
@@ -170,6 +171,8 @@ void init(airport_state * s, tw_lp * lp)
 				(lp->gid >= 341 && lp->gid <= 342))                                                                       
 		{
 			s->max_runway = NUMBER_OF_RUNWAY_MEDIUM_AIRPORT;
+			s->controller = new LocalTrafficController(NUMBER_OF_RUNWAY_MEDIUM_AIRPORT, num_aircraft);
+			
 			
 		}
 		else if (lp->gid == 22 ||
@@ -194,11 +197,13 @@ void init(airport_state * s, tw_lp * lp)
 				(lp->gid >= 321 && lp->gid <= 327))
 		{
 			s->max_runway = NUMBER_OF_RUNWAY_SMALL_AIRPORT;
+			s->controller = new LocalTrafficController(NUMBER_OF_RUNWAY_SMALL_AIRPORT, num_aircraft);
 			
 		}
 		else
 		{
 			s->max_runway = NUMBER_OF_RUNWAY_NH_AIRPORT;	
+			s->controller = new LocalTrafficController(NUMBER_OF_RUNWAY_NH_AIRPORT, num_aircraft);
 
 		}
 
@@ -267,11 +272,13 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 				aircraft.m_clock = tw_now(lp);
 				s->incoming_queue->push(aircraft);
 
-				if(s->incoming_queue->size() > s->max_queue_size_airport)
-					s->max_queue_size_airport = s->incoming_queue->size();
+				//if(s->incoming_queue->size() > s->max_queue_size_airport)
+					//s->max_queue_size_airport = s->incoming_queue->size();
 
-				if (s->runway_in_use < s->max_runway) 
+				if (s->controller->m_current_capacity < s->controller->m_max_capacity) 
 				{
+					s->controller->handle_incoming(lp);
+
 					s->runway_in_use++;
 					s->dep_req_accepted++;
 					s->dep_processed++;
@@ -341,10 +348,12 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 
 		case DEP:
 			{
-				if (s->runway_in_use < s->max_runway)
+				if (s->controller->m_current_capacity < s->controller->m_max_capacity) 
 				{
 					if(s->incoming_queue->size() > 0)
 					{
+						s->controller->handle_incoming(lp);
+
 						s->runway_in_use++;
 						s->dep_processed++;
 
@@ -430,6 +439,8 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 
 		case TAKE_OFF:
 			{            
+				s->controller->handle_outgoing(lp);
+
 				s->runway_in_use--;
 
 				int src_region = get_region(lp->gid);
@@ -682,11 +693,13 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 				aircraft.m_clock = tw_now(lp);
 				s->incoming_queue->push(aircraft);
 
-				if(s->incoming_queue->size() > s->max_queue_size_airport)
-					s->max_queue_size_airport = s->incoming_queue->size();
+				//if(s->incoming_queue->size() > s->max_queue_size_airport)
+					//s->max_queue_size_airport = s->incoming_queue->size();
 
-				if (s->runway_in_use < s->max_runway) 
+				if (s->controller->m_current_capacity < s->controller->m_max_capacity) 
 				{
+					s->controller->handle_incoming(lp);
+
 					s->runway_in_use++;
 					s->landing_req_accepted++;
 					s->landing_processed++;
@@ -756,10 +769,13 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 
 		case LANDING:
 			{
-				if (s->runway_in_use < s->max_runway)
+				if (s->controller->m_current_capacity < s->controller->m_max_capacity) 
+
 				{
 					if( s->incoming_queue->size() > 0)
 					{
+						s->controller->handle_incoming(lp);
+
 						s->runway_in_use++;
 						s->landing_processed++;
 
@@ -837,6 +853,8 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 
 		case ARRIVAL:
 			{
+				s->controller->handle_outgoing(lp);
+
 				s->runway_in_use--;
 
 				int to = lp->gid;
