@@ -106,26 +106,26 @@ void init(airport_state * s, tw_lp * lp)
 	if(lp->gid <NUMBER_OF_REGION_CONTROLLER)
 	{
 		if (lp->gid == 4 || lp->gid == 5 || lp->gid == 8 || lp->gid == 11 || lp->gid == 13 || lp->gid == 16 ) {
-			s->max_capacity = AIRCRAFT_CAPACITY_OF_SMALL_REGION;
+			//s->max_capacity = AIRCRAFT_CAPACITY_OF_SMALL_REGION;
 			s->controller = new RegionController(AIRCRAFT_CAPACITY_OF_SMALL_REGION, num_aircraft);
 
 		}
 		else if(lp->gid == 0 || lp->gid == 1 || lp->gid == 3 || lp->gid == 7 || lp->gid == 10 || lp->gid == 12 || lp->gid == 14 || lp->gid == 18 || lp->gid == 19 ) {
-			s->max_capacity = AIRCRAFT_CAPACITY_OF_MEDIUM_REGION;	
+			//s->max_capacity = AIRCRAFT_CAPACITY_OF_MEDIUM_REGION;	
 			s->controller = new RegionController(AIRCRAFT_CAPACITY_OF_MEDIUM_REGION, num_aircraft);
 
 		}
 		else {
-			s->max_capacity = AIRCRAFT_CAPACITY_OF_LARGE_REGION;
+			//s->max_capacity = AIRCRAFT_CAPACITY_OF_LARGE_REGION;
 			s->controller = new RegionController(AIRCRAFT_CAPACITY_OF_LARGE_REGION, num_aircraft);
 
 		}
 
-		s->airplane_in_region = 0;
+		//s->airplane_in_region = 0;
 
-		s->transit_req_accepted = 0;
-		s->transit_req_rejected = 0;
-		s->transit_processed = 0;
+		//s->transit_req_accepted = 0;
+		//s->transit_req_rejected = 0;
+		//s->transit_processed = 0;
 
 	}
 	else
@@ -149,7 +149,7 @@ void init(airport_state * s, tw_lp * lp)
 				(lp->gid >= 303 && lp->gid <= 305) ||                
 				(lp->gid >= 338 && lp->gid <= 340) )
 		{
-			s->max_runway = NUMBER_OF_RUNWAY_LARGE_AIRPORT;
+			//s->max_runway = NUMBER_OF_RUNWAY_LARGE_AIRPORT;
 			s->controller = new LocalTrafficController(NUMBER_OF_RUNWAY_LARGE_AIRPORT, num_aircraft);
 		}
 		else if (lp->gid == 21 ||
@@ -170,7 +170,7 @@ void init(airport_state * s, tw_lp * lp)
 				(lp->gid >= 306 && lp->gid <= 307) ||                                                   
 				(lp->gid >= 341 && lp->gid <= 342))                                                                       
 		{
-			s->max_runway = NUMBER_OF_RUNWAY_MEDIUM_AIRPORT;
+			//s->max_runway = NUMBER_OF_RUNWAY_MEDIUM_AIRPORT;
 			s->controller = new LocalTrafficController(NUMBER_OF_RUNWAY_MEDIUM_AIRPORT, num_aircraft);
 
 
@@ -196,27 +196,27 @@ void init(airport_state * s, tw_lp * lp)
 				(lp->gid >= 308 && lp->gid <= 310) ||                                                   
 				(lp->gid >= 321 && lp->gid <= 327))
 		{
-			s->max_runway = NUMBER_OF_RUNWAY_SMALL_AIRPORT;
+			//s->max_runway = NUMBER_OF_RUNWAY_SMALL_AIRPORT;
 			s->controller = new LocalTrafficController(NUMBER_OF_RUNWAY_SMALL_AIRPORT, num_aircraft);
 
 		}
 		else
 		{
-			s->max_runway = NUMBER_OF_RUNWAY_NH_AIRPORT;	
+			//s->max_runway = NUMBER_OF_RUNWAY_NH_AIRPORT;	
 			s->controller = new LocalTrafficController(NUMBER_OF_RUNWAY_NH_AIRPORT, num_aircraft);
 
 		}
 
 
-		s->runway_in_use=0;
+		//s->runway_in_use=0;
 
-		s->landing_processed = 0;
-		s->landing_req_accepted=0;
-		s->landing_req_rejected=0;
+		//s->landing_processed = 0;
+		//s->landing_req_accepted=0;
+		//s->landing_req_rejected=0;
 
-		s->dep_processed=0;
-		s->dep_req_accepted = 0;
-		s->dep_req_rejected=0;
+		//s->dep_processed=0;
+		//s->dep_req_accepted = 0;
+		//s->dep_req_rejected=0;
 
 
 		for(i = 0; i < planes_per_airport; i++)
@@ -282,9 +282,9 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 				{
 					s->controller->handle_incoming(lp);
 
-					s->runway_in_use++;
-					s->dep_req_accepted++;
-					s->dep_processed++;
+					//s->runway_in_use++;
+					//s->dep_req_accepted++;
+					//s->dep_processed++;
 
 					Aircraft aircraft = s->controller->m_q.top();
 					s->controller->m_q.pop();
@@ -309,7 +309,7 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 				}
 				else
 				{
-					s->dep_req_rejected++;
+					//s->dep_req_rejected++;
 				}
 
 				if(s->controller->m_q.size() > 0)
@@ -359,9 +359,9 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 					{
 						s->controller->handle_incoming(lp);
 
-						s->runway_in_use++;
-						s->dep_req_accepted++;
-						s->dep_processed++;
+						//s->runway_in_use++;
+						//s->dep_req_accepted++;
+						//s->dep_processed++;
 
 						Aircraft aircraft = s->controller->m_q.top();
 						s->controller->m_q.pop();
@@ -448,7 +448,7 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 			{            
 				s->controller->handle_outgoing(lp);
 
-				s->runway_in_use--;
+				//s->runway_in_use--;
 
 				int src_region = get_region(lp->gid);
 				int next_region = 0;
@@ -520,7 +520,8 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 
 					if(aircraft.m_remaining_dist <= 0)
 					{
-						s->transit_req_accepted++;
+						//s->transit_req_accepted++;
+
 						s->controller->handle_incoming(lp);
 						s->controller->m_q.pop();
 
@@ -546,7 +547,7 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 				}
 				else
 				{
-					s->transit_req_rejected++;
+					//s->transit_req_rejected++;
 				}
 
 				if(s->controller->m_q.size() > 0)
@@ -573,7 +574,7 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 						{
 							s->controller->handle_incoming(lp);
 
-							s->transit_req_accepted++;
+							//s->transit_req_accepted++;
 
 							s->controller->m_q.pop();
 
@@ -600,7 +601,7 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 				}
 				else
 				{
-					s->transit_req_rejected++;
+					//s->transit_req_rejected++;
 				}
 
 				if(s->controller->m_q.size() > 0)
@@ -709,9 +710,9 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 				{
 					s->controller->handle_incoming(lp);
 
-					s->runway_in_use++;
-					s->landing_req_accepted++;
-					s->landing_processed++;
+					//s->runway_in_use++;
+					//s->landing_req_accepted++;
+					//s->landing_processed++;
 
 					Aircraft aircraft = s->controller->m_q.top();
 					s->controller->m_q.pop();
@@ -736,7 +737,7 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 				}
 				else
 				{
-					s->landing_req_rejected++;
+					//s->landing_req_rejected++;
 				}
 
 				if(s->controller->m_q.size() > 0)
@@ -785,8 +786,8 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 					{
 						s->controller->handle_incoming(lp);
 
-						s->runway_in_use++;
-						s->landing_processed++;
+						//s->runway_in_use++;
+						//s->landing_processed++;
 
 						Aircraft aircraft = s->controller->m_q.top();
 						s->controller->m_q.pop();
@@ -865,7 +866,7 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 			{
 				s->controller->handle_outgoing(lp);
 
-				s->runway_in_use--;
+				//s->runway_in_use--;
 
 				int to = lp->gid;
 				ts = bs_rand_exponential(s->rn, MEAN_DEQ);
@@ -921,29 +922,29 @@ void final(airport_state * s, tw_lp * lp)
 
 {
 	//wait_time_avg += ((s->waiting_time / (double) s->landings) / nlp_per_pe);
-	total_transit_req_accepted += s->transit_req_accepted;
-	total_transit_req_rejected += s->transit_req_rejected;
-	total_transit_processed += s->transit_processed;
+	//total_transit_req_accepted += s->transit_req_accepted;
+	//total_transit_req_rejected += s->transit_req_rejected;
+	//total_transit_processed += s->transit_processed;
 
-	total_dep_processed += s->dep_processed;
-	total_dep_req_accepted += s->dep_req_accepted;
-	total_dep_req_rejected += s->dep_req_rejected;
+	//total_dep_processed += s->dep_processed;
+	//total_dep_req_accepted += s->dep_req_accepted;
+	//total_dep_req_rejected += s->dep_req_rejected;
 
-	total_landing_processed += s->landing_processed;
-	total_landing_req_accepted += s->landing_req_accepted;
-	total_landing_req_rejected += s->landing_req_rejected;
+	//total_landing_processed += s->landing_processed;
+	//total_landing_req_accepted += s->landing_req_accepted;
+	//total_landing_req_rejected += s->landing_req_rejected;
 
-	max_queue_size_airport = s->max_queue_size_airport > max_queue_size_airport ? s->max_queue_size_airport : max_queue_size_airport;
-	max_queue_size_region = s->max_queue_size_region > max_queue_size_region ? s->max_queue_size_region : max_queue_size_region;
+	//max_queue_size_airport = s->max_queue_size_airport > max_queue_size_airport ? s->max_queue_size_airport : max_queue_size_airport;
+	//max_queue_size_region = s->max_queue_size_region > max_queue_size_region ? s->max_queue_size_region : max_queue_size_region;
 
-	total_cdelay_airport_dep += s->cdelay_airport_dep;
-	total_delay_airport_dep += s->delay_airport_dep;
+	//total_cdelay_airport_dep += s->cdelay_airport_dep;
+	//total_delay_airport_dep += s->delay_airport_dep;
 
-	total_cdelay_airport_land += s->cdelay_airport_land;
-	total_delay_airport_land += s->delay_airport_land;
+	//total_cdelay_airport_land += s->cdelay_airport_land;
+	//total_delay_airport_land += s->delay_airport_land;
 
-	total_cdelay_region += s->cdelay_region;
-	total_delay_region += s->delay_region;
+	//total_cdelay_region += s->cdelay_region;
+	//total_delay_region += s->delay_region;
 
 	//cout<<lp->gid<<","<<total_cdelay<<endl;
 }

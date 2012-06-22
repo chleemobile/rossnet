@@ -70,16 +70,19 @@ struct airport_state
 	/*
 	   Region Controller State Variable
 	 */
-
+	/*
 	int max_capacity;
 	int airplane_in_region;
 
 	int transit_req_accepted;
 	int transit_req_rejected;
 	int transit_processed;
+	*/
+
 	/*
 	   Traffic Controller State Variable
 	 */
+	/*
 	int max_runway;
 	int runway_in_use;
 
@@ -90,6 +93,7 @@ struct airport_state
 	int dep_processed;
 	int dep_req_accepted;
 	int dep_req_rejected;
+	*/
 };
 
 struct air_traffic_message
