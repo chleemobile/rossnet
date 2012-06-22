@@ -1,3 +1,6 @@
+#ifndef _aircraft_h_
+#define _aircraft_h_
+
 #include "iostream"
 #include "assert.h"
 #include <deque>
@@ -39,3 +42,5 @@ public:
 	int 	m_cdelay;
 
 };
+
+#endif

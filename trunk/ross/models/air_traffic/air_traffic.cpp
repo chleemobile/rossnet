@@ -488,31 +488,34 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 				assert(lp->gid < NUMBER_OF_REGION_CONTROLLER);
 
 				
-				Aircraft aircraft = msg->aircraft;
+				Aircraft msg_aircraft = msg->aircraft;
 				
-				aircraft.m_clock = tw_now(lp);
+				msg_aircraft.m_clock = tw_now(lp);
 				
-				s->incoming_queue->push(aircraft);
+				//s->incoming_queue->push(msg_aircraft);
+				s->controller->m_q.push(msg_aircraft);
 
-				if(s->incoming_queue->size() > s->max_queue_size_region )
-					s->max_queue_size_region = s->incoming_queue->size();
+				//if(s->incoming_queue->size() > s->max_queue_size_region )
+					//s->max_queue_size_region = s->incoming_queue->size();
 
 //				if (s->airplane_in_region < s->max_capacity)
 				if(s->controller->m_current_capacity < s->controller->m_max_capacity)
 				{
 
-					Aircraft aircraft = s->incoming_queue->top();
+					//Aircraft aircraft = s->incoming_queue->top();
+					Aircraft aircraft = s->controller->m_q.top();
 
 					if(aircraft.m_remaining_dist <= 0)
 					{
-						s->controller->m_current_capacity++;
-						
+						//s->transit_processed++;						
+						//s->controller->m_current_capacity++;
+						s->controller->handle_incoming(lp);
 
-						s->airplane_in_region++;
+						//s->airplane_in_region++;
 						s->transit_req_accepted++;
-						s->transit_processed++;
 
-						s->incoming_queue->pop();
+						//s->incoming_queue->pop();
+						s->controller->m_q.pop();
 
 						s->delay_region += tw_now(lp) - aircraft.m_clock;
 						s->cdelay_region += aircraft.m_cdelay;
@@ -537,22 +540,23 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 				else
 				{
 					
-					assert(s->incoming_queue->size() > 0);
+					//assert(s->incoming_queue->size() > 0);
 					s->transit_req_rejected++;
 				}
 				//update remaining distance, process time, delays
 
-				if(s->incoming_queue->size() > 0)
+				//if(s->incoming_queue->size() > 0)
+				if(s->controller->m_q.size() > 0)
 				{
 					priority_queue < Aircraft, vector<Aircraft>, less<Aircraft> > *temp_q = new priority_queue < Aircraft, vector<Aircraft>, less<Aircraft> >();
 
-					Aircraft old_top = s->incoming_queue->top();
-					int old_size = s->incoming_queue->size();
+					Aircraft old_top = s->controller->m_q.top();
+					int old_size = s->controller->m_q.size();
 
-					while(!s->incoming_queue->empty())
+					while(!s->controller->m_q.empty())
 					{
-						Aircraft temp = s->incoming_queue->top();
-						s->incoming_queue->pop();
+						Aircraft temp = s->controller->m_q.top();
+						s->controller->m_q.pop();
 
 						temp.m_process_time -= temp.m_speed;
 						temp.m_remaining_dist -= temp.m_speed;
@@ -567,100 +571,17 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 						Aircraft temp =temp_q->top();
 						temp_q->pop();
 
-						s->incoming_queue->push(temp);
+						s->controller->m_q.push(temp);
 					}
 
-					Aircraft new_top = s->incoming_queue->top();
-					int new_size = s->incoming_queue->size();
+					Aircraft new_top = s->controller->m_q.top();
+					int new_size = s->controller->m_q.size();
 
 					delete temp_q;
 
 					//assert(old_top.m_id == new_top.m_id);
 					assert(old_size == new_size);
 				}
-
-				break;
-			}
-
-		case TRANSIT:
-			{
-				//assert(false);
-
-				if(s->controller->m_current_capacity < s->controller->m_max_capacity)				
-				//if (s->airplane_in_region < s->max_capacity) 
-				{
-					if(s->incoming_queue->size() > 0)
-					{
-						s->transit_processed++;
-
-						Aircraft aircraft = s->incoming_queue->top();
-
-						if(aircraft.m_remaining_dist <= 0)
-						{
-							s->controller->m_current_capacity++;
-							
-							s->incoming_queue->pop();
-
-							s->airplane_in_region++;
-
-							s->delay_region += tw_now(lp) - aircraft.m_clock;
-							s->cdelay_region += aircraft.m_cdelay;
-
-							aircraft.m_clock = 0;
-							aircraft.m_cdelay = 0;
-							aircraft.m_delay = 0;
-
-							int to = lp->gid;
-							ts = bs_rand_exponential(s->rn, MEAN_FLIGHT);
-
-							e = tw_event_new(to, ts, lp);
-
-							m = (air_traffic_message*)tw_event_data(e);
-							m->type = ON_THE_AIR;
-							m->aircraft = aircraft;
-							m->msg_from = lp->gid;
-
-							tw_event_send(e);
-						}
-					}
-				}
-
-				if(s->incoming_queue->size() > 0)
-				{
-					priority_queue < Aircraft, vector<Aircraft>, less<Aircraft> > *temp_q = new priority_queue < Aircraft, vector<Aircraft>, less<Aircraft> >();
-
-					Aircraft old_top = s->incoming_queue->top();
-					int old_size = s->incoming_queue->size();
-
-					while(!s->incoming_queue->empty())
-					{
-						Aircraft temp = s->incoming_queue->top();
-						s->incoming_queue->pop();
-
-						temp.m_process_time -= temp.m_speed;						
-						temp.m_remaining_dist -= temp.m_speed;
-						//if(temp.m_remaining_dist < 0) temp.m_remaining_dist = 0;
-
-						temp.m_cdelay++;
-						temp_q->push(temp);
-					}
-
-					while(!temp_q->empty())
-					{
-						Aircraft temp = temp_q->top();
-						temp_q->pop();
-
-						s->incoming_queue->push(temp);
-					}
-
-					Aircraft new_top = s->incoming_queue->top();
-					int new_size = s->incoming_queue->size();
-
-					delete temp_q;
-
-					//assert(old_top.m_id == new_top.m_id);
-					assert(old_size == new_size);
-				}					
 
 				break;
 			}
@@ -673,9 +594,10 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 			{
 				assert(lp->gid < NUMBER_OF_REGION_CONTROLLER);
 
-				s->airplane_in_region--;
+				//s->airplane_in_region--;
 
-				s->controller->m_current_capacity--;
+				//s->controller->m_current_capacity--;
+				s->controller->handle_outgoing(lp);
 				
 
 				int src_region = lp->gid;
@@ -715,6 +637,8 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 					   Schedule Transit Event
 					 */
 
+						
+					/*
 
 					int to2 = lp->gid;
 					ts = bs_rand_exponential(s->rn, MEAN_FLIGHT);
@@ -726,7 +650,7 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 					m->aircraft = msg->aircraft;
 
 					tw_event_send(e);
-
+					*/
 
 				}
 				else
