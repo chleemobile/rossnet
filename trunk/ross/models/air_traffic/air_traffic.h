@@ -50,6 +50,7 @@ struct airport_state
 	int 	rn;
 
 	Controller *controller;
+	vector<int> *counter;
 
 	double  delay_airport_dep;
 	double  delay_airport_land;
