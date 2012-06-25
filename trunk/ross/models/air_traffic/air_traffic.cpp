@@ -1029,13 +1029,16 @@ void event_handler_fw(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 				__store__(path1, lp);
 
 				int path2 = 0;
+				int path2_1 = 0;
 				if(s->controller->m_current_capacity < s->controller->m_max_capacity)
 				{
+					path2=1;
+
 					Aircraft aircraft = s->controller->m_q.top();
 
 					if(aircraft.m_remaining_dist <= 0)
 					{
-						path2=1;
+						path2_1=1;
 
 						s->transit_req_accepted++;
 						s->transit_processed++;
@@ -1065,6 +1068,7 @@ void event_handler_fw(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 
 						tw_event_send(e);
 					}
+					__store__(path2_1, lp);
 				}
 				else
 				{
@@ -1088,15 +1092,21 @@ void event_handler_fw(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 		case TRANSIT:
 			{
 				int path1 = 0;
+				int path1_2 = 0;
+				int path1_1 =0;
+
 				if(s->controller->m_current_capacity < s->controller->m_max_capacity)
 				{
+					path1=1;
+
 					if(s->controller->m_q.size() > 0)
 					{
+						path1_1=1;
 						Aircraft aircraft = s->controller->m_q.top();
 
 						if(aircraft.m_remaining_dist <= 0)
 						{
-							path1=1;
+							path1_2=1;
 
 							s->controller->handle_incoming(lp);
 
@@ -1128,7 +1138,9 @@ void event_handler_fw(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 
 							tw_event_send(e);
 						}
+						__store__(path1_2, lp);
 					}
+					__store__(path1_1, lp);
 				}
 				else
 				{
@@ -1142,7 +1154,7 @@ void event_handler_fw(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 				{
 					path2=1;
 					int q_stored = 0;
-					if(path1) q_stored = 1;
+					if(path1_1 && path1_2) q_stored = 1;
 					if(!q_stored)__store__(s->controller->m_q, lp);
 					s->controller->handle_aircraft(lp);
 					__store__(q_stored, lp);
@@ -1562,12 +1574,20 @@ void event_handler_rv(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 	
 				if(path2)
 				{
-					bs_rand_rvs(s->rn, lp);
-					__restore__(s->cdelay_region, lp);
-					__restore__(s->delay_region, lp);
+					int path2_1=-1;
+					__restore__(path2_1, lp);
+					assert(path2_1 >=0);
 
-					s->controller->m_aircraft_processed--;
-					s->controller->m_current_capacity--;
+					if(path2_1)
+					{
+						bs_rand_rvs(s->rn, lp);
+						__restore__(s->cdelay_region, lp);
+						__restore__(s->delay_region, lp);
+
+						s->controller->m_aircraft_processed--;
+						s->controller->m_current_capacity--;
+
+					}
 
 				}
 				else
@@ -1617,20 +1637,34 @@ void event_handler_rv(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 
 				if(path1)
 				{
-					bs_rand_rvs(s->rn, lp);
+					int path1_1=-1;
+					__restore__(path1_1, lp);
+					assert(path1_1 >=0);
+
+					if(path1_1)
+					{
 					
-					__restore__(s->cdelay_region, lp);
-					__restore__(s->delay_region, lp);
-					__restore__(s->controller->m_q, lp);	
+						int path1_2=-1;
+						__restore__(path1_2, lp);
+						assert(path1_2 >=0);
 
-					//assert(q_stored_in_path1 == 1);
+						if(path1_2)
+						{
+							bs_rand_rvs(s->rn, lp);
+					
+							__restore__(s->cdelay_region, lp);
+							__restore__(s->delay_region, lp);
+							__restore__(s->controller->m_q, lp);	
+	
+							//assert(q_stored_in_path1 == 1);
 
-					s->transit_req_accepted--;
-					s->transit_processed--;
+							s->transit_req_accepted--;
+							s->transit_processed--;
 
-					s->controller->m_aircraft_processed--;
-					s->controller->m_current_capacity--;
-
+							s->controller->m_aircraft_processed--;
+							s->controller->m_current_capacity--;
+						}
+					}
 				}
 				else
 				{
