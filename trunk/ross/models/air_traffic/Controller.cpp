@@ -6,7 +6,7 @@ Controller::Controller()
 	assert(false);
 }
 
-Controller::Controller(int in_max_capacity, int in_num_aircraft):m_counter(in_num_aircraft), m_max_capacity(in_max_capacity), m_current_capacity(0)
+Controller::Controller(int in_max_capacity, int in_num_aircraft):/*m_counter(in_num_aircraft),*/ m_max_capacity(in_max_capacity), m_current_capacity(0)
 {
 }
 
