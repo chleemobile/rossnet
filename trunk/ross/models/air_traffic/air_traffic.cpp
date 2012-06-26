@@ -1586,6 +1586,9 @@ void event_handler_rv(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 
 						s->controller->m_aircraft_processed--;
 						s->controller->m_current_capacity--;
+						
+						s->transit_req_accepted--;
+						s->transit_processed--;
 
 					}
 
@@ -1796,10 +1799,12 @@ void event_handler_rv(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 
 
 void final(airport_state * s, tw_lp * lp)
-
 {
 	//wait_time_avg += ((s->waiting_time / (double) s->landings) / nlp_per_pe);
+	
 	total_transit_req_accepted += s->transit_req_accepted;
+	cout<<lp->gid<<","<<total_transit_req_accepted<<endl;
+
 	total_transit_req_rejected += s->transit_req_rejected;
 	total_transit_processed += s->transit_processed;
 
