@@ -688,6 +688,15 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 
 						Aircraft aircraft = s->controller->m_q.top();
 						s->controller->m_q.pop();
+	
+						/*
+						s->delay_airport_land += tw_now(lp) - aircraft.m_clock;
+						s->cdelay_airport_land += aircraft.m_cdelay;
+
+						aircraft.m_clock = 0;
+						aircraft.m_cdelay = 0;
+						aircraft.m_delay = 0;
+						*/
 
 						int to = lp->gid;
 						ts = bs_rand_exponential(s->rn, MEAN_LAND);
@@ -1339,6 +1348,7 @@ void event_handler_fw(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 						__store__(s->controller->m_q, lp);						
 						s->controller->m_q.pop();
 
+						/*
 						__store__(s->delay_airport_land, lp);
 						s->delay_airport_land += tw_now(lp) - aircraft.m_clock;
 
@@ -1348,6 +1358,7 @@ void event_handler_fw(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 						aircraft.m_clock = 0;
 						aircraft.m_cdelay = 0;
 						aircraft.m_delay = 0;
+						*/
 
 						int to = lp->gid;
 						ts = bs_rand_exponential2(s->rn, MEAN_LAND, lp);
@@ -1679,7 +1690,6 @@ void event_handler_rv(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 
 		case ON_THE_AIR:
 			{
-				(*(s->counter))[msg->aircraft.m_id]--;
 				int path1=-1;
 				__restore__(path1, lp);
 				assert(path1 >=0);
@@ -1695,6 +1705,10 @@ void event_handler_rv(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 					bs_rand_rvs(s->rn, lp);
 				
 				}
+
+				(*(s->counter))[msg->aircraft.m_id]--;
+				s->controller->m_current_capacity++;
+
 				break;
 			}
 
@@ -1759,8 +1773,8 @@ void event_handler_rv(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 				{
 					bs_rand_rvs(s->rn, lp);
 					
-					__restore__(s->cdelay_airport_land, lp);
-					__restore__(s->delay_airport_land, lp);
+					//__restore__(s->cdelay_airport_land, lp);
+					//__restore__(s->delay_airport_land, lp);
 					__restore__(s->controller->m_q, lp);
 
 					//assert(q_stored_in_path1 == 1);
@@ -1803,7 +1817,7 @@ void final(airport_state * s, tw_lp * lp)
 	//wait_time_avg += ((s->waiting_time / (double) s->landings) / nlp_per_pe);
 	
 	total_transit_req_accepted += s->transit_req_accepted;
-	cout<<lp->gid<<","<<total_transit_req_accepted<<endl;
+	//cout<<lp->gid<<","<<total_transit_req_accepted<<endl;
 
 	total_transit_req_rejected += s->transit_req_rejected;
 	total_transit_processed += s->transit_processed;
@@ -1839,7 +1853,7 @@ tw_lptype airport_lps[] =
 {
 	{
 		(init_f) init,
-		(event_f) event_handler_fw,
+		(event_f) event_handler,
 		(revent_f) event_handler_rv,
 		(final_f) final,
 		(map_f) mapping_to_pe,
