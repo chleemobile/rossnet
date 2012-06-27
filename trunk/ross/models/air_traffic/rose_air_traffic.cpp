@@ -1816,12 +1816,17 @@ int main(int argc,char **argv,char **env)
   }
   else {
   }
-  if (0) {
-//	cout<<"Memory usage : "<<memusage<<" bytes,"<<" Store operations "<<store_operation<<" Restore operation "<<restore_operation<<endl;
-    (std::cout << memusage<<",") << std::endl< char  , std::char_traits< char  >  > ;
-  }
-  else {
-  }
+	if(COUNT_EVENT) write_map();
+
+	if(1)
+	{
+		std::cout<<g_tw_mynode<<","<<"total memory usage:"<<total_memusage<<std::endl;
+		std::cout<<g_tw_mynode<<","<<"max memory usage:"<<max_memusage<<std::endl;
+		std::cout<<g_tw_mynode<<","<<"current memory usage:"<<current_memusage<<std::endl;
+		std::cout<<g_tw_mynode<<","<<"store operations:"<<store_operation<<endl;
+		std::cout<<g_tw_mynode<<","<<"restore operations:"<<restore_operation<<endl;
+
+	}	
   return 0;
 }
 

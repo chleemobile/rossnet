@@ -105,9 +105,12 @@ DEF_GET_STACK(BS_ULONG)
 
 //static std::stack<int> int_stack;
 
-static int memusage = 0;
-static int store_operation = 0;
-static int restore_operation = 0;
+static unsigned long total_memusage = 0;
+static unsigned long current_memusage = 0;
+static unsigned long max_memusage = 0;
+
+static unsigned long store_operation = 0;
+static unsigned long restore_operation = 0;
 
 
 
@@ -168,7 +171,9 @@ inline void __store__(T obj, tw_lp* lp)
 {
     if(MEM_USAGE)
     {
-       memusage += sizeof(obj);
+       total_memusage += sizeof(obj);
+	   current_memusage += sizeof(obj);
+
        store_operation ++;
     }
 
@@ -181,7 +186,11 @@ inline void __restore__(T& obj, tw_lp* lp)
 {
     if(MEM_USAGE)
     {
-        restore_operation++;
+		restore_operation++;
+		current_memusage -= sizeof(obj);
+		if(current_memusage > max_memusage)
+			max_memusage = current_memusage;
+		
     }
     BSStack* stk  = static_cast<BSStack*>(lp->stack_pointer);
     obj = pop<T>(stk);

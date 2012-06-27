@@ -1853,7 +1853,7 @@ tw_lptype airport_lps[] =
 {
 	{
 		(init_f) init,
-		(event_f) event_handler,
+		(event_f) event_handler_fw,
 		(revent_f) event_handler_rv,
 		(final_f) final,
 		(map_f) mapping_to_pe,
@@ -2079,13 +2079,21 @@ void air_traffic_mapping()
 int main(int argc, char **argv, char **env)
 {
 
-	//int loop_size = LOOP_SCALE * atoi(argv[argc-1].c_str());
-	//std::string ssize = argv[argc-1];
-	//int size = atoi(ssize.c_str());
-	//loop_size = LOOP_SCALE * size;
-	//std::cout<<"loop size : "<<loop_size<<std::endl;
-	//argv[argc-1] = "";
-	//argc = argc-1;
+	int size_ss = sizeof(airport_state);
+	int size_msg = sizeof(air_traffic_message);
+	int size_enum = sizeof(air_traffic_event_t);
+	int size_counter_container = sizeof(counter_container);
+	int size_outer_map = sizeof(outer_map);
+	int size_inner_map = sizeof(inner_map);
+	int size_int = sizeof(int);
+	int size_double = sizeof(double);
+
+	cout<<"size of state structure:"<<size_ss<<endl;
+	cout<<"size of state message:"<<size_msg<<endl;
+	cout<<"size of int:"<<size_int<<endl;
+	cout<<"size of inner map:"<<size_inner_map<<endl;
+	cout<<"size of outer map:"<<size_outer_map<<endl;
+
 
 	int i;
 
@@ -2115,6 +2123,8 @@ int main(int argc, char **argv, char **env)
 		for(i = 0; i < g_tw_nlp; i++)
 			tw_lp_settype(i, &airport_lps[0]);
 	}
+
+	
 
 	//init map to count how many events are executed by each lp
 	//key lpid, value map<event type, counter>
@@ -2190,10 +2200,14 @@ int main(int argc, char **argv, char **env)
 
 	if(COUNT_EVENT) write_map();
 
-	if(0)
+	if(1)
 	{
-		//	cout<<"Memory usage : "<<memusage<<" bytes,"<<" Store operations "<<store_operation<<" Restore operation "<<restore_operation<<endl;
-		std::cout<<memusage<<","<<std::endl;
+		std::cout<<g_tw_mynode<<","<<"total memory usage:"<<total_memusage<<std::endl;
+		std::cout<<g_tw_mynode<<","<<"max memory usage:"<<max_memusage<<std::endl;
+		std::cout<<g_tw_mynode<<","<<"current memory usage:"<<current_memusage<<std::endl;
+		std::cout<<g_tw_mynode<<","<<"store operations:"<<store_operation<<endl;
+		std::cout<<g_tw_mynode<<","<<"restore operations:"<<restore_operation<<endl;
+
 	}	
 
 	return 0;
