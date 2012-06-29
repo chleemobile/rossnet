@@ -97,3 +97,10 @@ FILE		*g_tw_csv = NULL;
  */
 
 tw_stime g_tw_clock_rate=1000000000.0; // Default to 1 GHz
+
+/*
+ *Baskstroke
+ */
+
+int fossil_collected = 0;
+

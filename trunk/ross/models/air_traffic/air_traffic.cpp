@@ -75,9 +75,15 @@ tw_peid mapping_to_pe(tw_lpid gid)
 
 void init(airport_state * s, tw_lp * lp)
 {
+	//init additional data memeber of LP to support Backstroke
 	static int init_seed = lp->gid;
 	BSStack* stack = new BSStack();
 	lp->stack_pointer = stack;
+
+	lp->vector_pointer = get_gvt_vector();
+
+	lp->bs_record_stack_position = bs_record_stack_position;
+	lp->bs_fossil_collect = bs_fossil_collect;
 
 	int i;
 	tw_event *e;
@@ -1870,7 +1876,7 @@ const tw_optdef app_opt [] =
 	TWOPT_UINT("nplanes", planes_per_airport, "initial # of planes per airport(events)"),
 	TWOPT_STIME("mean", mean_flight_time, "mean flight time for planes"),
 	TWOPT_UINT("memory", opt_mem, "optimistic memory"),
-	TWOPT_UINT("loopsize", loop_size, "padding loop size"),
+	//TWOPT_UINT("loopsize", loop_size, "padding loop size"),
 	TWOPT_UINT("prun", p_run, "parallel run"),
 
 	TWOPT_END()
@@ -2078,23 +2084,6 @@ void air_traffic_mapping()
 
 int main(int argc, char **argv, char **env)
 {
-
-	int size_ss = sizeof(airport_state);
-	int size_msg = sizeof(air_traffic_message);
-	int size_enum = sizeof(air_traffic_event_t);
-	int size_counter_container = sizeof(counter_container);
-	int size_outer_map = sizeof(outer_map);
-	int size_inner_map = sizeof(inner_map);
-	int size_int = sizeof(int);
-	int size_double = sizeof(double);
-
-	cout<<"size of state structure:"<<size_ss<<endl;
-	cout<<"size of state message:"<<size_msg<<endl;
-	cout<<"size of int:"<<size_int<<endl;
-	cout<<"size of inner map:"<<size_inner_map<<endl;
-	cout<<"size of outer map:"<<size_outer_map<<endl;
-
-
 	int i;
 
 	tw_opt_add(app_opt);
@@ -2143,7 +2132,7 @@ int main(int argc, char **argv, char **env)
 
 	}
 
-	printf("loop size %d \n", loop_size);
+	//printf("loop size %d \n", loop_size);
 
 	tw_run();
 
@@ -2199,16 +2188,6 @@ int main(int argc, char **argv, char **env)
 	//cout<<path_cal<<endl;
 
 	if(COUNT_EVENT) write_map();
-
-	if(1)
-	{
-		std::cout<<g_tw_mynode<<","<<"total memory usage:"<<total_memusage<<std::endl;
-		std::cout<<g_tw_mynode<<","<<"max memory usage:"<<max_memusage<<std::endl;
-		std::cout<<g_tw_mynode<<","<<"current memory usage:"<<current_memusage<<std::endl;
-		std::cout<<g_tw_mynode<<","<<"store operations:"<<store_operation<<endl;
-		std::cout<<g_tw_mynode<<","<<"restore operations:"<<restore_operation<<endl;
-
-	}	
 
 	return 0;
 }

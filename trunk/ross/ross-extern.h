@@ -5,7 +5,11 @@
 extern "C" {
 #endif
     
-    extern int loop_size;
+	/*
+	 Backstroke
+	 */
+	extern int fossil_collected;
+
     
     extern void	tw_rand_init_streams(tw_lp * lp, unsigned int nstreams);
     

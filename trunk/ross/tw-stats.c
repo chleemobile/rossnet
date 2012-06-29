@@ -208,7 +208,7 @@ tw_stats(tw_pe * me)
 	tw_gvt_stats(stdout);
     fprintf(fp,"%ld,", g_tw_gvt_interval); 
 	fprintf(fp,"%ld,", g_tw_mblock);
-    fprintf(fp,"%ld,", loop_size);
+    //fprintf(fp,"%ld,", loop_size);
 	fprintf(fp,"\n");
     fclose(fp);
 	

@@ -155,6 +155,8 @@ tw_gvt_step2(tw_pe *me)
 	me->GVT = gvt;
 	me->gvt_status = TW_GVT_NORMAL;
 	
+//	printf("gvt before fossil %14.14lf\n", gvt);
+	
 	gvt_cnt = 0;
 	
 	// update GVT timing stats
@@ -164,7 +166,11 @@ tw_gvt_step2(tw_pe *me)
 	if( g_tw_synchronization_protocol == OPTIMISTIC )
 	{
 	    start = tw_clock_read();
+		
+		printf("ROSS fossil collect at gvt %14.14lf\n", gvt);
+		
 	    tw_pe_fossil_collect(me);
+		fossil_collected = 1;
 	    me->stats.s_fossil_collect += tw_clock_read() - start;
 	}
 	

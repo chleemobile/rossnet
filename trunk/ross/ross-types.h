@@ -316,13 +316,6 @@ struct tw_event
 };
 
 
-struct rng_seed_node
-{
-    int seed;
-    rng_seed_node *prev; 
-    rng_seed_node *next;
-};
-
 /**
  * tw_lp @brief LP State Structure
  *
@@ -351,12 +344,19 @@ struct tw_lp
   tw_lp_state	*state_qh; /**< @brief Head of [free] state queue (for state saving) */
   tw_lptype	 type; /**< @brief Type of this LP, including service callbacks */
   tw_rng_stream	*rng; /**< @brief  RNG stream array for this LP */
-    
-  void *stack_pointer;
+
+
+  /*
+
+	 Backstroke
+
+   */
+  void *stack_pointer; /**/
+  void *vector_pointer;
+
+  void (*bs_record_stack_position)(tw_stime GVT, tw_lp *lp);
+  void (*bs_fossil_collect)(tw_stime GVT, tw_lp *lp);
   
-  int current_seed;
-  rng_seed_node *seed_head;
-  rng_seed_node *seed_tail;    
 };
 
 /**

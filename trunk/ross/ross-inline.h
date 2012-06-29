@@ -51,6 +51,7 @@ tw_event_grab(tw_pe *pe)
 static inline tw_event * 
 tw_event_new(tw_lpid dest_gid, tw_stime offset_ts, tw_lp * sender)
 {
+
   tw_pe		*send_pe;
   tw_event	*e;
   tw_stime	 recv_ts;
