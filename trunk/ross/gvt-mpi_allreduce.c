@@ -167,7 +167,7 @@ tw_gvt_step2(tw_pe *me)
 	{
 	    start = tw_clock_read();
 		
-		printf("ROSS fossil collect at gvt %14.14lf\n", gvt);
+	//	printf("ROSS fossil collect at gvt %14.14lf\n", gvt);
 		
 	    tw_pe_fossil_collect(me);
 		fossil_collected = 1;

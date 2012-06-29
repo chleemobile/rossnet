@@ -35,15 +35,18 @@ tw_event_send(tw_event * event)
 	 */
 
 	//printf("adding %7.7lf at gvt time of %7.7lf\n", event->recv_ts, send_pe->GVT);
-	src_lp->bs_record_stack_position(event->recv_ts, src_lp);
+	
+	
+	//src_lp->bs_record_stack_position(event->recv_ts, src_lp);
 
 	if(fossil_collected)
 	{
-		printf("Backstroke fossil collection at gvt %7.7lf\n", send_pe->GVT);
+	//	printf("Backstroke fossil collection at gvt %7.7lf\n", send_pe->GVT);
 		src_lp->bs_fossil_collect(send_pe->GVT, src_lp);
 		fossil_collected = 0; /*fossile_collected set to 1 in gvt-mpi_allreduce.c at line 170*/
 		//assert(0);
 	}
+	
 	//	printf("gvt in send %14.14lf\n", send_pe->GVT);
 
 

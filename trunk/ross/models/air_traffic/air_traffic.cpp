@@ -80,9 +80,8 @@ void init(airport_state * s, tw_lp * lp)
 	BSStack* stack = new BSStack();
 	lp->stack_pointer = stack;
 
-	lp->vector_pointer = get_gvt_vector();
-
-	lp->bs_record_stack_position = bs_record_stack_position;
+	//lp->vector_pointer = get_gvt_vector();
+	//lp->bs_record_stack_position = bs_record_stack_position;
 	lp->bs_fossil_collect = bs_fossil_collect;
 
 	int i;
@@ -2084,7 +2083,16 @@ void air_traffic_mapping()
 
 int main(int argc, char **argv, char **env)
 {
-	int i;
+	
+	int i = 0;
+	/*
+	char hostname[256];
+	gethostname(hostname, sizeof(hostname));
+	printf("PID %d on %s ready for attach\n", getpid(), hostname);
+	fflush(stdout);
+	while (0 == i)
+		sleep(5);
+	*/
 
 	tw_opt_add(app_opt);
 
