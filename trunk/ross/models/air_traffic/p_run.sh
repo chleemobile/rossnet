@@ -1,5 +1,5 @@
-batch_size=4;
-gvt_interval=128;
+batch_size=16;
+gvt_interval=8;
 
 num_core=2;
 num_kp=15;

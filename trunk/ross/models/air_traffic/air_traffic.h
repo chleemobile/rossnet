@@ -91,9 +91,7 @@ struct airport_state
 struct air_traffic_message
 {
 	air_traffic_event_t	 type;
-
 	Aircraft aircraft;
-
 	int msg_from;
 };
 
@@ -116,7 +114,7 @@ static int nlp = NUMBER_OF_LP;
 static tw_lpid	 nlp_per_pe = NUMBER_OF_LP;
 static int p_run = 1;
 static tw_stime	 mean_flight_time = 1;
-static int       opt_mem = 4096;
+static int       opt_mem = 100000;
 static int       planes_per_airport = NUMBER_OF_PLANES_PER_AIRPORT;
 
 
