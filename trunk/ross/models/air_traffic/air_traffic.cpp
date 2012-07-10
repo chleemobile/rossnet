@@ -1022,6 +1022,21 @@ void event_handler_fw(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 				c++;
 				 (*(s->counter))[msg->aircraft.m_id] = c;
 
+				__store__(s->max_counter_aircraft_id, lp);
+				__store__(s->max_counter, lp);
+
+				int i=0;
+				while(i < num_aircraft)
+				{
+					int counter = (*(s->counter))[i];
+					if(counter > s->max_counter)
+					{
+						s->max_counter_aircraft_id = msg->aircraft.m_id;
+						s->max_counter = counter;
+					}
+					i++;
+				}
+				 
 				int to = lp->gid;				
 				ts = bs_rand_exponential2(s->rn, MEAN_TAXI, lp);
 
@@ -1260,6 +1275,20 @@ void event_handler_fw(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 				c++;
 				(*(s->counter))[msg->aircraft.m_id] = c;
 
+				__store__(s->max_counter_aircraft_id, lp);
+				__store__(s->max_counter, lp);
+
+				int i=0;
+				while(i < num_aircraft)
+				{
+					int counter = (*(s->counter))[i];
+					if(counter > s->max_counter)
+					{
+						s->max_counter_aircraft_id = msg->aircraft.m_id;
+						s->max_counter = counter;
+					}
+					i++;
+				}
 
 				int src_region = lp->gid;
 				int next_region = 0;
@@ -1475,6 +1504,20 @@ void event_handler_fw(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 				c++;
 				(*(s->counter))[msg->aircraft.m_id] = c;
 
+				__store__(s->max_counter_aircraft_id, lp);
+				__store__(s->max_counter, lp);
+
+				int i=0;
+				while(i < num_aircraft)
+				{
+					int counter = (*(s->counter))[i];
+					if(counter > s->max_counter)
+					{
+						s->max_counter_aircraft_id = msg->aircraft.m_id;
+						s->max_counter = counter;
+					}
+					i++;
+				}
 				
 				int to = lp->gid;
 				ts = bs_rand_exponential2(s->rn, MEAN_ARRIVAL,lp);
@@ -1638,6 +1681,10 @@ void event_handler_rv(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 		case TAXI_OUT:
 			{
 				bs_rand_rvs(s->rn, lp);
+				
+				__restore__(s->max_counter, lp);
+				__restore__(s->max_counter_aircraft_id, lp);
+
 				(*(s->counter))[msg->aircraft.m_id]--;
 
 				break;
@@ -1782,6 +1829,9 @@ void event_handler_rv(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 				
 				}
 
+				__restore__(s->max_counter, lp);
+				__restore__(s->max_counter_aircraft_id, lp);
+				
 				(*(s->counter))[msg->aircraft.m_id]--;
 				s->controller->m_current_capacity++;
 
@@ -1867,8 +1917,11 @@ void event_handler_rv(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 
 		case TAXI_IN:
 			{
-				(*(s->counter))[msg->aircraft.m_id]--;
 				bs_rand_rvs(s->rn, lp);
+				__restore__(s->max_counter, lp);
+				__restore__(s->max_counter_aircraft_id, lp);
+			
+				(*(s->counter))[msg->aircraft.m_id]--;
 				
 				break;
 			}
@@ -1929,7 +1982,7 @@ tw_lptype airport_lps[] =
 {
 	{
 		(init_f) init,
-		(event_f) event_handler,
+		(event_f) event_handler_fw,
 		(revent_f) event_handler_rv,
 		(final_f) final,
 		(map_f) mapping_to_pe,
