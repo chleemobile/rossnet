@@ -155,6 +155,8 @@ void init(airport_state * s, tw_lp * lp)
 	s->dep_req_accepted = 0;
 	s->dep_req_rejected=0;
 
+	s->max_counter_aircraft_id =0;
+	s->max_counter = 0;
 
 	if(lp->gid <NUMBER_OF_REGION_CONTROLLER)
 	{
@@ -313,7 +315,7 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 					Aircraft aircraft = s->controller->m_q.top();
 					s->controller->m_q.pop();
 
-					s->delay_airport_dep += tw_now(lp) - aircraft.m_clock;
+					s->delay_airport_dep = s->delay_airport_dep + (tw_now(lp) - aircraft.m_clock);
 					s->cdelay_airport_dep += aircraft.m_cdelay;
 
 					aircraft.m_clock = 0;
@@ -357,7 +359,7 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 						Aircraft aircraft = s->controller->m_q.top();
 						s->controller->m_q.pop();
 
-						s->delay_airport_dep += tw_now(lp) - aircraft.m_clock;
+						s->delay_airport_dep = s->delay_airport_dep + ( tw_now(lp) - aircraft.m_clock );
 						s->cdelay_airport_dep += aircraft.m_cdelay;
 
 						aircraft.m_clock = 0;
@@ -388,12 +390,23 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 		case TAXI_OUT:
 			{
 				//cout<<s->aircraft_counters->size()<<","<<msg->aircraft.m_id<<endl;
-				
 				//s->controller->m_counter[msg->aircraft.m_id]++;
 
 				int c = (*(s->counter))[msg->aircraft.m_id];
 				c++;
 				 (*(s->counter))[msg->aircraft.m_id] = c;
+
+				int i=0;
+				while(i < num_aircraft)
+				{
+					int counter = (*(s->counter))[i];
+					if(counter > s->max_counter)
+					{
+						s->max_counter_aircraft_id = msg->aircraft.m_id;
+						s->max_counter = counter;
+					}
+					i++;
+				}
 
 				int to = lp->gid;				
 				ts = bs_rand_exponential(s->rn, MEAN_TAXI);
@@ -491,7 +504,7 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 						s->controller->handle_incoming(lp);
 						s->controller->m_q.pop();
 
-						s->delay_region += tw_now(lp) - aircraft.m_clock;
+						s->delay_region = s->delay_region + (tw_now(lp) - aircraft.m_clock);
 						s->cdelay_region += aircraft.m_cdelay;
 
 						aircraft.m_clock = 0;
@@ -545,7 +558,7 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 
 							s->controller->m_q.pop();
 
-							s->delay_region += tw_now(lp) - aircraft.m_clock;
+							s->delay_region = s->delay_region  + (tw_now(lp) - aircraft.m_clock);
 							s->cdelay_region += aircraft.m_cdelay;
 
 							aircraft.m_clock = 0;
@@ -590,6 +603,17 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 				c++;
 				(*(s->counter))[msg->aircraft.m_id] = c;
 
+				int i=0;
+				while(i < num_aircraft)
+				{
+					int counter = (*(s->counter))[i];
+					if(counter > s->max_counter)
+					{
+						s->max_counter_aircraft_id = msg->aircraft.m_id;
+						s->max_counter = counter;
+					}
+					i++;
+				}
 
 				int src_region = lp->gid;
 				int next_region = 0;
@@ -687,7 +711,7 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 					Aircraft aircraft = s->controller->m_q.top();
 					s->controller->m_q.pop();
 
-					s->delay_airport_land += tw_now(lp) - aircraft.m_clock;
+					s->delay_airport_land = s->delay_airport_land + (tw_now(lp) - aircraft.m_clock);
 					s->cdelay_airport_land += aircraft.m_cdelay;
 
 					aircraft.m_clock = 0;
@@ -730,14 +754,14 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 						Aircraft aircraft = s->controller->m_q.top();
 						s->controller->m_q.pop();
 	
-						/*
-						s->delay_airport_land += tw_now(lp) - aircraft.m_clock;
+						
+						s->delay_airport_land = s->delay_airport_land + (tw_now(lp) - aircraft.m_clock);
 						s->cdelay_airport_land += aircraft.m_cdelay;
 
 						aircraft.m_clock = 0;
 						aircraft.m_cdelay = 0;
 						aircraft.m_delay = 0;
-						*/
+						
 
 						int to = lp->gid;
 						ts = bs_rand_exponential(s->rn, MEAN_LAND);
@@ -768,6 +792,17 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 				c++;
 				(*(s->counter))[msg->aircraft.m_id] = c;
 
+				int i=0;
+				while(i < num_aircraft)
+				{
+					int counter = (*(s->counter))[i];
+					if(counter > s->max_counter)
+					{
+						s->max_counter_aircraft_id = msg->aircraft.m_id;
+						s->max_counter = counter;
+					}
+					i++;
+				}
 				
 				int to = lp->gid;
 				ts = bs_rand_exponential(s->rn, MEAN_ARRIVAL);
@@ -1894,7 +1929,7 @@ tw_lptype airport_lps[] =
 {
 	{
 		(init_f) init,
-		(event_f) event_handler_fw,
+		(event_f) event_handler,
 		(revent_f) event_handler_rv,
 		(final_f) final,
 		(map_f) mapping_to_pe,

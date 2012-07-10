@@ -66,6 +66,8 @@ struct airport_state
 	int     max_queue_size_region;
 
 
+	int	    max_counter_aircraft_id;
+	int		max_counter;
 	/*
 	   Region Controller State Variable
 	 */
@@ -116,7 +118,7 @@ static int p_run = 1;
 static tw_stime	 mean_flight_time = 1;
 static int       opt_mem = 100000;
 static int       planes_per_airport = NUMBER_OF_PLANES_PER_AIRPORT;
-
+static int 		 num_aircraft = (NUMBER_OF_LP - NUMBER_OF_REGION_CONTROLLER) * NUMBER_OF_PLANES_PER_AIRPORT;
 
 static int total_transit_req_accepted = 0;
 static int total_transit_req_rejected = 0;
