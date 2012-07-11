@@ -21,14 +21,18 @@ class Controller
 		virtual void handle_incoming(tw_lp *lp) = 0;
 		virtual void handle_outgoing(tw_lp *lp)= 0;
 		virtual void handle_aircraft(tw_lp *lp) = 0;
-/*
+		virtual void add_aircraft(Aircraft aircraft, tw_lp *lp)=0;
+		virtual Aircraft get_aircraft(tw_lp *lp)=0;
+		virtual void remove_aircraft(tw_lp *lp)=0;
+
+		
 		virtual void handle_incoming_forward(tw_lp *lp)=0;
 		virtual void handle_incoming_reverse(tw_lp *lp)=0;
 		virtual void handle_outgoing_forward(tw_lp *lp)=0;
 		virtual void handle_outgoing_reverse(tw_lp *lp)=0;
 		virtual void handle_aircraft_forward(tw_lp *lp)=0;
 		virtual void handle_aircraft_reverse(tw_lp *lp)=0;
-*/
+		virtual Aircraft get_aircraft_forward(tw_lp *lp)=0;
 	//protected:
 		
 		int m_id;

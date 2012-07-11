@@ -300,7 +300,8 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 				Aircraft aircraft = msg->aircraft;
 				aircraft.m_clock = tw_now(lp);
 
-				s->controller->m_q.push(aircraft);
+				s->controller->add_aircraft(aircraft, lp);
+				//s->controller->m_q.push(aircraft);
 
 				if(s->controller->m_q.size() > s->max_queue_size_airport)
 					s->max_queue_size_airport = s->controller->m_q.size();
@@ -312,8 +313,10 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 					s->dep_req_accepted++;
 					s->dep_processed++;
 
-					Aircraft aircraft = s->controller->m_q.top();
-					s->controller->m_q.pop();
+					Aircraft aircraft = s->controller->get_aircraft(lp);
+					s->controller->remove_aircraft(lp);
+					//Aircraft aircraft = s->controller->m_q.top();
+					//s->controller->m_q.pop();
 
 					s->delay_airport_dep = s->delay_airport_dep + (tw_now(lp) - aircraft.m_clock);
 					s->cdelay_airport_dep += aircraft.m_cdelay;
@@ -356,8 +359,10 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 
 						s->dep_processed++;
 
-						Aircraft aircraft = s->controller->m_q.top();
-						s->controller->m_q.pop();
+						Aircraft aircraft = s->controller->get_aircraft(lp);
+						s->controller->remove_aircraft(lp);
+						//Aircraft aircraft = s->controller->m_q.top();
+						//s->controller->m_q.pop();
 
 						s->delay_airport_dep = s->delay_airport_dep + ( tw_now(lp) - aircraft.m_clock );
 						s->cdelay_airport_dep += aircraft.m_cdelay;
@@ -483,10 +488,11 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 			{
 				assert(lp->gid < NUMBER_OF_REGION_CONTROLLER);
 	
-				Aircraft msg_aircraft = msg->aircraft;
-				msg_aircraft.m_clock = tw_now(lp);
+				Aircraft aircraft = msg->aircraft;
+				aircraft.m_clock = tw_now(lp);
 
-				s->controller->m_q.push(msg_aircraft);
+				s->controller->add_aircraft(aircraft, lp);
+				//s->controller->m_q.push(aircraft);
 
 				if(s->controller->m_q.size() > s->max_queue_size_region)
 					s->max_queue_size_region = s->controller->m_q.size();
@@ -494,7 +500,8 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 				if(s->controller->m_current_capacity < s->controller->m_max_capacity)
 				{
 
-					Aircraft aircraft = s->controller->m_q.top();
+					Aircraft aircraft = s->controller->get_aircraft(lp);
+					//Aircraft aircraft = s->controller->m_q.top();
 
 					if(aircraft.m_remaining_dist <= 0)
 					{
@@ -502,7 +509,8 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 						s->transit_processed++;
 
 						s->controller->handle_incoming(lp);
-						s->controller->m_q.pop();
+						s->controller->remove_aircraft(lp);
+						//s->controller->m_q.pop();
 
 						s->delay_region = s->delay_region + (tw_now(lp) - aircraft.m_clock);
 						s->cdelay_region += aircraft.m_cdelay;
@@ -547,7 +555,8 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 				{
 					if(s->controller->m_q.size() > 0)
 					{
-						Aircraft aircraft = s->controller->m_q.top();
+						Aircraft aircraft = s->controller->get_aircraft(lp);
+						//Aircraft aircraft = s->controller->m_q.top();
 
 						if(aircraft.m_remaining_dist <= 0)
 						{
@@ -556,7 +565,8 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 							s->transit_req_accepted++;
 							s->transit_processed++;
 
-							s->controller->m_q.pop();
+							s->controller->remove_aircraft(lp);
+							//s->controller->m_q.pop();
 
 							s->delay_region = s->delay_region  + (tw_now(lp) - aircraft.m_clock);
 							s->cdelay_region += aircraft.m_cdelay;
@@ -695,8 +705,9 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 
 				Aircraft aircraft = msg->aircraft;
 				aircraft.m_clock = tw_now(lp);
-
-				s->controller->m_q.push(aircraft);
+				
+				s->controller->add_aircraft(aircraft, lp);
+				//s->controller->m_q.push(aircraft);
 
 				if(s->controller->m_q.size() > s->max_queue_size_airport)
 					s->max_queue_size_airport = s->controller->m_q.size();
@@ -708,8 +719,11 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 					s->landing_req_accepted++;
 					s->landing_processed++;
 
-					Aircraft aircraft = s->controller->m_q.top();
-					s->controller->m_q.pop();
+
+					Aircraft aircraft = s->controller->get_aircraft(lp);
+					s->controller->remove_aircraft(lp);
+					//Aircraft aircraft = s->controller->m_q.top();
+					//s->controller->m_q.pop();
 
 					s->delay_airport_land = s->delay_airport_land + (tw_now(lp) - aircraft.m_clock);
 					s->cdelay_airport_land += aircraft.m_cdelay;
@@ -751,8 +765,10 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 						s->controller->handle_incoming(lp);
 						s->landing_processed++;
 
-						Aircraft aircraft = s->controller->m_q.top();
-						s->controller->m_q.pop();
+						Aircraft aircraft = s->controller->get_aircraft(lp);
+						s->controller->remove_aircraft(lp);						
+						//Aircraft aircraft = s->controller->m_q.top();
+						//s->controller->m_q.pop();
 	
 						
 						s->delay_airport_land = s->delay_airport_land + (tw_now(lp) - aircraft.m_clock);
@@ -891,7 +907,8 @@ void event_handler_fw(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 
 				__store__(s->controller->m_q, lp);
 
-				s->controller->m_q.push(aircraft);
+				s->controller->add_aircraft(aircraft,lp);
+				//s->controller->m_q.push(aircraft);
 
 				int path1=0;
 
@@ -915,9 +932,11 @@ void event_handler_fw(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 					s->dep_req_accepted++;
 					s->dep_processed++;
 
+					Aircraft aircraft = s->controller->get_aircraft(lp);
+					s->controller->remove_aircraft(lp);
 
-					Aircraft aircraft = s->controller->m_q.top();
-					s->controller->m_q.pop();
+					//Aircraft aircraft = s->controller->m_q.top();
+					//s->controller->m_q.pop();
 
 					__store__(s->delay_airport_dep, lp);
 					s->delay_airport_dep += tw_now(lp) - aircraft.m_clock;
@@ -968,10 +987,13 @@ void event_handler_fw(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 
 						s->dep_processed++;
 
-						Aircraft aircraft = s->controller->m_q.top();
-
 						__store__(s->controller->m_q, lp);
-						s->controller->m_q.pop();
+
+						Aircraft aircraft = s->controller->get_aircraft(lp);
+						s->controller->remove_aircraft(lp);
+
+						//Aircraft aircraft = s->controller->m_q.top();
+						//s->controller->m_q.pop();
 
 						__store__(s->delay_airport_dep, lp);
 						s->delay_airport_dep += tw_now(lp) - aircraft.m_clock;
@@ -1116,7 +1138,8 @@ void event_handler_fw(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 				msg_aircraft.m_clock = tw_now(lp);
 
 				__store__(s->controller->m_q, lp);
-				s->controller->m_q.push(msg_aircraft);
+				s->controller->add_aircraft(msg_aircraft, lp);
+//				s->controller->m_q.push(msg_aircraft);
 
 				int path1 = 0;
 				if(s->controller->m_q.size() > s->max_queue_size_region)
@@ -1134,7 +1157,8 @@ void event_handler_fw(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 				{
 					path2=1;
 
-					Aircraft aircraft = s->controller->m_q.top();
+					Aircraft aircraft = s->controller->get_aircraft(lp);
+//					Aircraft aircraft = s->controller->m_q.top();
 
 					if(aircraft.m_remaining_dist <= 0)
 					{
@@ -1144,7 +1168,9 @@ void event_handler_fw(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 						s->transit_processed++;
 
 						s->controller->handle_incoming(lp);
-						s->controller->m_q.pop();
+
+						s->controller->remove_aircraft(lp);
+//						s->controller->m_q.pop();
 
 						__store__(s->delay_region, lp);
 						s->delay_region += tw_now(lp) - aircraft.m_clock;
@@ -1202,7 +1228,9 @@ void event_handler_fw(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 					if(s->controller->m_q.size() > 0)
 					{
 						path1_1=1;
-						Aircraft aircraft = s->controller->m_q.top();
+						
+						Aircraft aircraft = s->controller->get_aircraft(lp);
+//						Aircraft aircraft = s->controller->m_q.top();
 
 						if(aircraft.m_remaining_dist <= 0)
 						{
@@ -1213,8 +1241,9 @@ void event_handler_fw(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 							s->transit_req_accepted++;
 							s->transit_processed++;
 
-							__store__(s->controller->m_q, lp);							
-							s->controller->m_q.pop();
+							__store__(s->controller->m_q, lp);
+							s->controller->remove_aircraft(lp);
+//							s->controller->m_q.pop();
 
 							__store__(s->delay_region, lp);
 							s->delay_region += tw_now(lp) - aircraft.m_clock;
@@ -1377,7 +1406,8 @@ void event_handler_fw(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 				aircraft.m_clock = tw_now(lp);
 
 				__store__(s->controller->m_q, lp);
-				s->controller->m_q.push(aircraft);
+				s->controller->add_aircraft(aircraft,lp);
+//				s->controller->m_q.push(aircraft);
 
 				int path1=0;
 				if(s->controller->m_q.size() > s->max_queue_size_airport)
@@ -1397,11 +1427,14 @@ void event_handler_fw(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 					s->landing_req_accepted++;
 					s->landing_processed++;
 
-					Aircraft aircraft = s->controller->m_q.top();
-					s->controller->m_q.pop();
+					Aircraft aircraft = s->controller->get_aircraft(lp);
+					s->controller->remove_aircraft(lp);
+
+//					Aircraft aircraft = s->controller->m_q.top();
+//					s->controller->m_q.pop();
 
 					__store__(s->delay_airport_land, lp);
-					s->delay_airport_land += tw_now(lp) - aircraft.m_clock;
+					s->delay_airport_land = s->delay_airport_land + (tw_now(lp) - aircraft.m_clock);
 
 					__store__(s->cdelay_airport_land, lp);
 					s->cdelay_airport_land += aircraft.m_cdelay;
@@ -1448,14 +1481,17 @@ void event_handler_fw(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 						s->controller->handle_incoming(lp);
 						s->landing_processed++;
 
-						Aircraft aircraft = s->controller->m_q.top();
+						__store__(s->controller->m_q, lp);		
 
-						__store__(s->controller->m_q, lp);						
-						s->controller->m_q.pop();
+						Aircraft aircraft = s->controller->get_aircraft(lp);
+						s->controller->remove_aircraft(lp);
 
-						/*
+//						Aircraft aircraft = s->controller->m_q.top();
+//						s->controller->m_q.pop();
+
+						
 						__store__(s->delay_airport_land, lp);
-						s->delay_airport_land += tw_now(lp) - aircraft.m_clock;
+						s->delay_airport_land = s->delay_airport_land + (tw_now(lp) - aircraft.m_clock);
 
 						__store__(s->cdelay_airport_land, lp);
 						s->cdelay_airport_land += aircraft.m_cdelay;
@@ -1463,7 +1499,7 @@ void event_handler_fw(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 						aircraft.m_clock = 0;
 						aircraft.m_cdelay = 0;
 						aircraft.m_delay = 0;
-						*/
+						
 
 						int to = lp->gid;
 						ts = bs_rand_exponential2(s->rn, MEAN_LAND, lp);
@@ -1899,8 +1935,8 @@ void event_handler_rv(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 				{
 					bs_rand_rvs(s->rn, lp);
 					
-					//__restore__(s->cdelay_airport_land, lp);
-					//__restore__(s->delay_airport_land, lp);
+					__restore__(s->cdelay_airport_land, lp);
+					__restore__(s->delay_airport_land, lp);
 					__restore__(s->controller->m_q, lp);
 
 					//assert(q_stored_in_path1 == 1);

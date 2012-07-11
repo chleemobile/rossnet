@@ -57,3 +57,21 @@ void LocalTrafficController::handle_aircraft(tw_lp *lp)
 	assert(old_size == new_size);
 
 }
+
+Aircraft LocalTrafficController::get_aircraft(tw_lp *lp)
+{
+	Aircraft ret = m_q.top();
+	return ret;
+}
+
+
+void LocalTrafficController::remove_aircraft(tw_lp *lp)
+{
+	m_q.pop();
+}
+
+void LocalTrafficController::add_aircraft(Aircraft aircraft, tw_lp *lp)
+{
+	m_q.push(aircraft);
+}
+

@@ -1,5 +1,4 @@
 #include "RegionController.hpp"
-#include <ross.h>
 #include "rctypes.h" 
 
 RegionController::RegionController(int in_max_capacity,int in_num_aircraft) : Controller(in_max_capacity,in_num_aircraft)
@@ -14,22 +13,8 @@ void RegionController::handle_incoming(struct tw_lp *lp)
 {
 //cout<<"RC handle"<<endl;
   (this) -> m_current_capacity++;
-  (this) -> m_aircraft_processed++;
+  (this) -> m_aircraft_processed++;;
 //dm_num_aircrafts++;
-}
-
-void RegionController::handle_incoming_forward(struct tw_lp *lp)
-{
-//cout<<"RC handle"<<endl;
-  (this) -> m_current_capacity++;
-  (this) -> m_aircraft_processed++;
-//dm_num_aircrafts++;
-}
-
-void RegionController::handle_incoming_reverse(struct tw_lp *lp)
-{
-  --m_aircraft_processed;
-  --m_current_capacity;
 }
 
 void RegionController::handle_outgoing(struct tw_lp *lp)
@@ -73,10 +58,7 @@ void RegionController::handle_aircraft(struct tw_lp *lp)
   class Aircraft new_top((this) -> m_q. top ());
   int new_size = ((this) -> m_q. size ());
   delete temp_q;
-//assert(old_top.m_id == new_top.m_id);
-  bool __temp30__;
-  __temp30__ = !(old_size == new_size);
-  if ((__builtin_expect(__temp30__,0))) {
+  if ((__builtin_expect((!(old_size == new_size)),0))) {
     __assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/air_traffic/RegionController.cpp",62,"old_size == new_size");
   }
   else {
@@ -107,10 +89,7 @@ void RegionController::handle_aircraft_forward(struct tw_lp *lp)
   class Aircraft new_top((this) -> m_q. top ());
   int new_size = ((this) -> m_q. size ());
   delete temp_q;
-//assert(old_top.m_id == new_top.m_id);
-  bool __temp30__;
-  __temp30__ = !(old_size == new_size);
-  if ((__builtin_expect(__temp30__,0))) {
+  if ((__builtin_expect((!(old_size == new_size)),0))) {
     __assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/air_traffic/RegionController.cpp",62,"old_size == new_size");
   }
   else {
@@ -121,4 +100,30 @@ void RegionController::handle_aircraft_forward(struct tw_lp *lp)
 void RegionController::handle_aircraft_reverse(struct tw_lp *lp)
 {
   __restore__(m_q,lp);
+}
+
+Aircraft RegionController::get_aircraft(struct tw_lp *lp)
+{
+  class Aircraft ret((this) -> m_q. top ());
+  return (ret);
+}
+
+Aircraft RegionController::get_aircraft_forward(struct tw_lp *lp)
+{
+  class Aircraft ret((this) -> m_q. top ());
+  return (ret);
+}
+
+Aircraft RegionController::get_aircraft_reverse(struct tw_lp *lp)
+{
+}
+
+void RegionController::remove_aircraft(struct tw_lp *lp)
+{
+  (this) -> m_q. pop ();;
+}
+
+void RegionController::add_aircraft(class Aircraft aircraft,struct tw_lp *lp)
+{
+  (this) -> m_q. push (aircraft);;
 }

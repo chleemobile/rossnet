@@ -61,3 +61,19 @@ void RegionController::handle_aircraft(tw_lp *lp)
 	//assert(old_top.m_id == new_top.m_id);
 	assert(old_size == new_size);
 }
+
+Aircraft RegionController::get_aircraft(tw_lp *lp)
+{
+	Aircraft ret = m_q.top();
+	return ret;
+}
+
+void RegionController::remove_aircraft(tw_lp *lp)
+{
+	m_q.pop();
+}
+
+void RegionController::add_aircraft(Aircraft aircraft, tw_lp *lp)
+{
+	m_q.push(aircraft);
+}
