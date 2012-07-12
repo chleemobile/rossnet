@@ -1,4 +1,5 @@
 #include "LocalTrafficController.hpp"
+#include "ross.h" 
 #include "rctypes.h" 
 
 LocalTrafficController::LocalTrafficController(int in_max_capacity,int in_num_airport) : Controller(in_max_capacity,in_num_airport)
@@ -13,7 +14,20 @@ void LocalTrafficController::handle_incoming(struct tw_lp *lp)
 {
 //cout<<"LTC handle"<<endl;
   (this) -> m_current_capacity++;
-  (this) -> m_aircraft_processed++;;
+  (this) -> m_aircraft_processed++;
+}
+
+void LocalTrafficController::handle_incoming_forward(struct tw_lp *lp)
+{
+//cout<<"LTC handle"<<endl;
+  (this) -> m_current_capacity++;
+  (this) -> m_aircraft_processed++;
+}
+
+void LocalTrafficController::handle_incoming_reverse(struct tw_lp *lp)
+{
+  --m_aircraft_processed;
+  --m_current_capacity;
 }
 
 void LocalTrafficController::handle_outgoing(struct tw_lp *lp)
@@ -125,10 +139,32 @@ Aircraft LocalTrafficController::get_aircraft_reverse(struct tw_lp *lp)
 
 void LocalTrafficController::remove_aircraft(struct tw_lp *lp)
 {
-  (this) -> m_q. pop ();;
+  (this) -> m_q. pop ();
+}
+
+void LocalTrafficController::remove_aircraft_forward(struct tw_lp *lp)
+{
+  __store__(m_q,lp);
+  (this) -> m_q. pop ();
+}
+
+void LocalTrafficController::remove_aircraft_reverse(struct tw_lp *lp)
+{
+  __restore__(m_q,lp);
 }
 
 void LocalTrafficController::add_aircraft(class Aircraft aircraft,struct tw_lp *lp)
 {
-  (this) -> m_q. push (aircraft);;
+  (this) -> m_q. push (aircraft);
+}
+
+void LocalTrafficController::add_aircraft_forward(class Aircraft aircraft,struct tw_lp *lp)
+{
+  __store__(m_q,lp);
+  (this) -> m_q. push (aircraft);
+}
+
+void LocalTrafficController::add_aircraft_reverse(struct tw_lp *lp)
+{
+  __restore__(m_q,lp);
 }

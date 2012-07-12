@@ -1,4 +1,5 @@
 #include "RegionController.hpp"
+#include "ross.h" 
 #include "rctypes.h" 
 
 RegionController::RegionController(int in_max_capacity,int in_num_aircraft) : Controller(in_max_capacity,in_num_aircraft)
@@ -13,8 +14,22 @@ void RegionController::handle_incoming(struct tw_lp *lp)
 {
 //cout<<"RC handle"<<endl;
   (this) -> m_current_capacity++;
-  (this) -> m_aircraft_processed++;;
+  (this) -> m_aircraft_processed++;
 //dm_num_aircrafts++;
+}
+
+void RegionController::handle_incoming_forward(struct tw_lp *lp)
+{
+//cout<<"RC handle"<<endl;
+  (this) -> m_current_capacity++;
+  (this) -> m_aircraft_processed++;
+//dm_num_aircrafts++;
+}
+
+void RegionController::handle_incoming_reverse(struct ::tw_lp *lp)
+{
+  --m_aircraft_processed;
+  --m_current_capacity;
 }
 
 void RegionController::handle_outgoing(struct tw_lp *lp)
@@ -31,7 +46,7 @@ void RegionController::handle_outgoing_forward(struct tw_lp *lp)
 //dm_num_aircrafts++;
 }
 
-void RegionController::handle_outgoing_reverse(struct tw_lp *lp)
+void RegionController::handle_outgoing_reverse(struct ::tw_lp *lp)
 {
   ++m_current_capacity;
 }
@@ -97,7 +112,7 @@ void RegionController::handle_aircraft_forward(struct tw_lp *lp)
   }
 }
 
-void RegionController::handle_aircraft_reverse(struct tw_lp *lp)
+void RegionController::handle_aircraft_reverse(struct ::tw_lp *lp)
 {
   __restore__(m_q,lp);
 }
@@ -114,16 +129,38 @@ Aircraft RegionController::get_aircraft_forward(struct tw_lp *lp)
   return (ret);
 }
 
-Aircraft RegionController::get_aircraft_reverse(struct tw_lp *lp)
+Aircraft RegionController::get_aircraft_reverse(struct ::tw_lp *lp)
 {
 }
 
 void RegionController::remove_aircraft(struct tw_lp *lp)
 {
-  (this) -> m_q. pop ();;
+  (this) -> m_q. pop ();
+}
+
+void RegionController::remove_aircraft_forward(struct tw_lp *lp)
+{
+  __store__(m_q,lp);
+  (this) -> m_q. pop ();
+}
+
+void RegionController::remove_aircraft_reverse(struct ::tw_lp *lp)
+{
+  __restore__(m_q,lp);
 }
 
 void RegionController::add_aircraft(class Aircraft aircraft,struct tw_lp *lp)
 {
-  (this) -> m_q. push (aircraft);;
+  (this) -> m_q. push (aircraft);
+}
+
+void RegionController::add_aircraft_forward(class Aircraft aircraft,struct tw_lp *lp)
+{
+  __store__(m_q,lp);
+  (this) -> m_q. push (aircraft);
+}
+
+void RegionController::add_aircraft_reverse(struct ::tw_lp *lp)
+{
+  __restore__(m_q,lp);
 }
