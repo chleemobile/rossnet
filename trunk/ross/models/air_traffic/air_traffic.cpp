@@ -404,7 +404,9 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 				int i=0;
 				while(i < num_aircraft)
 				{
-					int counter = (*(s->counter))[i];
+                    const vector<int>& counterRef = *(s->counter);
+					int counter = counterRef.at(i);
+					//int counter = (*(s->counter))[i];
 					if(counter > s->max_counter)
 					{
 						s->max_counter_aircraft_id = msg->aircraft.m_id;
@@ -616,7 +618,9 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 				int i=0;
 				while(i < num_aircraft)
 				{
-					int counter = (*(s->counter))[i];
+                    const vector<int>& counterRef = *(s->counter);
+					int counter = counterRef.at(i);
+					//int counter = (*(s->counter))[i];
 					if(counter > s->max_counter)
 					{
 						s->max_counter_aircraft_id = msg->aircraft.m_id;
@@ -811,7 +815,9 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 				int i=0;
 				while(i < num_aircraft)
 				{
-					int counter = (*(s->counter))[i];
+                    const vector<int>& counterRef = *(s->counter);
+					int counter = counterRef.at(i);
+					//int counter = (*(s->counter))[i];
 					if(counter > s->max_counter)
 					{
 						s->max_counter_aircraft_id = msg->aircraft.m_id;
