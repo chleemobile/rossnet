@@ -295,7 +295,7 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 		case DEP_REQ:
 			{
 
-				assert(lp->gid > NUMBER_OF_REGION_CONTROLLER-1);
+				//assert(lp->gid > NUMBER_OF_REGION_CONTROLLER-1);
 
 				Aircraft aircraft = msg->aircraft;
 				aircraft.m_clock = tw_now(lp);
@@ -445,7 +445,7 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 				else 
 				{
 					next_region = path.front();;
-					assert(next_region == msg->aircraft.m_dest_region);
+					//assert(next_region == msg->aircraft.m_dest_region);
 				}
 
 				float distance = graph->adjMatrix[src_region][next_region];
@@ -488,7 +488,7 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 			 */
 		case TRANSIT_REQ:
 			{
-				assert(lp->gid < NUMBER_OF_REGION_CONTROLLER);
+				//assert(lp->gid < NUMBER_OF_REGION_CONTROLLER);
 	
 				Aircraft aircraft = msg->aircraft;
 				aircraft.m_clock = tw_now(lp);
@@ -606,7 +606,7 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 			}
 		case ON_THE_AIR:
 			{
-				assert(lp->gid < NUMBER_OF_REGION_CONTROLLER);
+				//assert(lp->gid < NUMBER_OF_REGION_CONTROLLER);
 
 				s->controller->handle_outgoing(lp);
 				//s->controller->m_counter[msg->aircraft.m_id]++;
@@ -641,7 +641,7 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 				else 
 				{
 					next_region = path.front();;
-					assert(next_region == msg->aircraft.m_dest_region);
+					//assert(next_region == msg->aircraft.m_dest_region);
 				}
 
 				if (next_region == msg->aircraft.m_dest_region)
@@ -705,7 +705,7 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 		case LANDING_REQ:
 			{
 
-				assert(lp->gid > NUMBER_OF_REGION_CONTROLLER-1);
+				//assert(lp->gid > NUMBER_OF_REGION_CONTROLLER-1);
 
 				Aircraft aircraft = msg->aircraft;
 				aircraft.m_clock = tw_now(lp);
