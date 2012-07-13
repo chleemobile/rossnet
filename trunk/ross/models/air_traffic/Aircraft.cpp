@@ -49,7 +49,14 @@ Aircraft& Aircraft::operator=( Aircraft &src)
 
 bool Aircraft::operator<(const Aircraft &rhs) const
 {
-	return (m_process_time > rhs.m_process_time);
+#if 0
+	return m_process_time > rhs.m_process_time;
+#else
+	if (m_process_time == rhs.m_process_time)
+        return m_id < rhs.m_id;
+    else
+        return m_process_time > rhs.m_process_time;
+#endif
 }
 
 /*
