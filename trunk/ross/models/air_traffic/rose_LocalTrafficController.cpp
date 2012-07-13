@@ -1,5 +1,6 @@
 #include "LocalTrafficController.hpp"
 #include "ross.h" 
+#include "backstroke/stl_fwd_rvs_funcs.h" 
 #include "rctypes.h" 
 
 LocalTrafficController::LocalTrafficController(int in_max_capacity,int in_num_airport) : Controller(in_max_capacity,in_num_airport)
@@ -144,13 +145,12 @@ void LocalTrafficController::remove_aircraft(struct tw_lp *lp)
 
 void LocalTrafficController::remove_aircraft_forward(struct tw_lp *lp)
 {
-  __store__(m_q,lp);
-  (this) -> m_q. pop ();
+  bs_priority_queue_pop_forward((this) -> m_q,lp);
 }
 
 void LocalTrafficController::remove_aircraft_reverse(struct tw_lp *lp)
 {
-  __restore__(m_q,lp);
+  bs_priority_queue_pop_reverse((this) -> m_q,lp);
 }
 
 void LocalTrafficController::add_aircraft(class Aircraft aircraft,struct tw_lp *lp)
@@ -160,11 +160,10 @@ void LocalTrafficController::add_aircraft(class Aircraft aircraft,struct tw_lp *
 
 void LocalTrafficController::add_aircraft_forward(class Aircraft aircraft,struct tw_lp *lp)
 {
-  __store__(m_q,lp);
-  (this) -> m_q. push (aircraft);
+  bs_priority_queue_push_forward((this) -> m_q,aircraft,lp);
 }
 
 void LocalTrafficController::add_aircraft_reverse(struct tw_lp *lp)
 {
-  __restore__(m_q,lp);
+  bs_priority_queue_push_reverse((this) -> m_q,lp);
 }
