@@ -1,5 +1,6 @@
 #include "RegionController.hpp"
 #include "ross.h" 
+#include "backstroke/stl_fwd_rvs_funcs.h" 
 #include "rctypes.h" 
 
 RegionController::RegionController(int in_max_capacity,int in_num_aircraft) : Controller(in_max_capacity,in_num_aircraft)
@@ -73,8 +74,11 @@ void RegionController::handle_aircraft(struct tw_lp *lp)
   class Aircraft new_top((this) -> m_q. top ());
   int new_size = ((this) -> m_q. size ());
   delete temp_q;
-  if ((__builtin_expect((!(old_size == new_size)),0))) {
-    __assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/air_traffic/RegionController.cpp",62,"old_size == new_size");
+//assert(old_top.m_id == new_top.m_id);
+  bool __temp44__;
+  __temp44__ = !(old_size == new_size);
+  if ((__builtin_expect(__temp44__,0))) {
+    __assert_rtn(__func__,"/Users/cong/MyWork/newROSS/rossnet/trunk/ross/models/air_traffic/RegionController.cpp",62,"old_size == new_size");
   }
   else {
     (void )0;
@@ -104,8 +108,11 @@ void RegionController::handle_aircraft_forward(struct tw_lp *lp)
   class Aircraft new_top((this) -> m_q. top ());
   int new_size = ((this) -> m_q. size ());
   delete temp_q;
-  if ((__builtin_expect((!(old_size == new_size)),0))) {
-    __assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/air_traffic/RegionController.cpp",62,"old_size == new_size");
+//assert(old_top.m_id == new_top.m_id);
+  bool __temp44__;
+  __temp44__ = !(old_size == new_size);
+  if ((__builtin_expect(__temp44__,0))) {
+    __assert_rtn(__func__,"/Users/cong/MyWork/newROSS/rossnet/trunk/ross/models/air_traffic/RegionController.cpp",62,"old_size == new_size");
   }
   else {
     (void )0;
@@ -140,13 +147,12 @@ void RegionController::remove_aircraft(struct tw_lp *lp)
 
 void RegionController::remove_aircraft_forward(struct tw_lp *lp)
 {
-  __store__(m_q,lp);
-  (this) -> m_q. pop ();
+  bs_priority_queue_pop_forward((this) -> m_q,lp);
 }
 
 void RegionController::remove_aircraft_reverse(struct ::tw_lp *lp)
 {
-  __restore__(m_q,lp);
+  bs_priority_queue_pop_reverse((this) -> m_q,lp);
 }
 
 void RegionController::add_aircraft(class Aircraft aircraft,struct tw_lp *lp)
