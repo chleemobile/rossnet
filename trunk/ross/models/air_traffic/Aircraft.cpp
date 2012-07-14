@@ -10,7 +10,6 @@ Aircraft::Aircraft():m_src_airport(0), m_src_region(0),
 {
 	m_id_generator++;
 	m_id = m_id_generator;
-
 	//cout<<"Aircraft "<<m_id<<" had been creatd"<<endl;
 
 }
@@ -50,10 +49,16 @@ Aircraft& Aircraft::operator=( Aircraft &src)
 bool Aircraft::operator<(const Aircraft &rhs) const
 {
 #if 0
+	if ((m_process_time == rhs.m_process_time) && (m_id == rhs.m_id))
+        printf("%d!!!\n", m_id),exit(0);
 	return m_process_time > rhs.m_process_time;
 #else
 	if (m_process_time == rhs.m_process_time)
+    {
+        if (m_id == rhs.m_id)
+            printf("%d!!!\n", m_id);//,assert(0);
         return m_id < rhs.m_id;
+    }
     else
         return m_process_time > rhs.m_process_time;
 #endif

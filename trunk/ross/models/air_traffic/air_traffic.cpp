@@ -270,6 +270,17 @@ void init(airport_state * s, tw_lp * lp)
 			aircraft.m_max_speed = max_speed;
 			aircraft.m_speed = max_speed;
 
+            if(g_tw_mynode == 0)
+			{
+				aircraft.m_id += 0;
+
+			}
+			else
+			{
+				aircraft.m_id += 332;
+
+			}
+
 			e = tw_event_new(event_send_to, ts, lp);            
 			m = (air_traffic_message*)tw_event_data(e);
 			m->type = DEP_REQ;
