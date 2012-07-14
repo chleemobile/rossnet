@@ -961,8 +961,8 @@ void event_handler_forward(airport_state *s,tw_bf *bf,air_traffic_message *msg,t
       ( *(s -> airport_state::counter))[msg -> air_traffic_message::aircraft.Aircraft::m_id] = c;
       int i = 0;
       __store__(s -> airport_state::max_counter_aircraft_id,lp);
-      __store__(s -> airport_state::max_counter,lp);
       __store__(s,lp);
+      __store__(s -> airport_state::max_counter,lp);
       while(i < num_aircraft){
         const class std::vector< int  , std::allocator< int  >  > &counterRef =  *(s -> airport_state::counter);
         int counter = counterRef. at (i);
@@ -1169,9 +1169,9 @@ void event_handler_forward(airport_state *s,tw_bf *bf,air_traffic_message *msg,t
       c++;
       ( *(s -> airport_state::counter))[msg -> air_traffic_message::aircraft.Aircraft::m_id] = c;
       int i = 0;
-      __store__(s -> airport_state::max_counter_aircraft_id,lp);
-      __store__(s,lp);
       __store__(s -> airport_state::max_counter,lp);
+      __store__(s,lp);
+      __store__(s -> airport_state::max_counter_aircraft_id,lp);
       while(i < num_aircraft){
         const class std::vector< int  , std::allocator< int  >  > &counterRef =  *(s -> airport_state::counter);
         int counter = counterRef. at (i);
@@ -1358,9 +1358,9 @@ void event_handler_forward(airport_state *s,tw_bf *bf,air_traffic_message *msg,t
       c++;
       ( *(s -> airport_state::counter))[msg -> air_traffic_message::aircraft.Aircraft::m_id] = c;
       int i = 0;
+      __store__(s -> airport_state::max_counter_aircraft_id,lp);
       __store__(s,lp);
       __store__(s -> airport_state::max_counter,lp);
-      __store__(s -> airport_state::max_counter_aircraft_id,lp);
       while(i < num_aircraft){
         const class std::vector< int  , std::allocator< int  >  > &counterRef =  *(s -> airport_state::counter);
         int counter = counterRef. at (i);
@@ -1434,22 +1434,29 @@ void event_handler_reverse(airport_state *s,tw_bf *bf,air_traffic_message *msg,t
   int __num0;
   __restore__(__num0,lp);
   int c;
-  if ((__num0 & 4091) == 4090) {
+  if ((__num0 & 3584) == 3072) {
     __restore__(s -> airport_state::rn,lp);
-    ( *(s -> airport_state::controller)). handle_outgoing_reverse (lp);
+    __restore__(s -> airport_state::max_counter,lp);
+    __restore__(s,lp);
+    __restore__(s -> airport_state::max_counter_aircraft_id,lp);
+    c = ( *s -> airport_state::counter)[msg -> air_traffic_message::aircraft.Aircraft::m_id];
+    --c;
+    ( *s -> airport_state::counter)[msg -> air_traffic_message::aircraft.Aircraft::m_id] = c;
   }
   else {
-    if ((__num0 & 4091) == 4091) {
+    if ((__num0 & 4090) == 4088) {
+      __restore__(s -> airport_state::rn,lp);
+      __restore__(s -> airport_state::max_counter,lp);
+      __restore__(s,lp);
+      __restore__(s -> airport_state::max_counter_aircraft_id,lp);
+      c = ( *s -> airport_state::counter)[msg -> air_traffic_message::aircraft.Aircraft::m_id];
+      --c;
+      ( *s -> airport_state::counter)[msg -> air_traffic_message::aircraft.Aircraft::m_id] = c;
     }
     else {
-      if ((__num0 & 4090) == 4088) {
+      if ((__num0 & 4091) == 4090) {
         __restore__(s -> airport_state::rn,lp);
-        __restore__(s -> airport_state::max_counter_aircraft_id,lp);
-        __restore__(s -> airport_state::max_counter,lp);
-        __restore__(s,lp);
-        c = ( *s -> airport_state::counter)[msg -> air_traffic_message::aircraft.Aircraft::m_id];
-        --c;
-        ( *s -> airport_state::counter)[msg -> air_traffic_message::aircraft.Aircraft::m_id] = c;
+        ( *(s -> airport_state::controller)). handle_outgoing_reverse (lp);
       }
       else {
         if ((__num0 & 3072) == 2048) {
@@ -1475,32 +1482,32 @@ void event_handler_reverse(airport_state *s,tw_bf *bf,air_traffic_message *msg,t
           }
         }
         else {
-          if ((__num0 & 4088) == 4080) {
-            if ((__num0 & 4089) == 4080) {
-              ( *(s -> airport_state::controller)). handle_aircraft_reverse (lp);
-            }
-            else {
-            }
-            if ((__num0 & 4092) == 4080) {
-              if ((__num0 & 4094) == 4082) {
-              }
-              else {
-                __restore__(s -> airport_state::rn,lp);
-                __restore__(s -> airport_state::cdelay_airport_land,lp);
-                __restore__(s -> airport_state::delay_airport_land,lp);
-                ( *(s -> airport_state::controller)). remove_aircraft_reverse (lp);
-                ( *(s -> airport_state::controller)). get_aircraft_reverse (lp);
-                --s -> airport_state::landing_processed;
-                ( *(s -> airport_state::controller)). handle_incoming_reverse (lp);
-              }
-            }
-            else {
-            }
+          if ((__num0 & 3840) == 3584) {
+            __restore__(s -> airport_state::rn,lp);
+            ( *(s -> airport_state::controller)). handle_outgoing_reverse (lp);
           }
           else {
-            if ((__num0 & 3840) == 3584) {
-              __restore__(s -> airport_state::rn,lp);
-              ( *(s -> airport_state::controller)). handle_outgoing_reverse (lp);
+            if ((__num0 & 4088) == 4080) {
+              if ((__num0 & 4089) == 4080) {
+                ( *(s -> airport_state::controller)). handle_aircraft_reverse (lp);
+              }
+              else {
+              }
+              if ((__num0 & 4092) == 4080) {
+                if ((__num0 & 4094) == 4082) {
+                }
+                else {
+                  __restore__(s -> airport_state::rn,lp);
+                  __restore__(s -> airport_state::cdelay_airport_land,lp);
+                  __restore__(s -> airport_state::delay_airport_land,lp);
+                  ( *(s -> airport_state::controller)). remove_aircraft_reverse (lp);
+                  ( *(s -> airport_state::controller)). get_aircraft_reverse (lp);
+                  --s -> airport_state::landing_processed;
+                  ( *(s -> airport_state::controller)). handle_incoming_reverse (lp);
+                }
+              }
+              else {
+              }
             }
             else {
               if ((__num0 & 4032) == 3968) {
@@ -1538,10 +1545,7 @@ void event_handler_reverse(airport_state *s,tw_bf *bf,air_traffic_message *msg,t
                   }
                   else {
                   }
-                  if ((__num0 & 4082) == 4066) {
-                    --s -> airport_state::landing_req_rejected;
-                  }
-                  else {
+                  if ((__num0 & 4082) == 4064) {
                     __restore__(s -> airport_state::rn,lp);
                     __restore__(s -> airport_state::cdelay_airport_land,lp);
                     __restore__(s -> airport_state::delay_airport_land,lp);
@@ -1550,6 +1554,9 @@ void event_handler_reverse(airport_state *s,tw_bf *bf,air_traffic_message *msg,t
                     --s -> airport_state::landing_processed;
                     --s -> airport_state::landing_req_accepted;
                     ( *(s -> airport_state::controller)). handle_incoming_reverse (lp);
+                  }
+                  else {
+                    --s -> airport_state::landing_req_rejected;
                   }
                   if ((__num0 & 4084) == 4068) {
                   }
@@ -1566,9 +1573,9 @@ void event_handler_reverse(airport_state *s,tw_bf *bf,air_traffic_message *msg,t
                     else {
                       __restore__(s -> airport_state::rn,lp);
                     }
-                    __restore__(s -> airport_state::max_counter,lp);
-                    __restore__(s,lp);
                     __restore__(s -> airport_state::max_counter_aircraft_id,lp);
+                    __restore__(s,lp);
+                    __restore__(s -> airport_state::max_counter,lp);
                     c = ( *s -> airport_state::counter)[msg -> air_traffic_message::aircraft.Aircraft::m_id];
                     --c;
                     ( *s -> airport_state::counter)[msg -> air_traffic_message::aircraft.Aircraft::m_id] = c;
@@ -1633,13 +1640,6 @@ void event_handler_reverse(airport_state *s,tw_bf *bf,air_traffic_message *msg,t
                         ( *(s -> airport_state::controller)). add_aircraft_reverse (lp);
                       }
                       else {
-                        __restore__(s -> airport_state::rn,lp);
-                        __restore__(s,lp);
-                        __restore__(s -> airport_state::max_counter,lp);
-                        __restore__(s -> airport_state::max_counter_aircraft_id,lp);
-                        c = ( *s -> airport_state::counter)[msg -> air_traffic_message::aircraft.Aircraft::m_id];
-                        --c;
-                        ( *s -> airport_state::counter)[msg -> air_traffic_message::aircraft.Aircraft::m_id] = c;
                       }
                     }
                   }

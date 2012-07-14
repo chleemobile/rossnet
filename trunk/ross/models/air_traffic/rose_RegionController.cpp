@@ -162,11 +162,10 @@ void RegionController::add_aircraft(class Aircraft aircraft,struct tw_lp *lp)
 
 void RegionController::add_aircraft_forward(class Aircraft aircraft,struct tw_lp *lp)
 {
-  __store__(m_q,lp);
-  (this) -> m_q. push (aircraft);
+  bs_priority_queue_push_forward((this) -> m_q,aircraft,lp);
 }
 
 void RegionController::add_aircraft_reverse(struct ::tw_lp *lp)
 {
-  __restore__(m_q,lp);
+  bs_priority_queue_push_reverse((this) -> m_q,lp);
 }
