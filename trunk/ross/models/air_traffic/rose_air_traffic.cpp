@@ -124,6 +124,9 @@ void init(airport_state *s,tw_lp *lp)
   air_traffic_message *m;
   tw_stime ts;
   int num_aircraft = (NUMBER_OF_LP - NUMBER_OF_REGION_CONTROLLER) * NUMBER_OF_PLANES_PER_AIRPORT;
+  int num_aircraft_per_core = num_aircraft / tw_nnodes();
+  int aircraft_id_offset = num_aircraft_per_core * g_tw_mynode; 
+
   s -> airport_state::rn = (lp -> tw_lp::gid);
   s -> airport_state::counter = (::new class std::vector< int  , std::allocator< int  >  > (num_aircraft));
   s -> airport_state::delay_airport_dep = 0;
@@ -192,6 +195,8 @@ void init(airport_state *s,tw_lp *lp)
       aircraft.Aircraft::m_dest_region = dest_region;
       aircraft.Aircraft::m_max_speed = max_speed;
       aircraft.Aircraft::m_speed = max_speed;
+      aircraft.m_id += aircraft_id_offset;
+
       e = tw_event_new(event_send_to,ts,lp);
       m = ((air_traffic_message *)(tw_event_data(e)));
       m -> air_traffic_message::type = DEP_REQ;

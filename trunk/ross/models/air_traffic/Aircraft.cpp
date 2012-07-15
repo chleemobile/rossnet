@@ -49,6 +49,8 @@ Aircraft& Aircraft::operator=( Aircraft &src)
 
 bool Aircraft::operator<(const Aircraft &rhs) const
 {
+	if(m_process_time == rhs.m_process_time)
+		return (m_id > rhs.m_id);//possible in parallel run
 	return (m_process_time > rhs.m_process_time);
 }
 

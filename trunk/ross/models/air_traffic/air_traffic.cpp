@@ -126,6 +126,8 @@ void init(airport_state * s, tw_lp * lp)
 	tw_stime ts;
 
 	int num_aircraft = (NUMBER_OF_LP - NUMBER_OF_REGION_CONTROLLER) * NUMBER_OF_PLANES_PER_AIRPORT;
+	int num_aircraft_per_core = num_aircraft / tw_nnodes();
+	int aircraft_id_offset = num_aircraft_per_core * g_tw_mynode; 
 	
 	s->rn=lp->gid;
 
@@ -269,6 +271,7 @@ void init(airport_state * s, tw_lp * lp)
 			aircraft.m_dest_region = dest_region;
 			aircraft.m_max_speed = max_speed;
 			aircraft.m_speed = max_speed;
+			aircraft.m_id += aircraft_id_offset;
 
 			e = tw_event_new(event_send_to, ts, lp);            
 			m = (air_traffic_message*)tw_event_data(e);
