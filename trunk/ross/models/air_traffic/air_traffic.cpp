@@ -193,8 +193,41 @@ void init(airport_state * s, tw_lp * lp)
 	tw_stime ts;
 
 	int num_aircraft = (NUMBER_OF_LP - NUMBER_OF_REGION_CONTROLLER) * NUMBER_OF_PLANES_PER_AIRPORT;
+
 	int num_aircraft_per_core = num_aircraft / tw_nnodes();
-	int aircraft_id_offset = num_aircraft_per_core * g_tw_mynode; 
+	int aircraft_id_offset = num_aircraft_per_core * g_tw_mynode;
+	if(tw_nnodes() == 16)
+	{
+		if (g_tw_mynode == 0) aircraft_id_offset = 0;
+		else if(g_tw_mynode == 1) aircraft_id_offset = 40;
+		else if(g_tw_mynode == 2) aircraft_id_offset = 80;
+		else if(g_tw_mynode == 3) aircraft_id_offset = 122;
+		else if(g_tw_mynode == 4) aircraft_id_offset = 164;
+		else if(g_tw_mynode == 5) aircraft_id_offset = 206;
+		else if(g_tw_mynode == 6) aircraft_id_offset = 248;
+		else if(g_tw_mynode == 7) aircraft_id_offset = 290;
+		else if(g_tw_mynode == 8) aircraft_id_offset = 332;
+		else if(g_tw_mynode == 9) aircraft_id_offset = 374;
+		else if(g_tw_mynode == 10) aircraft_id_offset = 416;
+		else if(g_tw_mynode == 11) aircraft_id_offset = 458;
+		else if(g_tw_mynode == 12) aircraft_id_offset = 500;
+		else if(g_tw_mynode == 13) aircraft_id_offset = 542;
+		else if(g_tw_mynode == 14) aircraft_id_offset = 582;
+		else if(g_tw_mynode == 15) aircraft_id_offset = 624;
+	}
+	else if (tw_nnodes() ==8)
+	{
+		if (g_tw_mynode == 0) aircraft_id_offset = 0;
+		else if(g_tw_mynode == 1) aircraft_id_offset = 82;
+		else if(g_tw_mynode == 2) aircraft_id_offset = 166;
+		else if(g_tw_mynode == 3) aircraft_id_offset = 250;
+		else if(g_tw_mynode == 4) aircraft_id_offset = 332;
+		else if(g_tw_mynode == 5) aircraft_id_offset = 416;
+		else if(g_tw_mynode == 6) aircraft_id_offset = 498;
+		else if(g_tw_mynode == 7) aircraft_id_offset = 580;
+
+	}
+	//cout<<aircraft_id_offset<<endl;
 	
 	s->rn=lp->gid;
 
@@ -276,7 +309,7 @@ void init(airport_state * s, tw_lp * lp)
 				(lp->gid >= 57 && lp->gid <= 59)   ||                 
 				(lp->gid >= 150 && lp->gid <= 152) ||
 				(lp->gid >= 182 && lp->gid <= 185) ||
-				(lp->gid >= 215 && lp->gid <= 216) ||                 
+					(lp->gid >= 215 && lp->gid <= 216) ||                 
 				(lp->gid >= 228 && lp->gid <= 230) ||                                  
 				(lp->gid >= 245 && lp->gid <= 246) ||                 
 				(lp->gid >= 273 && lp->gid <= 275) ||                                  
