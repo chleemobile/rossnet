@@ -170,7 +170,7 @@ tw_peid mapping_to_pe(tw_lpid gid)
 	}	
 	else 
 	{
-		std::cout << "support upto 8 cores"<<std::endl;
+		std::cout << "support upto 16 cores"<<std::endl;
 		assert(false);
 	}
 
@@ -2316,7 +2316,7 @@ tw_lp* mapping_to_lp(tw_lpid lpid)
 		{
 			if(lpid == 7 )
 				ret = ret + 103;      
-			if(lpid == 123 || lpid == 143 )
+			if(lpid >= 123 && lpid <= 143 )
 				ret = ret - 12;     			
               
 
@@ -2417,7 +2417,7 @@ tw_lp* mapping_to_lp(tw_lpid lpid)
 
 	else 
 	{
-		std::cout << "Only support upto 4 cores "<<std::endl;;
+		std::cout << "Only support upto 16 cores "<<std::endl;;
 		assert(false);
 	}
 
@@ -2623,7 +2623,7 @@ int mapping_to_local_index(int lpid)
 		{
 			if(lpid == 7 )
 				ret = ret + 103;      
-			if(lpid == 123 || lpid == 143 )
+			if(lpid >= 123 && lpid <= 143 )
 				ret = ret - 12;     			
               
 
