@@ -48,20 +48,9 @@ Aircraft& Aircraft::operator=( Aircraft &src)
 
 bool Aircraft::operator<(const Aircraft &rhs) const
 {
-#if 0
-	if ((m_process_time == rhs.m_process_time) && (m_id == rhs.m_id))
-        printf("%d!!!\n", m_id),exit(0);
-	return m_process_time > rhs.m_process_time;
-#else
-	if (m_process_time == rhs.m_process_time)
-    {
-        if (m_id == rhs.m_id)
-            printf("%d!!!\n", m_id);//,assert(0);
-        return m_id < rhs.m_id;
-    }
-    else
-        return m_process_time > rhs.m_process_time;
-#endif
+	if(m_process_time == rhs.m_process_time)
+		return (m_id > rhs.m_id);//possible in parallel run
+	return (m_process_time > rhs.m_process_time);
 }
 
 /*

@@ -101,9 +101,76 @@ tw_peid mapping_to_pe(tw_lpid gid)
 		}
 
 	}
+	else if(tw_nnodes() == 16)
+	{
+		if(gid == 0|| gid == 1 || (gid >= 20 && gid <= 39))
+		{
+			return 0;
+		}
+		else if(gid == 2|| gid == 5 ||  (gid >= 40 && gid <= 59))
+		{
+			return 1;
+		}
+		else if(gid == 3|| (gid >= 60 && gid <= 80))
+		{
+			return 2;
+		}
+		else if(gid == 4||  (gid >= 81 && gid <= 101))
+		{
+			return 3;
+		}
+		else if(gid == 6 || (gid >= 102 && gid <= 122))
+		{
+			return 4;
+		}
+		else if(gid == 7|| (gid >= 123 && gid <= 143))
+		{
+			return 5;
+		}
+		else if(gid == 8 || (gid >= 144 && gid <= 164))
+		{
+			return 6;
+		}
+		else if(gid == 9 || (gid >= 165 && gid <= 185))
+		{
+			return 7;
+		}
+		if(gid == 10|| (gid >= 186 && gid <= 206))
+		{
+			return 8;
+		}
+		else if(gid == 11|| (gid >= 207 && gid <= 227))
+		{
+			return 9;
+		}
+		else if(gid == 12|| (gid >= 228 && gid <= 248))
+		{
+			return 10;
+		}
+		else if(gid == 13||  (gid >= 249 && gid <= 269))
+		{
+			return 11;
+		}
+		else if(gid == 14 || (gid >= 270 && gid <= 290))
+		{
+			return 12;
+		}
+		else if(gid == 15 || gid == 16 || (gid >= 291 && gid <= 310))
+		{
+			return 13;
+		}
+		else if(gid == 17 || (gid >= 311 && gid <= 331))
+		{
+			return 14;
+		}
+		else if(gid == 18 || gid == 19 || (gid >= 332 && gid <= 351))
+		{
+			return 15;
+		}
+	}	
 	else 
 	{
-		std::cout << "support upto 8 cores"<<std::endl;
+		std::cout << "support upto 16 cores"<<std::endl;
 		assert(false);
 	}
 
@@ -126,6 +193,8 @@ void init(airport_state * s, tw_lp * lp)
 	tw_stime ts;
 
 	int num_aircraft = (NUMBER_OF_LP - NUMBER_OF_REGION_CONTROLLER) * NUMBER_OF_PLANES_PER_AIRPORT;
+	int num_aircraft_per_core = num_aircraft / tw_nnodes();
+	int aircraft_id_offset = num_aircraft_per_core * g_tw_mynode; 
 	
 	s->rn=lp->gid;
 
@@ -269,6 +338,7 @@ void init(airport_state * s, tw_lp * lp)
 			aircraft.m_dest_region = dest_region;
 			aircraft.m_max_speed = max_speed;
 			aircraft.m_speed = max_speed;
+			aircraft.m_id += aircraft_id_offset;
 
             if(g_tw_mynode == 0)
 			{
@@ -306,7 +376,7 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 		case DEP_REQ:
 			{
 
-				assert(lp->gid > NUMBER_OF_REGION_CONTROLLER-1);
+				//assert(lp->gid > NUMBER_OF_REGION_CONTROLLER-1);
 
 				Aircraft aircraft = msg->aircraft;
 				aircraft.m_clock = tw_now(lp);
@@ -456,7 +526,7 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 				else 
 				{
 					next_region = path.front();;
-					assert(next_region == msg->aircraft.m_dest_region);
+					//assert(next_region == msg->aircraft.m_dest_region);
 				}
 
 				float distance = graph->adjMatrix[src_region][next_region];
@@ -499,7 +569,7 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 			 */
 		case TRANSIT_REQ:
 			{
-				assert(lp->gid < NUMBER_OF_REGION_CONTROLLER);
+				//assert(lp->gid < NUMBER_OF_REGION_CONTROLLER);
 	
 				Aircraft aircraft = msg->aircraft;
 				aircraft.m_clock = tw_now(lp);
@@ -617,7 +687,7 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 			}
 		case ON_THE_AIR:
 			{
-				assert(lp->gid < NUMBER_OF_REGION_CONTROLLER);
+				//assert(lp->gid < NUMBER_OF_REGION_CONTROLLER);
 
 				s->controller->handle_outgoing(lp);
 				//s->controller->m_counter[msg->aircraft.m_id]++;
@@ -652,7 +722,7 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 				else 
 				{
 					next_region = path.front();;
-					assert(next_region == msg->aircraft.m_dest_region);
+					//assert(next_region == msg->aircraft.m_dest_region);
 				}
 
 				if (next_region == msg->aircraft.m_dest_region)
@@ -716,7 +786,7 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 		case LANDING_REQ:
 			{
 
-				assert(lp->gid > NUMBER_OF_REGION_CONTROLLER-1);
+				//assert(lp->gid > NUMBER_OF_REGION_CONTROLLER-1);
 
 				Aircraft aircraft = msg->aircraft;
 				aircraft.m_clock = tw_now(lp);
@@ -2210,10 +2280,158 @@ tw_lp* mapping_to_lp(tw_lpid lpid)
 			ret = ret - 308;
 		}
 	}
+
+	else if (tw_nnodes() == 16) 
+	{
+		if(g_tw_mynode == 0)
+		{
+			if(lpid >= 20 && lpid <= 39)
+				ret = ret - 18;
+		}
+		else if (g_tw_mynode == 1)
+		{
+			if(lpid == 2)
+				ret = ret + 20;
+			if(lpid == 5)
+				ret = ret + 18;
+			if(lpid >= 40 && lpid <= 59)
+				ret = ret - 16;
+
+			ret = ret - 22;
+		}
+		else if (g_tw_mynode == 2)
+		{
+			if(lpid == 3)
+				ret = ret + 41;        
+			if(lpid >= 60 && lpid <= 80)
+				ret = ret - 15;                
+
+			ret = ret - 44;
+		}
+		else if (g_tw_mynode == 3)
+		{
+			if(lpid == 4)
+				ret = ret + 62;      
+			if(lpid >= 81 && lpid <= 101)
+				ret = ret - 14;                
+
+			ret = ret - 66;
+		}
+		else if (g_tw_mynode == 4)
+		{
+			if(lpid == 6 )
+				ret = ret + 82;         			
+			if(lpid >= 102 && lpid <= 122)
+				ret = ret - 13;                
+
+			ret = ret - 88;
+		}
+		else if (g_tw_mynode == 5)
+		{
+			if(lpid == 7 )
+				ret = ret + 103;      
+			if(lpid >= 123 && lpid <= 143 )
+				ret = ret - 12;     			
+              
+
+			ret = ret - 110;
+		}
+		else if (g_tw_mynode == 6)
+		{
+			if(lpid == 8 )
+				ret = ret + 124;        			
+			if(lpid >= 144 && lpid <= 164)
+				ret = ret - 11;                
+
+			ret = ret - 132;
+		}
+		else if (g_tw_mynode == 7)
+		{
+			if(lpid == 9 )
+				ret = ret + 145;   			
+			if(lpid >= 165 && lpid <= 185)
+				ret = ret - 10;
+
+			ret = ret - 154;
+		}
+
+
+		else if (g_tw_mynode == 8)
+		{
+			if(lpid == 10 )
+				ret = ret + 166;   			
+			if(lpid >= 186 && lpid <= 206)
+				ret = ret - 9;
+
+			ret = ret - 176;
+		}
+		else if (g_tw_mynode == 9)
+		{
+			if(lpid == 11 )
+				ret = ret + 187;   			
+			if(lpid >= 207 && lpid <= 227)
+				ret = ret - 8;
+
+			ret = ret - 198;
+		}
+		else if (g_tw_mynode == 10)
+		{
+			if(lpid == 12 )
+				ret = ret + 208;   			
+			if(lpid >= 228 && lpid <= 248)
+				ret = ret - 7;
+
+			ret = ret - 220;
+		}
+		else if (g_tw_mynode == 11)
+		{
+			if(lpid == 13 )
+				ret = ret + 229;   			
+			if(lpid >= 249 && lpid <= 269)
+				ret = ret - 6;
+
+			ret = ret - 242;
+		}
+		else if (g_tw_mynode == 12)
+		{
+			if(lpid == 14 )
+				ret = ret + 250;   			
+			if(lpid >= 270 && lpid <= 290)
+				ret = ret - 5;
+
+			ret = ret - 264;
+		}
+		else if (g_tw_mynode == 13)
+		{
+			if(lpid == 15 || lpid == 16)
+				ret = ret + 271;   			
+			if(lpid >= 291 && lpid <= 310)
+				ret = ret - 3;
+
+			ret = ret - 286;
+		}
+		else if (g_tw_mynode == 14)
+		{
+			if(lpid == 17 )
+				ret = ret + 291;   			
+			if(lpid >= 311 && lpid <= 331)
+				ret = ret - 2;
+
+			ret = ret - 308;
+		}
+		else if (g_tw_mynode == 15)
+		{
+			if(lpid == 18 || lpid ==19 )
+				ret = ret + 312;   			
+
+			ret = ret - 330;
+		}
+	}
 	
+
 	else 
 	{
-		std::cout << "Only support upto 4 cores "<<std::endl;;
+		std::cout << "Only support upto 16 cores "<<std::endl;;
 		assert(false);
 	}
 
@@ -2370,10 +2588,156 @@ int mapping_to_local_index(int lpid)
 			ret = ret - 308;
 		}
 	}
+	else if (tw_nnodes() == 16) 
+	{
+		if(g_tw_mynode == 0)
+		{
+			if(lpid >= 20 && lpid <= 39)
+				ret = ret - 18;
+		}
+		else if (g_tw_mynode == 1)
+		{
+			if(lpid == 2)
+				ret = ret + 20;
+			if(lpid == 5)
+				ret = ret + 18;
+			if(lpid >= 40 && lpid <= 59)
+				ret = ret - 16;
+
+			ret = ret - 22;
+		}
+		else if (g_tw_mynode == 2)
+		{
+			if(lpid == 3)
+				ret = ret + 41;        
+			if(lpid >= 60 && lpid <= 80)
+				ret = ret - 15;                
+
+			ret = ret - 44;
+		}
+		else if (g_tw_mynode == 3)
+		{
+			if(lpid == 4)
+				ret = ret + 62;      
+			if(lpid >= 81 && lpid <= 101)
+				ret = ret - 14;                
+
+			ret = ret - 66;
+		}
+		else if (g_tw_mynode == 4)
+		{
+			if(lpid == 6 )
+				ret = ret + 82;         			
+			if(lpid >= 102 && lpid <= 122)
+				ret = ret - 13;                
+
+			ret = ret - 88;
+		}
+		else if (g_tw_mynode == 5)
+		{
+			if(lpid == 7 )
+				ret = ret + 103;      
+			if(lpid >= 123 && lpid <= 143 )
+				ret = ret - 12;     			
+              
+
+			ret = ret - 110;
+		}
+		else if (g_tw_mynode == 6)
+		{
+			if(lpid == 8 )
+				ret = ret + 124;        			
+			if(lpid >= 144 && lpid <= 164)
+				ret = ret - 11;                
+
+			ret = ret - 132;
+		}
+		else if (g_tw_mynode == 7)
+		{
+			if(lpid == 9 )
+				ret = ret + 145;   			
+			if(lpid >= 165 && lpid <= 185)
+				ret = ret - 10;
+
+			ret = ret - 154;
+		}
+
+
+		else if (g_tw_mynode == 8)
+		{
+			if(lpid == 10 )
+				ret = ret + 166;   			
+			if(lpid >= 186 && lpid <= 206)
+				ret = ret - 9;
+
+			ret = ret - 176;
+		}
+		else if (g_tw_mynode == 9)
+		{
+			if(lpid == 11 )
+				ret = ret + 187;   			
+			if(lpid >= 207 && lpid <= 227)
+				ret = ret - 8;
+
+			ret = ret - 198;
+		}
+		else if (g_tw_mynode == 10)
+		{
+			if(lpid == 12 )
+				ret = ret + 208;   			
+			if(lpid >= 228 && lpid <= 248)
+				ret = ret - 7;
+
+			ret = ret - 220;
+		}
+		else if (g_tw_mynode == 11)
+		{
+			if(lpid == 13 )
+				ret = ret + 229;   			
+			if(lpid >= 249 && lpid <= 269)
+				ret = ret - 6;
+
+			ret = ret - 242;
+		}
+		else if (g_tw_mynode == 12)
+		{
+			if(lpid == 14 )
+				ret = ret + 250;   			
+			if(lpid >= 270 && lpid <= 290)
+				ret = ret - 5;
+
+			ret = ret - 264;
+		}
+		else if (g_tw_mynode == 13)
+		{
+			if(lpid == 15 || lpid == 16)
+				ret = ret + 271;   			
+			if(lpid >= 291 && lpid <= 310)
+				ret = ret - 3;
+
+			ret = ret - 286;
+		}
+		else if (g_tw_mynode == 14)
+		{
+			if(lpid == 17 )
+				ret = ret + 291;   			
+			if(lpid >= 311 && lpid <= 331)
+				ret = ret - 2;
+
+			ret = ret - 308;
+		}
+		else if (g_tw_mynode == 15)
+		{
+			if(lpid == 18 || lpid ==19 )
+				ret = ret + 312;   			
+
+			ret = ret - 330;
+		}
+	}
 	
 	else 
 	{
-		std::cout << "Only support upto 4 cores "<<std::endl;;
+		std::cout << "Only support upto 16 cores "<<std::endl;;
 		assert(false);
 	}
 
