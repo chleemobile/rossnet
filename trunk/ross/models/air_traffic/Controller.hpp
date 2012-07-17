@@ -25,7 +25,7 @@ class Controller
 		virtual Aircraft get_aircraft(tw_lp *lp)=0;
 		virtual void remove_aircraft(tw_lp *lp)=0;
 
-
+/*
 		virtual void handle_incoming_forward(tw_lp *lp)=0;
 		virtual void handle_incoming_reverse(tw_lp *lp)=0;
 
@@ -43,7 +43,7 @@ class Controller
 
 		virtual void remove_aircraft_forward(tw_lp *lp)=0;
 		virtual void remove_aircraft_reverse(tw_lp *lp)=0;
-		
+*/		
 		
 		//protected:
 		
