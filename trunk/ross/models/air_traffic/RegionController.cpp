@@ -76,7 +76,7 @@ void RegionController::handle_aircraft(tw_lp *lp)
 	
 }
 
-Aircraft RegionController::get_aircraft(tw_lp *lp)
+Aircraft RegionController::get_aircraft(tw_lp *lp) const
 {
 	Aircraft ret = *max_element(m_q.begin(), m_q.end());
 	return ret;

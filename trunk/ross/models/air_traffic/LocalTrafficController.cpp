@@ -69,7 +69,7 @@ void LocalTrafficController::handle_aircraft(tw_lp *lp)
 
 #define CTR_Q_DEBUG 
 
-Aircraft LocalTrafficController::get_aircraft(tw_lp *lp)
+Aircraft LocalTrafficController::get_aircraft(tw_lp *lp) const
 {
 	/*
 #ifdef CTR_Q_DEBUG
