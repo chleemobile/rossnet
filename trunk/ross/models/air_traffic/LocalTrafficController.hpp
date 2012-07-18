@@ -6,6 +6,10 @@ class LocalTrafficController : public Controller
 	public:
 		LocalTrafficController(int in_max_capacity, int in_num_aircraft);
 		virtual ~LocalTrafficController();
+
+		template <class T>
+		bool sort_predicate(const T &lhs, const T &rhs);
+
 		void handle_incoming(tw_lp *lp);
 		void handle_outgoing(tw_lp *lp);
 		void handle_aircraft(tw_lp *lp);
