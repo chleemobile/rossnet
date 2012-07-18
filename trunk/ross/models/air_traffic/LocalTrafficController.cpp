@@ -67,12 +67,13 @@ void LocalTrafficController::handle_aircraft(tw_lp *lp)
 	}
 }
 
-//#define CTR_Q_DEBUG 
+#define CTR_Q_DEBUG 
 
 Aircraft LocalTrafficController::get_aircraft(tw_lp *lp)
 {
+	/*
 #ifdef CTR_Q_DEBUG
-//	if(m_q.size() == 10)
+	if(m_q.size() == 5 )
 	{
 		cout<<""<<endl;
 		cout<<"before"<<endl;
@@ -89,7 +90,7 @@ Aircraft LocalTrafficController::get_aircraft(tw_lp *lp)
 	//sort(m_q.begin(), m_q.end(), sort_predicate<Aircraft>) // I can't do this. Do you know why? 
 
 #ifdef CTR_Q_DEBUG	
-//	if(m_q.size() == 10 )
+	if(m_q.size() == 5 )
 	{
 		cout<<""<<endl;
 		cout<<"after"<<endl;
@@ -102,14 +103,18 @@ Aircraft LocalTrafficController::get_aircraft(tw_lp *lp)
 	}
 #endif
 
-	Aircraft ret = m_q.back();
+	Aircraft ret = m_q.back();*/
+	Aircraft ret = *max_element(m_q.begin(), m_q.end());
+//	cout<<ret.m_process_time<<","<<ret2.m_process_time<<endl;
+
 	return ret;
 }
 
 
 void LocalTrafficController::remove_aircraft(tw_lp *lp)
 {
-	m_q.pop_back();
+	m_q.erase(max_element(m_q.begin(), m_q.end()));
+//	m_q.pop_back();
 }
 
 void LocalTrafficController::add_aircraft(Aircraft aircraft, tw_lp *lp)

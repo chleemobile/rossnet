@@ -78,15 +78,13 @@ void RegionController::handle_aircraft(tw_lp *lp)
 
 Aircraft RegionController::get_aircraft(tw_lp *lp)
 {
-	sort(m_q.begin(), m_q.end());
-	//sort(m_q.begin(), m_q.end(), sort_predicate<Aircraft>) // I can't do this. Do you know why? 
-	Aircraft ret = m_q.back();
+	Aircraft ret = *max_element(m_q.begin(), m_q.end());
 	return ret;
 }
 
 void RegionController::remove_aircraft(tw_lp *lp)
 {
-	m_q.pop_back();
+	m_q.erase(max_element(m_q.begin(), m_q.end()));
 }
 
 void RegionController::add_aircraft(Aircraft aircraft, tw_lp *lp)
