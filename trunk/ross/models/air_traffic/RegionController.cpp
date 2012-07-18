@@ -78,64 +78,27 @@ void RegionController::handle_aircraft(tw_lp *lp)
 
 Aircraft RegionController::get_aircraft(tw_lp *lp)
 {
-	
-	int i=0;
-	int size = m_q.size();
-	int min_i=-1;
-	int min_process_time = 99999999;
-
-	while(i<size)
-	{
-		if(m_q.at(i).m_process_time < min_process_time)
-		{
-			min_i = i;
-			min_process_time = m_q.at(i).m_process_time;
-		}
-		i++;
-	}
-	
-	Aircraft ret = m_q.at(min_i);
+	sort(m_q.begin(), m_q.end());
+	//sort(m_q.begin(), m_q.end(), sort_predicate<Aircraft>) // I can't do this. Do you know why? 
+	Aircraft ret = m_q.back();
 	return ret;
 }
 
 void RegionController::remove_aircraft(tw_lp *lp)
 {
-	deque<Aircraft> *temp_q = new deque<Aircraft>();
-
-	int i=0;
-	int size = m_q.size();
-	int min_i=-1;
-	int min_process_time = 99999999;
-
-	while(i<size)
-	{
-		if(m_q.at(i).m_process_time < min_process_time)
-		{
-			min_i = i;
-			min_process_time = m_q.at(i).m_process_time;
-		}
-		i++;
-	}
-	
-	i=0;
-	while(i<size)
-	{
-		if(i!=min_i)
-			temp_q->push_back(m_q.front());
-		m_q.pop_front();
-		i++;
-	}
-
-	while(!temp_q->empty())
-	{
-		m_q.push_back(temp_q->front());
-		temp_q->pop_front();
-	}
-
-	delete temp_q;
+	m_q.pop_back();
 }
 
 void RegionController::add_aircraft(Aircraft aircraft, tw_lp *lp)
 {
 	m_q.push_back(aircraft);
 }
+
+template <class T>
+bool RegionController::sort_predicate(const T &lhs, const T &rhs)
+{
+	if(lhs.m_process_time == rhs.m_process_time)
+		return (lhs.m_id > rhs.m_id);//possible in parallel run
+	return (lhs.m_process_time > rhs.m_process_time);	
+}
+

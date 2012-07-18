@@ -4,9 +4,12 @@
 #include <queue>
 #include <vector>
 #include <iostream>
+#include <algorithm>
+
 #include "Aircraft.hpp"
 
 struct tw_lp;
+
 
 using namespace std;
 
@@ -55,7 +58,7 @@ class Controller
 		double dummy_test;
 		
 //		priority_queue < Aircraft, vector<Aircraft>, less<Aircraft> > m_q;
-		deque <Aircraft> m_q;
+		vector <Aircraft> m_q;
 		//vector<int> m_counter;
 };
 

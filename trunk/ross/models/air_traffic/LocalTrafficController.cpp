@@ -27,26 +27,26 @@ void LocalTrafficController::handle_outgoing(tw_lp *lp)
 void LocalTrafficController::handle_aircraft(tw_lp *lp)
 {
 	/*
-	priority_queue < Aircraft, vector<Aircraft>, less<Aircraft> > *temp_q = new priority_queue < Aircraft, vector<Aircraft>, less<Aircraft> >();
+	   priority_queue < Aircraft, vector<Aircraft>, less<Aircraft> > *temp_q = new priority_queue < Aircraft, vector<Aircraft>, less<Aircraft> >();
 
-	Aircraft old_top = m_q.top();
-	int old_size = m_q.size();
+	   Aircraft old_top = m_q.top();
+	   int old_size = m_q.size();
 
-	while(!m_q.empty())
-	{
-		Aircraft temp = m_q.top();
-		m_q.pop();
-		temp.m_cdelay++;
-		//cout<<temp.m_cdelay<<endl;
-		temp_q->push(temp);
+	   while(!m_q.empty())
+	   {
+	   Aircraft temp = m_q.top();
+	   m_q.pop();
+	   temp.m_cdelay++;
+	//cout<<temp.m_cdelay<<endl;
+	temp_q->push(temp);
 	}
 
 	while(!temp_q->empty())
 	{
-		Aircraft temp =temp_q->top();
-		temp_q->pop();
+	Aircraft temp =temp_q->top();
+	temp_q->pop();
 
-		m_q.push(temp);
+	m_q.push(temp);
 	}
 
 	Aircraft new_top = m_q.top();
@@ -56,7 +56,7 @@ void LocalTrafficController::handle_aircraft(tw_lp *lp)
 
 	assert(old_top.m_id == new_top.m_id);
 	assert(old_size == new_size);
-	*/
+	 */
 
 	int i=0;
 	int size = m_q.size();
@@ -67,68 +67,62 @@ void LocalTrafficController::handle_aircraft(tw_lp *lp)
 	}
 }
 
+//#define CTR_Q_DEBUG 
+
 Aircraft LocalTrafficController::get_aircraft(tw_lp *lp)
 {
-	
-	int i=0;
-	int size = m_q.size();
-	int min_i=-1;
-	int min_process_time = 99999999;
-
-	while(i<size)
+#ifdef CTR_Q_DEBUG
+//	if(m_q.size() == 10)
 	{
-		if(m_q.at(i).m_process_time < min_process_time)
+		cout<<""<<endl;
+		cout<<"before"<<endl;
+
+		for(int i=0; i<m_q.size();i++)
 		{
-			min_i = i;
-			min_process_time = m_q.at(i).m_process_time;
+			cout<<m_q[i].m_process_time<<","<<m_q[i].m_id<<","<<m_q[i].m_cdelay<<","<<m_q[i].m_delay<<","<<m_q[i].m_clock<<endl;
+
 		}
-		i++;
 	}
-	
-	Aircraft ret = m_q.at(min_i);
+#endif
+
+	sort(m_q.begin(), m_q.end());
+	//sort(m_q.begin(), m_q.end(), sort_predicate<Aircraft>) // I can't do this. Do you know why? 
+
+#ifdef CTR_Q_DEBUG	
+//	if(m_q.size() == 10 )
+	{
+		cout<<""<<endl;
+		cout<<"after"<<endl;
+
+		for(int i=0; i<m_q.size();i++)
+		{
+			cout<<m_q[i].m_process_time<<","<<m_q[i].m_id<<","<<m_q[i].m_cdelay<<","<<m_q[i].m_delay<<","<<m_q[i].m_clock<<endl;
+		}
+		//assert(false);
+	}
+#endif
+
+	Aircraft ret = m_q.back();
 	return ret;
 }
 
 
 void LocalTrafficController::remove_aircraft(tw_lp *lp)
 {
-	
-	deque<Aircraft> *temp_q = new deque<Aircraft>();
-
-	int i=0;
-	int size = m_q.size();
-	int min_i=-1;
-	int min_process_time = 99999999;
-
-	while(i<size)
-	{
-		if(m_q.at(i).m_process_time < min_process_time)
-		{
-			min_i = i;
-			min_process_time = m_q.at(i).m_process_time;
-		}
-		i++;
-	}
-
-	i=0;
-	while(i<size)
-	{
-		if(i!=min_i)
-			temp_q->push_back(m_q.front());
-		m_q.pop_front();
-		i++;
-	}
-
-	while(!temp_q->empty())
-	{
-		m_q.push_back(temp_q->front());
-		temp_q->pop_front();
-	}
-	delete temp_q;
+	m_q.pop_back();
 }
 
 void LocalTrafficController::add_aircraft(Aircraft aircraft, tw_lp *lp)
 {
 	m_q.push_back(aircraft);
 }
+
+	template <class T>
+bool LocalTrafficController::sort_predicate(const T &lhs, const T &rhs)
+{
+	if(lhs.m_process_time == rhs.m_process_time)
+		return (lhs.m_id > rhs.m_id);//possible in parallel run
+	return (lhs.m_process_time > rhs.m_process_time);	
+}
+
 
