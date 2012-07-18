@@ -4,9 +4,12 @@
 #include <queue>
 #include <vector>
 #include <iostream>
+#include <algorithm>
+
 #include "Aircraft.hpp"
 
 struct tw_lp;
+
 
 using namespace std;
 
@@ -25,7 +28,7 @@ class Controller
 		virtual Aircraft get_aircraft(tw_lp *lp)=0;
 		virtual void remove_aircraft(tw_lp *lp)=0;
 
-
+/*
 		virtual void handle_incoming_forward(tw_lp *lp)=0;
 		virtual void handle_incoming_reverse(tw_lp *lp)=0;
 
@@ -43,7 +46,7 @@ class Controller
 
 		virtual void remove_aircraft_forward(tw_lp *lp)=0;
 		virtual void remove_aircraft_reverse(tw_lp *lp)=0;
-		
+*/		
 		
 		//protected:
 		
@@ -54,7 +57,8 @@ class Controller
 
 		double dummy_test;
 		
-		priority_queue < Aircraft, vector<Aircraft>, less<Aircraft> > m_q;
+//		priority_queue < Aircraft, vector<Aircraft>, less<Aircraft> > m_q;
+		vector <Aircraft> m_q;
 		//vector<int> m_counter;
 };
 

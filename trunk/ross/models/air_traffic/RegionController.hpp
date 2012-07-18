@@ -1,4 +1,5 @@
 #include "Controller.hpp"
+#include <algorithm>
 
 class RegionController : public Controller
 {
@@ -30,5 +31,10 @@ class RegionController : public Controller
 
 		void remove_aircraft_forward(tw_lp *lp);
 		void remove_aircraft_reverse(tw_lp *lp);
+
+	private:
+		template <class T>	
+		bool sort_predicate(const T &lhs, const T &rhs);
+		
 		
 };

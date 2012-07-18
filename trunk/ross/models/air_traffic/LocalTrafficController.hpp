@@ -1,11 +1,11 @@
 #include "Controller.hpp"
 
-
 class LocalTrafficController : public Controller
 {
 	public:
 		LocalTrafficController(int in_max_capacity, int in_num_aircraft);
 		virtual ~LocalTrafficController();
+
 		void handle_incoming(tw_lp *lp);
 		void handle_outgoing(tw_lp *lp);
 		void handle_aircraft(tw_lp *lp);
@@ -30,5 +30,10 @@ class LocalTrafficController : public Controller
 
 		void remove_aircraft_forward(tw_lp *lp);
 		void remove_aircraft_reverse(tw_lp *lp);
+
+	private:
+		template <class T>	
+		bool sort_predicate(const T &lhs, const T &rhs);
+	
 };
 

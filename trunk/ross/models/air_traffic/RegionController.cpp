@@ -27,6 +27,7 @@ void RegionController::handle_outgoing(tw_lp *lp)
 
 void RegionController::handle_aircraft(tw_lp *lp)
 {
+	/*
 	priority_queue < Aircraft, vector<Aircraft>, less<Aircraft> > *temp_q = new priority_queue < Aircraft, vector<Aircraft>, less<Aircraft> >();
 
 	Aircraft old_top = m_q.top();
@@ -60,20 +61,42 @@ void RegionController::handle_aircraft(tw_lp *lp)
 
 	//assert(old_top.m_id == new_top.m_id);
 	assert(old_size == new_size);
+	*/
+
+	int i=0;
+	int size = m_q.size();
+	while(i<size)
+	{
+		m_q.at(i).m_process_time -= m_q.at(i).m_speed;
+		m_q.at(i).m_remaining_dist -= m_q.at(i).m_speed;
+		m_q.at(i).m_cdelay++;
+		
+		i++;
+	}
+	
 }
 
 Aircraft RegionController::get_aircraft(tw_lp *lp)
 {
-	Aircraft ret = m_q.top();
+	Aircraft ret = *max_element(m_q.begin(), m_q.end());
 	return ret;
 }
 
 void RegionController::remove_aircraft(tw_lp *lp)
 {
-	m_q.pop();
+	m_q.erase(max_element(m_q.begin(), m_q.end()));
 }
 
 void RegionController::add_aircraft(Aircraft aircraft, tw_lp *lp)
 {
-	m_q.push(aircraft);
+	m_q.push_back(aircraft);
 }
+
+template <class T>
+bool RegionController::sort_predicate(const T &lhs, const T &rhs)
+{
+	if(lhs.m_process_time == rhs.m_process_time)
+		return (lhs.m_id > rhs.m_id);//possible in parallel run
+	return (lhs.m_process_time > rhs.m_process_time);	
+}
+
