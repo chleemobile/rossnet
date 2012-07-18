@@ -373,17 +373,6 @@ void init(airport_state * s, tw_lp * lp)
 			aircraft.m_speed = max_speed;
 			aircraft.m_id += aircraft_id_offset;
 
-            if(g_tw_mynode == 0)
-			{
-				aircraft.m_id += 0;
-
-			}
-			else
-			{
-				aircraft.m_id += 332;
-
-			}
-
 			e = tw_event_new(event_send_to, ts, lp);            
 			m = (air_traffic_message*)tw_event_data(e);
 			m->type = DEP_REQ;
@@ -1006,9 +995,6 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 			}
 	}
 }
-
-void event_handler_forward(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * lp);
-void event_handler_reverse(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * lp);
 
 void event_handler_fw(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_lp * lp)
 {    
@@ -2141,8 +2127,8 @@ tw_lptype airport_lps[] =
 {
 	{
 		(init_f) init,
-		(event_f) event_handler_forward,
-		(revent_f) event_handler_reverse,
+		(event_f) event_handler_fw,
+		(revent_f) event_handler_rv,
 		(final_f) final,
 		(map_f) mapping_to_pe,
 		sizeof(airport_state),
