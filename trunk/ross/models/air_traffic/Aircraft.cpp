@@ -10,6 +10,7 @@ Aircraft::Aircraft():m_src_airport(0), m_src_region(0),
 {
 	m_id_generator++;
 	m_id = m_id_generator;
+
 	//cout<<"Aircraft "<<m_id<<" had been creatd"<<endl;
 
 }
