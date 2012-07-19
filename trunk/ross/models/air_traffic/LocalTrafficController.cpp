@@ -60,9 +60,13 @@ void LocalTrafficController::handle_aircraft(tw_lp *lp)
 
 	int i=0;
 	int size = m_q.size();
+
 	while(i<size)
 	{
-		m_q.at(i).m_cdelay++;
+		Aircraft aircraft = m_q.front();
+		m_q.pop_front();
+		aircraft.m_cdelay++;
+		m_q.push_back(aircraft);		
 		i++;
 	}
 }

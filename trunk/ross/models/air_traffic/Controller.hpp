@@ -5,7 +5,7 @@
 #include <vector>
 #include <iostream>
 #include <algorithm>
-
+#include <list>
 #include "Aircraft.hpp"
 
 struct tw_lp;
@@ -58,7 +58,7 @@ class Controller
 		double dummy_test;
 		
 
-		deque <Aircraft> m_q;
+		list <Aircraft> m_q;
 		
 };
 
