@@ -113,7 +113,9 @@ Aircraft LocalTrafficController::get_aircraft(tw_lp *lp) const
 
 void LocalTrafficController::remove_aircraft(tw_lp *lp)
 {
-	m_q.erase(max_element<std::vector<Aircraft>::iterator>(m_q.begin(), m_q.end()));
+	vector<Aircraft>::iterator target = max_element<std::vector<Aircraft>::iterator>(m_q.begin(), m_q.end());
+	m_q.erase(target);
+
 //	m_q.pop_back();
 }
 
