@@ -1,17 +1,25 @@
 INCLUDE_DIRECTORIES(${ROSS_SOURCE_DIR})
 INCLUDE_DIRECTORIES("/opt/local/include")
 
-
-SET(air_traffic_srcs
-	rose_air_traffic.cpp air_traffic.h 
-	Aircraft.cpp Aircraft.hpp
-	Graph.cpp Graph.hpp 
-	rose_Controller.cpp Controller.hpp
-	rose_RegionController.cpp RegionController.hpp
-	rose_LocalTrafficController.cpp LocalTrafficController.hpp
-	Constants.hpp
-	)
-
+if(BACKSTROKE)
+	SET(air_traffic_srcs 
+		rose_air_traffic.cpp air_traffic.h 
+		Aircraft.cpp Aircraft.hpp
+		Graph.cpp Graph.hpp 
+		rose_Controller.cpp Controller.hpp
+		rose_RegionController.cpp RegionController.hpp
+		rose_LocalTrafficController.cpp LocalTrafficController.hpp
+		Constants.hpp)
+else()
+	SET(air_traffic_srcs 
+		air_traffic.cpp air_traffic.h 
+		Aircraft.cpp Aircraft.hpp
+		Graph.cpp Graph.hpp 
+		Controller.cpp Controller.hpp
+		RegionController.cpp RegionController.hpp
+		LocalTrafficController.cpp LocalTrafficController.hpp
+		Constants.hpp)
+endif(BACKSTROKE)
 
 file(COPY ./adjlist.csv DESTINATION ${PROJECT_BINARY_DIR}/models/air_traffic/)
 file(COPY ./run_gvt_batch.sh DESTINATION ${PROJECT_BINARY_DIR}/models/air_traffic/)

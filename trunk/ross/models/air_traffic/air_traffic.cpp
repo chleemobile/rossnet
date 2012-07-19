@@ -228,7 +228,7 @@ void init(airport_state * s, tw_lp * lp)
 
 	}
 	//cout<<aircraft_id_offset<<endl;
-	
+
 	s->rn=lp->gid;
 
 	s->counter = new vector<int>(num_aircraft);
@@ -309,7 +309,7 @@ void init(airport_state * s, tw_lp * lp)
 				(lp->gid >= 57 && lp->gid <= 59)   ||                 
 				(lp->gid >= 150 && lp->gid <= 152) ||
 				(lp->gid >= 182 && lp->gid <= 185) ||
-					(lp->gid >= 215 && lp->gid <= 216) ||                 
+				(lp->gid >= 215 && lp->gid <= 216) ||                 
 				(lp->gid >= 228 && lp->gid <= 230) ||                                  
 				(lp->gid >= 245 && lp->gid <= 246) ||                 
 				(lp->gid >= 273 && lp->gid <= 275) ||                                  
@@ -502,12 +502,12 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 
 				int c = (*(s->counter))[msg->aircraft.m_id];
 				c++;
-				 (*(s->counter))[msg->aircraft.m_id] = c;
+				(*(s->counter))[msg->aircraft.m_id] = c;
 
 				int i=0;
 				while(i < num_aircraft)
 				{
-                    const vector<int>& counterRef = *(s->counter);
+					const vector<int>& counterRef = *(s->counter);
 					int counter = counterRef.at(i);
 					//int counter = (*(s->counter))[i];
 					if(counter > s->max_counter)
@@ -592,7 +592,7 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 		case TRANSIT_REQ:
 			{
 				//assert(lp->gid < NUMBER_OF_REGION_CONTROLLER);
-	
+
 				Aircraft aircraft = msg->aircraft;
 				aircraft.m_clock = tw_now(lp);
 
@@ -713,7 +713,7 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 
 				s->controller->handle_outgoing(lp);
 				//s->controller->m_counter[msg->aircraft.m_id]++;
-				
+
 				int c = (*(s->counter))[msg->aircraft.m_id];
 				c++;
 				(*(s->counter))[msg->aircraft.m_id] = c;
@@ -721,7 +721,7 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 				int i=0;
 				while(i < num_aircraft)
 				{
-                    const vector<int>& counterRef = *(s->counter);
+					const vector<int>& counterRef = *(s->counter);
 					int counter = counterRef.at(i);
 					//int counter = (*(s->counter))[i];
 					if(counter > s->max_counter)
@@ -812,7 +812,7 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 
 				Aircraft aircraft = msg->aircraft;
 				aircraft.m_clock = tw_now(lp);
-				
+
 				s->controller->add_aircraft(aircraft, lp);
 				//s->controller->m_q.push(aircraft);
 
@@ -876,15 +876,15 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 						s->controller->remove_aircraft(lp);						
 						//Aircraft aircraft = s->controller->m_q.top();
 						//s->controller->m_q.pop();
-	
-						
+
+
 						s->delay_airport_land = s->delay_airport_land + (tw_now(lp) - aircraft.m_clock);
 						s->cdelay_airport_land += aircraft.m_cdelay;
 
 						aircraft.m_clock = 0;
 						aircraft.m_cdelay = 0;
 						aircraft.m_delay = 0;
-						
+
 
 						int to = lp->gid;
 						ts = bs_rand_exponential(s->rn, MEAN_LAND);
@@ -910,7 +910,7 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 		case TAXI_IN:
 			{
 				//s->controller->m_counter[msg->aircraft.m_id]++;
-				
+
 				int c = (*(s->counter))[msg->aircraft.m_id];
 				c++;
 				(*(s->counter))[msg->aircraft.m_id] = c;
@@ -918,7 +918,7 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 				int i=0;
 				while(i < num_aircraft)
 				{
-                    const vector<int>& counterRef = *(s->counter);
+					const vector<int>& counterRef = *(s->counter);
 					int counter = counterRef.at(i);
 					//int counter = (*(s->counter))[i];
 					if(counter > s->max_counter)
@@ -928,7 +928,7 @@ void event_handler(airport_state * s, tw_bf * bf, air_traffic_message * msg, tw_
 					}
 					i++;
 				}
-				
+
 				int to = lp->gid;
 				ts = bs_rand_exponential(s->rn, MEAN_ARRIVAL);
 
@@ -1029,7 +1029,7 @@ void event_handler_fw(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 				}
 
 				__store__(path1, lp);
-				
+
 				int path2=0;
 
 				if (s->controller->m_current_capacity < s->controller->m_max_capacity) 
@@ -1141,7 +1141,7 @@ void event_handler_fw(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 
 					__store__(q_stored, lp);					
 				}
-				
+
 				__store__(path2, lp);
 
 				break;
@@ -1151,7 +1151,7 @@ void event_handler_fw(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 			{
 				int c = (*(s->counter))[msg->aircraft.m_id];
 				c++;
-				 (*(s->counter))[msg->aircraft.m_id] = c;
+				(*(s->counter))[msg->aircraft.m_id] = c;
 
 				__store__(s->max_counter_aircraft_id, lp);
 				__store__(s->max_counter, lp);
@@ -1167,7 +1167,7 @@ void event_handler_fw(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 					}
 					i++;
 				}
-				 
+
 				int to = lp->gid;				
 				ts = bs_rand_exponential2(s->rn, MEAN_TAXI, lp);
 
@@ -1242,13 +1242,13 @@ void event_handler_fw(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 		case TRANSIT_REQ:
 			{
 				assert(lp->gid < NUMBER_OF_REGION_CONTROLLER);
-	
+
 				Aircraft msg_aircraft = msg->aircraft;
 				msg_aircraft.m_clock = tw_now(lp);
 
 				__store__(s->controller->m_q, lp);
 				s->controller->add_aircraft(msg_aircraft, lp);
-//				s->controller->m_q.push(msg_aircraft);
+				//				s->controller->m_q.push(msg_aircraft);
 
 				int path1 = 0;
 				if(s->controller->m_q.size() > s->max_queue_size_region)
@@ -1267,7 +1267,7 @@ void event_handler_fw(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 					path2=1;
 
 					Aircraft aircraft = s->controller->get_aircraft(lp);
-//					Aircraft aircraft = s->controller->m_q.top();
+					//					Aircraft aircraft = s->controller->m_q.top();
 
 					if(aircraft.m_remaining_dist <= 0)
 					{
@@ -1279,7 +1279,7 @@ void event_handler_fw(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 						s->controller->handle_incoming(lp);
 
 						s->controller->remove_aircraft(lp);
-//						s->controller->m_q.pop();
+						//						s->controller->m_q.pop();
 
 						__store__(s->delay_region, lp);
 						s->delay_region += tw_now(lp) - aircraft.m_clock;
@@ -1337,9 +1337,9 @@ void event_handler_fw(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 					if(s->controller->m_q.size() > 0)
 					{
 						path1_1=1;
-						
+
 						Aircraft aircraft = s->controller->get_aircraft(lp);
-//						Aircraft aircraft = s->controller->m_q.top();
+						//						Aircraft aircraft = s->controller->m_q.top();
 
 						if(aircraft.m_remaining_dist <= 0)
 						{
@@ -1352,7 +1352,7 @@ void event_handler_fw(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 
 							__store__(s->controller->m_q, lp);
 							s->controller->remove_aircraft(lp);
-//							s->controller->m_q.pop();
+							//							s->controller->m_q.pop();
 
 							__store__(s->delay_region, lp);
 							s->delay_region += tw_now(lp) - aircraft.m_clock;
@@ -1408,7 +1408,7 @@ void event_handler_fw(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 
 				s->controller->handle_outgoing(lp);
 				//s->controller->m_counter[msg->aircraft.m_id]++;
-				
+
 				int c = (*(s->counter))[msg->aircraft.m_id];
 				c++;
 				(*(s->counter))[msg->aircraft.m_id] = c;
@@ -1500,7 +1500,7 @@ void event_handler_fw(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 					tw_event_send(e);
 
 				}
-				
+
 				__store__(path1, lp);
 
 				break;
@@ -1516,7 +1516,7 @@ void event_handler_fw(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 
 				__store__(s->controller->m_q, lp);
 				s->controller->add_aircraft(aircraft,lp);
-//				s->controller->m_q.push(aircraft);
+				//				s->controller->m_q.push(aircraft);
 
 				int path1=0;
 				if(s->controller->m_q.size() > s->max_queue_size_airport)
@@ -1539,8 +1539,8 @@ void event_handler_fw(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 					Aircraft aircraft = s->controller->get_aircraft(lp);
 					s->controller->remove_aircraft(lp);
 
-//					Aircraft aircraft = s->controller->m_q.top();
-//					s->controller->m_q.pop();
+					//					Aircraft aircraft = s->controller->m_q.top();
+					//					s->controller->m_q.pop();
 
 					__store__(s->delay_airport_land, lp);
 					s->delay_airport_land = s->delay_airport_land + (tw_now(lp) - aircraft.m_clock);
@@ -1595,10 +1595,10 @@ void event_handler_fw(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 						Aircraft aircraft = s->controller->get_aircraft(lp);
 						s->controller->remove_aircraft(lp);
 
-//						Aircraft aircraft = s->controller->m_q.top();
-//						s->controller->m_q.pop();
+						//						Aircraft aircraft = s->controller->m_q.top();
+						//						s->controller->m_q.pop();
 
-						
+
 						__store__(s->delay_airport_land, lp);
 						s->delay_airport_land = s->delay_airport_land + (tw_now(lp) - aircraft.m_clock);
 
@@ -1608,7 +1608,7 @@ void event_handler_fw(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 						aircraft.m_clock = 0;
 						aircraft.m_cdelay = 0;
 						aircraft.m_delay = 0;
-						
+
 
 						int to = lp->gid;
 						ts = bs_rand_exponential2(s->rn, MEAN_LAND, lp);
@@ -1644,7 +1644,7 @@ void event_handler_fw(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 		case TAXI_IN:
 			{
 				//s->controller->m_counter[msg->aircraft.m_id]++;
-				
+
 				int c = (*(s->counter))[msg->aircraft.m_id];
 				c++;
 				(*(s->counter))[msg->aircraft.m_id] = c;
@@ -1663,7 +1663,7 @@ void event_handler_fw(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 					}
 					i++;
 				}
-				
+
 				int to = lp->gid;
 				ts = bs_rand_exponential2(s->rn, MEAN_ARRIVAL,lp);
 
@@ -1743,7 +1743,7 @@ void event_handler_rv(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 
 		case DEP_REQ:
 			{
-				
+
 				int path2=-1;
 				__restore__(path2, lp);
 				assert(path2 >=0);
@@ -1756,10 +1756,10 @@ void event_handler_rv(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 
 					s->dep_processed--;
 					s->dep_req_accepted--;
-					
+
 					s->controller->m_aircraft_processed--;
 					s->controller->m_current_capacity--;
-					
+
 				}
 				else
 				{
@@ -1777,7 +1777,7 @@ void event_handler_rv(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 				}
 
 				__restore__(s->controller->m_q, lp);
-				
+
 				break;
 			}
 
@@ -1798,7 +1798,7 @@ void event_handler_rv(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 						__restore__(s->controller->m_q, lp);
 					}
 				}
-				
+
 				int path1=-1;
 				__restore__(path1, lp);
 				assert(path1 >=0);
@@ -1809,7 +1809,7 @@ void event_handler_rv(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 					__restore__(s->cdelay_airport_dep, lp);
 					__restore__(s->delay_airport_dep, lp);
 					__restore__(s->controller->m_q, lp);
-					
+
 					//assert(q_stored_in_path1 == 1);
 
 					s->dep_processed--;
@@ -1817,7 +1817,7 @@ void event_handler_rv(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 					s->controller->m_aircraft_processed--;
 					s->controller->m_current_capacity--;
 
-					
+
 				}
 
 				break;
@@ -1826,7 +1826,7 @@ void event_handler_rv(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 		case TAXI_OUT:
 			{
 				bs_rand_rvs(s->rn, lp);
-				
+
 				__restore__(s->max_counter, lp);
 				__restore__(s->max_counter_aircraft_id, lp);
 
@@ -1850,7 +1850,7 @@ void event_handler_rv(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 				int path2=-1;
 				__restore__(path2, lp);
 				assert(path2 >=0);
-	
+
 				if(path2)
 				{
 					int path2_1=-1;
@@ -1865,7 +1865,7 @@ void event_handler_rv(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 
 						s->controller->m_aircraft_processed--;
 						s->controller->m_current_capacity--;
-						
+
 						s->transit_req_accepted--;
 						s->transit_processed--;
 
@@ -1887,7 +1887,7 @@ void event_handler_rv(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 				}
 
 				__restore__(s->controller->m_q, lp);
-				
+
 				break;
 			}
 
@@ -1925,7 +1925,7 @@ void event_handler_rv(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 
 					if(path1_1)
 					{
-					
+
 						int path1_2=-1;
 						__restore__(path1_2, lp);
 						assert(path1_2 >=0);
@@ -1933,11 +1933,11 @@ void event_handler_rv(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 						if(path1_2)
 						{
 							bs_rand_rvs(s->rn, lp);
-					
+
 							__restore__(s->cdelay_region, lp);
 							__restore__(s->delay_region, lp);
 							__restore__(s->controller->m_q, lp);	
-	
+
 							//assert(q_stored_in_path1 == 1);
 
 							s->transit_req_accepted--;
@@ -1971,12 +1971,12 @@ void event_handler_rv(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 				else
 				{
 					bs_rand_rvs(s->rn, lp);
-				
+
 				}
 
 				__restore__(s->max_counter, lp);
 				__restore__(s->max_counter_aircraft_id, lp);
-				
+
 				(*(s->counter))[msg->aircraft.m_id]--;
 				s->controller->m_current_capacity++;
 
@@ -1997,7 +1997,7 @@ void event_handler_rv(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 
 					s->landing_req_accepted--;
 					s->landing_processed--;
-					
+
 					s->controller->m_aircraft_processed--;
 					s->controller->m_current_capacity--;
 
@@ -2017,7 +2017,7 @@ void event_handler_rv(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 				}
 
 				__restore__(s->controller->m_q, lp);
-				
+
 				break;
 			}
 
@@ -2026,7 +2026,7 @@ void event_handler_rv(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 				int path2=-1;
 				__restore__(path2, lp);
 				assert(path2 >=0);
-				
+
 				int q_stored_in_path1=-1;
 				if(path2)
 				{
@@ -2043,7 +2043,7 @@ void event_handler_rv(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 				if(path1)
 				{
 					bs_rand_rvs(s->rn, lp);
-					
+
 					__restore__(s->cdelay_airport_land, lp);
 					__restore__(s->delay_airport_land, lp);
 					__restore__(s->controller->m_q, lp);
@@ -2051,7 +2051,7 @@ void event_handler_rv(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 					//assert(q_stored_in_path1 == 1);
 
 					s->landing_processed--;
-					
+
 					s->controller->m_aircraft_processed--;
 					s->controller->m_current_capacity--;
 
@@ -2065,9 +2065,9 @@ void event_handler_rv(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 				bs_rand_rvs(s->rn, lp);
 				__restore__(s->max_counter, lp);
 				__restore__(s->max_counter_aircraft_id, lp);
-			
+
 				(*(s->counter))[msg->aircraft.m_id]--;
-				
+
 				break;
 			}
 
@@ -2089,7 +2089,7 @@ void event_handler_rv(airport_state * s, tw_bf * bf, air_traffic_message * msg, 
 void final(airport_state * s, tw_lp * lp)
 {
 	//wait_time_avg += ((s->waiting_time / (double) s->landings) / nlp_per_pe);
-	
+
 	total_transit_req_accepted += s->transit_req_accepted;
 	//cout<<lp->gid<<","<<total_transit_req_accepted<<endl;
 
@@ -2123,6 +2123,20 @@ void final(airport_state * s, tw_lp * lp)
    Parallel Running
  */
 
+#ifdef RUN_WITH_backstroke
+tw_lptype airport_lps[] =
+{
+	{
+		(init_f) init,
+		(event_f) event_handler_forward,
+		(revent_f) event_handler_reverse,
+		(final_f) final,
+		(map_f) mapping_to_pe,
+		sizeof(airport_state),
+	},
+	{0},
+};
+#else
 tw_lptype airport_lps[] =
 {
 	{
@@ -2135,6 +2149,7 @@ tw_lptype airport_lps[] =
 	},
 	{0},
 };
+#endif
 
 
 const tw_optdef app_opt [] =
@@ -2351,7 +2366,7 @@ tw_lp* mapping_to_lp(tw_lpid lpid)
 				ret = ret + 103;      
 			if(lpid >= 123 && lpid <= 143 )
 				ret = ret - 12;     			
-              
+
 
 			ret = ret - 110;
 		}
@@ -2446,7 +2461,7 @@ tw_lp* mapping_to_lp(tw_lpid lpid)
 			ret = ret - 330;
 		}
 	}
-	
+
 
 	else 
 	{
@@ -2658,7 +2673,7 @@ int mapping_to_local_index(int lpid)
 				ret = ret + 103;      
 			if(lpid >= 123 && lpid <= 143 )
 				ret = ret - 12;     			
-              
+
 
 			ret = ret - 110;
 		}
@@ -2753,7 +2768,7 @@ int mapping_to_local_index(int lpid)
 			ret = ret - 330;
 		}
 	}
-	
+
 	else 
 	{
 		std::cout << "Only support upto 16 cores "<<std::endl;;
@@ -2804,16 +2819,20 @@ void air_traffic_mapping()
 
 int main(int argc, char **argv, char **env)
 {
-	
+#ifdef RUN_WITH_backstroke
+	cout<<"Backstroke"<<endl;
+#else
+	cout<<"Hand-generated"<<endl;
+#endif
 	int i = 0;
 	/*
-	char hostname[256];
-	gethostname(hostname, sizeof(hostname));
-	printf("PID %d on %s ready for attach\n", getpid(), hostname);
-	fflush(stdout);
-	while (0 == i)
-		sleep(5);
-	*/
+	   char hostname[256];
+	   gethostname(hostname, sizeof(hostname));
+	   printf("PID %d on %s ready for attach\n", getpid(), hostname);
+	   fflush(stdout);
+	   while (0 == i)
+	   sleep(5);
+	 */
 
 	tw_opt_add(app_opt);
 
@@ -2842,7 +2861,7 @@ int main(int argc, char **argv, char **env)
 			tw_lp_settype(i, &airport_lps[0]);
 	}
 
-	
+
 
 	//init map to count how many events are executed by each lp
 	//key lpid, value map<event type, counter>

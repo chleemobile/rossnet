@@ -11,7 +11,6 @@
 struct tw_lp;
 using namespace std;
 
-#define BS
 
 class Controller
 {
@@ -28,7 +27,7 @@ class Controller
 		Aircraft get_aircraft(tw_lp *lp) const;
 		void remove_aircraft(tw_lp *lp);
 
-#ifdef BS		
+#ifdef RUN_WITH_backstroke
 		virtual void handle_incoming_forward(tw_lp *lp)=0;
 		virtual void handle_incoming_reverse(tw_lp *lp)=0;
 
