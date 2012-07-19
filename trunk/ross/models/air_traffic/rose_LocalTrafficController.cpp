@@ -151,9 +151,8 @@ Aircraft LocalTrafficController::get_aircraft(struct tw_lp *lp) const
 		//assert(false);
 	}
 #endif
-	Aircraft ret = m_q.back();
-	*/
-  class Aircraft ret( * (::std::max_element< ::__gnu_cxx::__normal_iterator< ::std::vector< Aircraft ,::std::allocator< Aircraft  > > ::const_pointer  , ::std::vector< Aircraft ,::std::allocator< Aircraft  > > ::vector_type  >  > ((this) -> m_q. begin (),(this) -> m_q. end ())));
+	Aircraft ret = m_q.back();*/
+  class Aircraft ret( * (::std::max_element< ::std::vector< Aircraft ,::std::allocator< Aircraft  > > ::const_iterator  > ((this) -> m_q. begin (),(this) -> m_q. end ())));
 //	cout<<ret.m_process_time<<","<<ret2.m_process_time<<endl;
   return (ret);
 }
@@ -186,9 +185,8 @@ Aircraft LocalTrafficController::get_aircraft_forward(struct tw_lp *lp) const
 		//assert(false);
 	}
 #endif
-	Aircraft ret = m_q.back();
-	*/
-  class Aircraft ret( * (::std::max_element< ::__gnu_cxx::__normal_iterator< ::std::vector< Aircraft ,::std::allocator< Aircraft  > > ::const_pointer  , ::std::vector< Aircraft ,::std::allocator< Aircraft  > > ::vector_type  >  > ((this) -> m_q. begin (),(this) -> m_q. end ())));
+	Aircraft ret = m_q.back();*/
+  class Aircraft ret( * (::std::max_element< ::std::vector< Aircraft ,::std::allocator< Aircraft  > > ::const_iterator  > ((this) -> m_q. begin (),(this) -> m_q. end ())));
 //	cout<<ret.m_process_time<<","<<ret2.m_process_time<<endl;
   return (ret);
 }
@@ -199,14 +197,14 @@ Aircraft LocalTrafficController::get_aircraft_reverse(struct tw_lp *lp) const
 
 void LocalTrafficController::remove_aircraft(struct tw_lp *lp)
 {
-  ::std::vector< Aircraft ,::std::allocator< Aircraft  > > ::iterator target = ::std::max_element< ::__gnu_cxx::__normal_iterator< ::std::vector< Aircraft ,::std::allocator< Aircraft  > > ::pointer  , ::std::vector< Aircraft ,::std::allocator< Aircraft  > > ::vector_type  >  > ((this) -> m_q. begin (),(this) -> m_q. end ());
+  ::std::vector< Aircraft ,::std::allocator< Aircraft  > > ::iterator target = ::std::max_element< ::std::vector< Aircraft ,::std::allocator< Aircraft  > > ::iterator  > ((this) -> m_q. begin (),(this) -> m_q. end ());
   (this) -> m_q. erase (target);
 //	m_q.pop_back();
 }
 
 void LocalTrafficController::remove_aircraft_forward(struct tw_lp *lp)
 {
-  ::std::vector< Aircraft ,::std::allocator< Aircraft  > > ::iterator target = ::std::max_element< ::__gnu_cxx::__normal_iterator< ::std::vector< Aircraft ,::std::allocator< Aircraft  > > ::pointer  , ::std::vector< Aircraft ,::std::allocator< Aircraft  > > ::vector_type  >  > (bs_vector_begin_forward((this) -> m_q,lp),bs_vector_end_forward((this) -> m_q,lp));
+  ::std::vector< Aircraft ,::std::allocator< Aircraft  > > ::iterator target = ::std::max_element< ::std::vector< Aircraft ,::std::allocator< Aircraft  > > ::iterator  > (bs_vector_begin_forward((this) -> m_q,lp),bs_vector_end_forward((this) -> m_q,lp));
   bs_vector_erase_forward((this) -> m_q,target,lp);
 //	m_q.pop_back();
 }
