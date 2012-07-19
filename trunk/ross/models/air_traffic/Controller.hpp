@@ -9,10 +9,9 @@
 #include "Aircraft.hpp"
 
 struct tw_lp;
-
-
 using namespace std;
 
+#define BS
 
 class Controller
 {
@@ -24,10 +23,12 @@ class Controller
 		virtual void handle_incoming(tw_lp *lp) = 0;
 		virtual void handle_outgoing(tw_lp *lp)= 0;
 		virtual void handle_aircraft(tw_lp *lp) = 0;
-		virtual void add_aircraft(Aircraft aircraft, tw_lp *lp)=0;
-		virtual Aircraft get_aircraft(tw_lp *lp) const =0;
-		virtual void remove_aircraft(tw_lp *lp)=0;
 
+		void add_aircraft(Aircraft aircraft, tw_lp *lp);
+		Aircraft get_aircraft(tw_lp *lp) const;
+		void remove_aircraft(tw_lp *lp);
+
+#ifdef BS		
 		virtual void handle_incoming_forward(tw_lp *lp)=0;
 		virtual void handle_incoming_reverse(tw_lp *lp)=0;
 
@@ -37,14 +38,16 @@ class Controller
 		virtual void handle_aircraft_forward(tw_lp *lp)=0;
 		virtual void handle_aircraft_reverse(tw_lp *lp)=0;
 
-		virtual Aircraft get_aircraft_forward(tw_lp *lp) const=0;
-		virtual Aircraft get_aircraft_reverse(tw_lp *lp) const=0;
+		Aircraft get_aircraft_forward(tw_lp *lp) const;
+		Aircraft get_aircraft_reverse(tw_lp *lp) const;
 
-		virtual void add_aircraft_forward(Aircraft aircraft, tw_lp *lp)=0;
-		virtual void add_aircraft_reverse(tw_lp *lp)=0;
+		void add_aircraft_forward(Aircraft aircraft, tw_lp *lp);
+		void add_aircraft_reverse(tw_lp *lp);
 
-		virtual void remove_aircraft_forward(tw_lp *lp)=0;
-		virtual void remove_aircraft_reverse(tw_lp *lp)=0;
+		void remove_aircraft_forward(tw_lp *lp);
+		void remove_aircraft_reverse(tw_lp *lp);
+#endif
+		
 		//protected:
 		
 		int m_id;
