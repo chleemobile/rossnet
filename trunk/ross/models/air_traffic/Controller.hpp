@@ -45,7 +45,6 @@ class Controller
 
 		virtual void remove_aircraft_forward(tw_lp *lp)=0;
 		virtual void remove_aircraft_reverse(tw_lp *lp)=0;
-		
 		//protected:
 		
 		int m_id;
