@@ -2,12 +2,12 @@ INCLUDE_DIRECTORIES(${ROSS_SOURCE_DIR})
 INCLUDE_DIRECTORIES("/opt/local/include")
 
 SET(air_traffic_srcs
-	air_traffic.cpp air_traffic.h 
+	rose_air_traffic.cpp air_traffic.h 
 	Aircraft.cpp Aircraft.hpp
 	Graph.cpp Graph.hpp 
-	Controller.cpp Controller.hpp
-	RegionController.cpp RegionController.hpp
-	LocalTrafficController.cpp LocalTrafficController.hpp
+	rose_Controller.cpp Controller.hpp
+	rose_RegionController.cpp RegionController.hpp
+	rose_LocalTrafficController.cpp LocalTrafficController.hpp
 	Constants.hpp
 	)
 

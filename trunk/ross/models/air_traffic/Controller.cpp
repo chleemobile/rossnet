@@ -15,22 +15,25 @@ Controller::~Controller()
 
 }
 
-/*
-void Controller::handle_incoming(tw_lp *lp)
-{
-	assert(false);
-	cout<<"CTR handle"<<endl;
-}
 
-void Controller::handle_outgoing(tw_lp *lp)
+Aircraft Controller::get_aircraft(tw_lp *lp) const
 {
-	assert(false);
-	cout<<"CTR handle"<<endl;
+	Aircraft ret = *max_element<std::vector<Aircraft>::const_iterator>(m_q.begin(), m_q.end());
+
+	return ret;
 }
 
 
-void Controller::handle_aircraft(tw_lp *lp)
+void Controller::remove_aircraft(tw_lp *lp)
 {
-	assert(false);
+	vector<Aircraft>::iterator target = max_element<std::vector<Aircraft>::iterator>(m_q.begin(), m_q.end());
+	m_q.erase(target);
+
 }
-*/
+
+void Controller::add_aircraft(Aircraft aircraft, tw_lp *lp)
+{
+	m_q.push_back(aircraft);
+}
+
+
