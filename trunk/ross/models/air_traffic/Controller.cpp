@@ -18,7 +18,7 @@ Controller::~Controller()
 
 Aircraft Controller::get_aircraft(tw_lp *lp) const
 {
-	Aircraft ret = *max_element<std::vector<Aircraft>::const_iterator>(m_q.begin(), m_q.end());
+	Aircraft ret = *max_element<std::deque<Aircraft>::const_iterator>(m_q.begin(), m_q.end());
 
 	return ret;
 }
@@ -26,7 +26,7 @@ Aircraft Controller::get_aircraft(tw_lp *lp) const
 
 void Controller::remove_aircraft(tw_lp *lp)
 {
-	vector<Aircraft>::iterator target = max_element<std::vector<Aircraft>::iterator>(m_q.begin(), m_q.end());
+	deque<Aircraft>::iterator target = max_element<std::deque<Aircraft>::iterator>(m_q.begin(), m_q.end());
 	m_q.erase(target);
 
 }
