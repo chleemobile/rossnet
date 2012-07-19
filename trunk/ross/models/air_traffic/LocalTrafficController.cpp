@@ -104,7 +104,7 @@ Aircraft LocalTrafficController::get_aircraft(tw_lp *lp) const
 #endif
 
 	Aircraft ret = m_q.back();*/
-	Aircraft ret = *max_element(m_q.begin(), m_q.end());
+	Aircraft ret = *max_element<std::vector<Aircraft>::const_iterator>(m_q.begin(), m_q.end());
 //	cout<<ret.m_process_time<<","<<ret2.m_process_time<<endl;
 
 	return ret;
@@ -113,7 +113,7 @@ Aircraft LocalTrafficController::get_aircraft(tw_lp *lp) const
 
 void LocalTrafficController::remove_aircraft(tw_lp *lp)
 {
-	m_q.erase(max_element(m_q.begin(), m_q.end()));
+	m_q.erase(max_element<std::vector<Aircraft>::iterator>(m_q.begin(), m_q.end()));
 //	m_q.pop_back();
 }
 

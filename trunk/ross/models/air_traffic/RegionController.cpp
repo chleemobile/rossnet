@@ -78,13 +78,13 @@ void RegionController::handle_aircraft(tw_lp *lp)
 
 Aircraft RegionController::get_aircraft(tw_lp *lp) const
 {
-	Aircraft ret = *max_element(m_q.begin(), m_q.end());
+	Aircraft ret = *max_element<std::vector<Aircraft>::const_iterator>(m_q.begin(), m_q.end());
 	return ret;
 }
 
 void RegionController::remove_aircraft(tw_lp *lp)
 {
-	m_q.erase(max_element(m_q.begin(), m_q.end()));
+	m_q.erase(max_element<std::vector<Aircraft>::iterator>(m_q.begin(), m_q.end()));
 }
 
 void RegionController::add_aircraft(Aircraft aircraft, tw_lp *lp)
