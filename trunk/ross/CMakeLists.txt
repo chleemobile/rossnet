@@ -37,6 +37,10 @@ tw-timing.c
 tw-timing.h
 tw-util.c)
 
+#IF(BACKSTROKE)
+#	SET(OPTIONS "${OPTIONS} -DBACKSTROKE")
+#ENDIF(MEMORY)
+
 IF(MEMORY)
 	SET(OPTIONS "${OPTIONS} -DROSS_MEMORY")
 	SET(ross_srcs ${ross_srcs} tw-memory.c tw-memoryq.h tw-memory.h)
@@ -54,7 +58,9 @@ IF(NETWORK STREQUAL tcp)
 	   SET(ross_srcs ${ross_srcs} socket-tcp.c socket-tcp.h)
 ENDIF(NETWORK STREQUAL tcp)
 
-SET(OPTIONS "${OPTIONS} -DROSS_QUEUE_${QUEUE} -DROSS_RAND_${RAND} -DROSS_NETWORK_${NETWORK} -DROSS_CLOCK_${CLOCK} -DROSS_GVT_${GVT} -DARCH_${ARCH}")
+SET(OPTIONS "${OPTIONS} -DRUN_WITH_${CODE} -DROSS_QUEUE_${QUEUE} -DROSS_RAND_${RAND} -DROSS_NETWORK_${NETWORK} -DROSS_CLOCK_${CLOCK} -DROSS_GVT_${GVT} -DARCH_${ARCH}")
+#This will generate RUN_WITH_backstroke
+
 
 ADD_DEFINITIONS(${OPTIONS})
 

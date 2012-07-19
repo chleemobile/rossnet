@@ -15,6 +15,8 @@ CHECK_TYPE_SIZE("long long"     SIZEOF_LONG_LONG   )
 CHECK_TYPE_SIZE("uint"          SIZEOF_UINT        )
 CHECK_TYPE_SIZE("void *"        SIZEOF_VPTR        )
 
+#set( CMAKE_VERBOSE_MAKEFILE on )
+
 #SET(QUEUE      calendar) #Calendar Queue
 #SET(QUEUE      heap) #Push/Down Heap
 SET(QUEUE       splay) #Splay Tree
@@ -23,12 +25,26 @@ SET(QUEUE       splay) #Splay Tree
 #SET(MAPPING       linear)
 #SET(MAPPING      rrobin)
 
+#Backstroke#
+########################
+########################
+
+SET(BACKSTROKE YES)
+if(BACKSTROKE)
+	SET (CODE backstroke)
+endif(BACKSTROKE)
+
+########################
+########################
+
+
 SET(RAND           clcg4)
 OPTION(RAND_NORMAL "Turn on state for normal distribution" ON)
 
 #MEMORY is either on or off depending on whether or not we desire
 #memory buffers.  If it's not set to YES, it defaults to NO
 OPTION(MEMORY	  "ROSS Memory Buffers (membufs)"     ON)
+
 SET(MEMORY        YES)
 
 OPTION(TIMING	   "Perform ROSS timings"	ON)
