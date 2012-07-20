@@ -49,9 +49,12 @@ void RegionController::handle_aircraft(struct tw_lp *lp)
   int i = 0;
   int size = ((this) -> m_q. size ());
   while(i < size){
-    (this) -> m_q. at (i).Aircraft::m_process_time -= (this) -> m_q. at (i).Aircraft::m_speed;
-    (this) -> m_q. at (i).Aircraft::m_remaining_dist -= (this) -> m_q. at (i).Aircraft::m_speed;
-    (this) -> m_q. at (i).Aircraft::m_cdelay++;
+    class Aircraft aircraft((this) -> m_q. front ());
+    (this) -> m_q. pop_front ();
+    aircraft.Aircraft::m_process_time -= aircraft.Aircraft::m_speed;
+    aircraft.Aircraft::m_remaining_dist -= aircraft.Aircraft::m_speed;
+    aircraft.Aircraft::m_cdelay++;
+    (this) -> m_q. push_back (aircraft);
     i++;
   }
 }
@@ -62,9 +65,12 @@ void RegionController::handle_aircraft_forward(struct tw_lp *lp)
   int size = ((this) -> m_q. size ());
   __store__(m_q,lp);
   while(i < size){
-    (this) -> m_q. at (i).Aircraft::m_process_time -= (this) -> m_q. at (i).Aircraft::m_speed;
-    (this) -> m_q. at (i).Aircraft::m_remaining_dist -= (this) -> m_q. at (i).Aircraft::m_speed;
-    (this) -> m_q. at (i).Aircraft::m_cdelay++;
+    class Aircraft aircraft((this) -> m_q. front ());
+    (this) -> m_q. pop_front ();
+    aircraft.Aircraft::m_process_time -= aircraft.Aircraft::m_speed;
+    aircraft.Aircraft::m_remaining_dist -= aircraft.Aircraft::m_speed;
+    aircraft.Aircraft::m_cdelay++;
+    (this) -> m_q. push_back (aircraft);
     i++;
   }
 }

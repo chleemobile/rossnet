@@ -20,36 +20,38 @@ Controller::~Controller()
 
 Aircraft Controller::get_aircraft(struct tw_lp *lp) const
 {
-  ::std::deque< Aircraft ,::std::allocator< Aircraft  > > ::const_iterator __temp42__;
-  ::std::deque< Aircraft ,::std::allocator< Aircraft  > > ::const_iterator __temp43__;
-  ::std::deque< Aircraft ,::std::allocator< Aircraft  > > ::const_iterator __temp44__;
-  class Aircraft ret(((__temp44__ = ((__temp42__ = (this) -> m_q. begin () , ((__temp43__ = (this) -> m_q. end () , ::std::max_element< ::std::deque< Aircraft ,::std::allocator< Aircraft  > > ::const_iterator  > (__temp42__,__temp43__))))) ,  * __temp44__)));
+  ::std::list< Aircraft ,::std::allocator< Aircraft  > > ::const_iterator __temp34__;
+  ::std::list< Aircraft ,::std::allocator< Aircraft  > > ::const_iterator __temp35__;
+  ::std::list< Aircraft ,::std::allocator< Aircraft  > > ::const_iterator __temp36__;
+  class Aircraft ret(((__temp36__ = ((__temp34__ = (this) -> m_q. begin () , ((__temp35__ = (this) -> m_q. end () , ::std::max_element< ::std::list< Aircraft ,::std::allocator< Aircraft  > > ::const_iterator  > (__temp34__,__temp35__))))) ,  * __temp36__)));
   return (ret);;
 }
 
 void Controller::remove_aircraft(struct tw_lp *lp)
 {
-  ::std::deque< Aircraft ,::std::allocator< Aircraft  > > ::iterator __temp45__;
-  ::std::deque< Aircraft ,::std::allocator< Aircraft  > > ::iterator __temp46__;
-  ::std::deque< Aircraft ,::std::allocator< Aircraft  > > ::iterator target = ((__temp45__ = (this) -> m_q. begin () , ((__temp46__ = (this) -> m_q. end () , ::std::max_element< ::std::deque< Aircraft ,::std::allocator< Aircraft  > > ::iterator  > (__temp45__,__temp46__)))));
-  struct ::std::_Deque_iterator< Aircraft  , Aircraft & , Aircraft * > __temp47__;
-  ((__temp47__ = (target) , (this) -> m_q. erase (__temp47__)));
+  ::std::list< Aircraft ,::std::allocator< Aircraft  > > ::iterator __temp37__;
+  ::std::list< Aircraft ,::std::allocator< Aircraft  > > ::iterator __temp38__;
+  __temp37__ = (this) -> m_q. begin ();
+  __temp38__ = (this) -> m_q. end ();
+  ::std::list< Aircraft ,::std::allocator< Aircraft  > > ::iterator target = ::std::max_element< ::std::list< Aircraft ,::std::allocator< Aircraft  > > ::iterator  > (__temp37__,__temp38__);
+  (this) -> m_q. erase (target);
 }
 
 void Controller::remove_aircraft_forward(struct tw_lp *lp)
 {
-  ::std::deque< Aircraft ,::std::allocator< Aircraft  > > ::iterator __temp45__;
-  ::std::deque< Aircraft ,::std::allocator< Aircraft  > > ::iterator __temp46__;
-  ::std::deque< Aircraft ,::std::allocator< Aircraft  > > ::iterator target = ((__temp45__ = bs_deque_begin_forward((this) -> m_q,lp) , ((__temp46__ = bs_deque_end_forward((this) -> m_q,lp) , ::std::max_element< ::std::deque< Aircraft ,::std::allocator< Aircraft  > > ::iterator  > (__temp45__,__temp46__)))));
-  struct ::std::_Deque_iterator< Aircraft  , Aircraft & , Aircraft * > __temp47__;
-  ((__temp47__ = (target) , bs_deque_erase_forward((this) -> m_q,__temp47__,lp)));
+  ::std::list< Aircraft ,::std::allocator< Aircraft  > > ::iterator __temp37__;
+  ::std::list< Aircraft ,::std::allocator< Aircraft  > > ::iterator __temp38__;
+  __temp37__ = bs_list_begin_forward((this) -> m_q,lp);
+  __temp38__ = bs_list_end_forward((this) -> m_q,lp);
+  ::std::list< Aircraft ,::std::allocator< Aircraft  > > ::iterator target = ::std::max_element< ::std::list< Aircraft ,::std::allocator< Aircraft  > > ::iterator  > (__temp37__,__temp38__);
+  bs_list_erase_forward((this) -> m_q,target,lp);
 }
 
 void Controller::remove_aircraft_reverse(struct tw_lp *lp)
 {
-  bs_deque_erase_reverse((this) -> m_q,lp);
-  bs_deque_end_reverse((this) -> m_q,lp);
-  bs_deque_begin_reverse((this) -> m_q,lp);
+  bs_list_erase_reverse((this) -> m_q,lp);
+  bs_list_end_reverse((this) -> m_q,lp);
+  bs_list_begin_reverse((this) -> m_q,lp);
 }
 
 void Controller::add_aircraft(class Aircraft aircraft,struct tw_lp *lp)
@@ -59,10 +61,10 @@ void Controller::add_aircraft(class Aircraft aircraft,struct tw_lp *lp)
 
 void Controller::add_aircraft_forward(class Aircraft aircraft,struct tw_lp *lp)
 {
-  bs_deque_push_back_forward((this) -> m_q,aircraft,lp);
+  bs_list_push_back_forward((this) -> m_q,aircraft,lp);
 }
 
 void Controller::add_aircraft_reverse(struct tw_lp *lp)
 {
-  bs_deque_push_back_reverse((this) -> m_q,lp);
+  bs_list_push_back_reverse((this) -> m_q,lp);
 }

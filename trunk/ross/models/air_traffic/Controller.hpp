@@ -1,10 +1,9 @@
 #ifndef _controller_h_
 #define _controller_h_
 
-#include <queue>
-#include <vector>
 #include <iostream>
 #include <algorithm>
+#include <list>
 
 #include "Aircraft.hpp"
 
@@ -59,8 +58,9 @@ class Controller
 		
 //		priority_queue < Aircraft, vector<Aircraft>, less<Aircraft> > m_q;
 //		vector <Aircraft> m_q;
-		deque <Aircraft> m_q;
-		//vector<int> m_counter;
+//		deque <Aircraft> m_q;
+		list <Aircraft> m_q;
+		
 };
 
 #endif

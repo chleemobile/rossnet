@@ -26,12 +26,15 @@ void RegionController::handle_aircraft(tw_lp *lp)
 
 	int i=0;
 	int size = m_q.size();
+
 	while(i<size)
 	{
-		m_q.at(i).m_process_time -= m_q.at(i).m_speed;
-		m_q.at(i).m_remaining_dist -= m_q.at(i).m_speed;
-		m_q.at(i).m_cdelay++;
-		
+		Aircraft aircraft = m_q.front();
+		m_q.pop_front();
+		aircraft.m_process_time -= aircraft.m_speed;
+		aircraft.m_remaining_dist -= aircraft.m_speed;
+		aircraft.m_cdelay++;
+		m_q.push_back(aircraft);		
 		i++;
 	}
 	
