@@ -1,7 +1,7 @@
 PROJECT(ROSS C)
 INCLUDE_DIRECTORIES(${ROSS_SOURCE_DIR})
-INCLUDE_DIRECTORIES("/Users/lee1017/dev/boost/include/")
-#INCLUDE_DIRECTORIES("/nethome/clee333//boost/include/")
+#INCLUDE_DIRECTORIES("/Users/lee1017/dev/boost/include/")
+INCLUDE_DIRECTORIES("/home/clee333/bin/boost-1.42/include/")
 
 SET(ross_srcs
 clock-${CLOCK}.c

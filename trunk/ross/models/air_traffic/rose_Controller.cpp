@@ -6,7 +6,7 @@
 
 Controller::Controller()
 {
-  (__builtin_expect((!false),0))?__assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/air_traffic/Controller.cpp",6,"false") : ((void )0);
+//  (__builtin_expect((!false),0))?__assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/air_traffic/Controller.cpp",6,"false") : ((void )0);
 }
 /*m_counter(in_num_aircraft),*/
 
