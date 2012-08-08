@@ -1120,9 +1120,9 @@ void event_handler_forward(airport_state *s,tw_bf *bf,air_traffic_message *msg,t
       c++;
       ( *(s -> airport_state::counter))[msg -> air_traffic_message::aircraft.Aircraft::m_id] = c;
       int i = 0;
-      __store__(s -> airport_state::max_counter_aircraft_id,lp);
       __store__(s,lp);
       __store__(s -> airport_state::max_counter,lp);
+      __store__(s -> airport_state::max_counter_aircraft_id,lp);
       while(i < num_aircraft){
         const class std::vector< int  , std::allocator< int  >  > &counterRef =  *(s -> airport_state::counter);
         int counter = counterRef. at (i);
@@ -1478,9 +1478,9 @@ void event_handler_forward(airport_state *s,tw_bf *bf,air_traffic_message *msg,t
       c++;
       ( *(s -> airport_state::counter))[msg -> air_traffic_message::aircraft.Aircraft::m_id] = c;
       int i = 0;
+      __store__(s -> airport_state::max_counter_aircraft_id,lp);
       __store__(s -> airport_state::max_counter,lp);
       __store__(s,lp);
-      __store__(s -> airport_state::max_counter_aircraft_id,lp);
       while(i < num_aircraft){
         const class std::vector< int  , std::allocator< int  >  > &counterRef =  *(s -> airport_state::counter);
         int counter = counterRef. at (i);
@@ -1554,21 +1554,16 @@ void event_handler_reverse(airport_state *s,tw_bf *bf,air_traffic_message *msg,t
   int __num0;
   __restore__(__num0,lp);
   int c;
-  if ((__num0 & 3584) == 3072) {
+  if ((__num0 & 4091) == 4090) {
     __restore__(s -> airport_state::rn,lp);
-    __restore__(s -> airport_state::max_counter,lp);
-    __restore__(s,lp);
-    __restore__(s -> airport_state::max_counter_aircraft_id,lp);
-    c = ( *s -> airport_state::counter)[msg -> air_traffic_message::aircraft.Aircraft::m_id];
-    --c;
-    ( *s -> airport_state::counter)[msg -> air_traffic_message::aircraft.Aircraft::m_id] = c;
+    ( *(s -> airport_state::controller)). handle_outgoing_reverse (lp);
   }
   else {
     if ((__num0 & 4090) == 4088) {
       __restore__(s -> airport_state::rn,lp);
-      __restore__(s -> airport_state::max_counter_aircraft_id,lp);
       __restore__(s,lp);
       __restore__(s -> airport_state::max_counter,lp);
+      __restore__(s -> airport_state::max_counter_aircraft_id,lp);
       c = ( *s -> airport_state::counter)[msg -> air_traffic_message::aircraft.Aircraft::m_id];
       --c;
       ( *s -> airport_state::counter)[msg -> air_traffic_message::aircraft.Aircraft::m_id] = c;
@@ -1582,43 +1577,37 @@ void event_handler_reverse(airport_state *s,tw_bf *bf,air_traffic_message *msg,t
           ( *(s -> airport_state::controller)). handle_outgoing_reverse (lp);
         }
         else {
-          if ((__num0 & 3072) == 2048) {
-            if ((__num0 & 3073) == 2048) {
-              ( *(s -> airport_state::controller)). handle_aircraft_reverse (lp);
+          if ((__num0 & 4064) == 4032) {
+            if ((__num0 & 4066) == 4032) {
+              __restore__(s -> airport_state::rn,lp);
             }
             else {
+              __restore__(s -> airport_state::rn,lp);
             }
-            if ((__num0 & 3076) == 2048) {
-              if ((__num0 & 3078) == 2050) {
-              }
-              else {
-                __restore__(s -> airport_state::rn,lp);
-                __restore__(s -> airport_state::cdelay_airport_dep,lp);
-                __restore__(s -> airport_state::delay_airport_dep,lp);
-                ( *(s -> airport_state::controller)). remove_aircraft_reverse (lp);
-                --s -> airport_state::dep_processed;
-                ( *(s -> airport_state::controller)). handle_incoming_reverse (lp);
-              }
-            }
-            else {
-            }
+            __restore__(s -> airport_state::max_counter_aircraft_id,lp);
+            __restore__(s -> airport_state::max_counter,lp);
+            __restore__(s,lp);
+            c = ( *s -> airport_state::counter)[msg -> air_traffic_message::aircraft.Aircraft::m_id];
+            --c;
+            ( *s -> airport_state::counter)[msg -> air_traffic_message::aircraft.Aircraft::m_id] = c;
+            ( *(s -> airport_state::controller)). handle_outgoing_reverse (lp);
           }
           else {
-            if ((__num0 & 4088) == 4080) {
-              if ((__num0 & 4089) == 4080) {
+            if ((__num0 & 3072) == 2048) {
+              if ((__num0 & 3073) == 2048) {
                 ( *(s -> airport_state::controller)). handle_aircraft_reverse (lp);
               }
               else {
               }
-              if ((__num0 & 4092) == 4080) {
-                if ((__num0 & 4094) == 4082) {
+              if ((__num0 & 3076) == 2048) {
+                if ((__num0 & 3078) == 2050) {
                 }
                 else {
                   __restore__(s -> airport_state::rn,lp);
-                  __restore__(s -> airport_state::cdelay_airport_land,lp);
-                  __restore__(s -> airport_state::delay_airport_land,lp);
+                  __restore__(s -> airport_state::cdelay_airport_dep,lp);
+                  __restore__(s -> airport_state::delay_airport_dep,lp);
                   ( *(s -> airport_state::controller)). remove_aircraft_reverse (lp);
-                  --s -> airport_state::landing_processed;
+                  --s -> airport_state::dep_processed;
                   ( *(s -> airport_state::controller)). handle_incoming_reverse (lp);
                 }
               }
@@ -1626,20 +1615,26 @@ void event_handler_reverse(airport_state *s,tw_bf *bf,air_traffic_message *msg,t
               }
             }
             else {
-              if ((__num0 & 4064) == 4032) {
-                if ((__num0 & 4066) == 4032) {
-                  __restore__(s -> airport_state::rn,lp);
+              if ((__num0 & 4088) == 4080) {
+                if ((__num0 & 4089) == 4080) {
+                  ( *(s -> airport_state::controller)). handle_aircraft_reverse (lp);
                 }
                 else {
-                  __restore__(s -> airport_state::rn,lp);
                 }
-                __restore__(s -> airport_state::max_counter_aircraft_id,lp);
-                __restore__(s -> airport_state::max_counter,lp);
-                __restore__(s,lp);
-                c = ( *s -> airport_state::counter)[msg -> air_traffic_message::aircraft.Aircraft::m_id];
-                --c;
-                ( *s -> airport_state::counter)[msg -> air_traffic_message::aircraft.Aircraft::m_id] = c;
-                ( *(s -> airport_state::controller)). handle_outgoing_reverse (lp);
+                if ((__num0 & 4092) == 4080) {
+                  if ((__num0 & 4094) == 4082) {
+                  }
+                  else {
+                    __restore__(s -> airport_state::rn,lp);
+                    __restore__(s -> airport_state::cdelay_airport_land,lp);
+                    __restore__(s -> airport_state::delay_airport_land,lp);
+                    ( *(s -> airport_state::controller)). remove_aircraft_reverse (lp);
+                    --s -> airport_state::landing_processed;
+                    ( *(s -> airport_state::controller)). handle_incoming_reverse (lp);
+                  }
+                }
+                else {
+                }
               }
               else {
                 if ((__num0 & 4032) == 3968) {
@@ -1753,7 +1748,12 @@ void event_handler_reverse(airport_state *s,tw_bf *bf,air_traffic_message *msg,t
                       }
                       else {
                         __restore__(s -> airport_state::rn,lp);
-                        ( *(s -> airport_state::controller)). handle_outgoing_reverse (lp);
+                        __restore__(s -> airport_state::max_counter_aircraft_id,lp);
+                        __restore__(s -> airport_state::max_counter,lp);
+                        __restore__(s,lp);
+                        c = ( *s -> airport_state::counter)[msg -> air_traffic_message::aircraft.Aircraft::m_id];
+                        --c;
+                        ( *s -> airport_state::counter)[msg -> air_traffic_message::aircraft.Aircraft::m_id] = c;
                       }
                     }
                   }
@@ -1780,7 +1780,7 @@ void event_handler_fw(airport_state *s,tw_bf *bf,air_traffic_message *msg,tw_lp 
         (__builtin_expect((!((lp -> tw_lp::gid) > (NUMBER_OF_REGION_CONTROLLER - 1))),0))?__assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/air_traffic/air_traffic.cpp",1012,"lp->gid > NUMBER_OF_REGION_CONTROLLER-1") : ((void )0);
         class Aircraft aircraft(msg -> air_traffic_message::aircraft);
         aircraft.Aircraft::m_clock = tw_now(lp);
-        __store__< std::deque< Aircraft  , std::allocator< Aircraft  >  >  > (( *(s -> airport_state::controller)).Controller::m_q,lp);
+        __store__< std::priority_queue< Aircraft  , std::vector< Aircraft  , std::allocator< Aircraft  >  >  , std::less< Aircraft  >  >  > (( *(s -> airport_state::controller)).Controller::m_q,lp);
         ( *(s -> airport_state::controller)). add_aircraft ((aircraft),lp);
 //s->controller->m_q.push(aircraft);
         int path1 = 0;
@@ -1838,7 +1838,7 @@ void event_handler_fw(airport_state *s,tw_bf *bf,air_traffic_message *msg,tw_lp 
             path1 = 1;
             ( *(s -> airport_state::controller)). handle_incoming (lp);
             s -> airport_state::dep_processed++;
-            __store__< std::deque< Aircraft  , std::allocator< Aircraft  >  >  > (( *(s -> airport_state::controller)).Controller::m_q,lp);
+            __store__< std::priority_queue< Aircraft  , std::vector< Aircraft  , std::allocator< Aircraft  >  >  , std::less< Aircraft  >  >  > (( *(s -> airport_state::controller)).Controller::m_q,lp);
             class Aircraft aircraft = ( *(s -> airport_state::controller)). get_aircraft (lp);
             ( *(s -> airport_state::controller)). remove_aircraft (lp);
 //Aircraft aircraft = s->controller->m_q.top();
@@ -1874,7 +1874,7 @@ void event_handler_fw(airport_state *s,tw_bf *bf,air_traffic_message *msg,tw_lp 
           else {
           }
           if (!q_stored) {
-            __store__< std::deque< Aircraft  , std::allocator< Aircraft  >  >  > (( *(s -> airport_state::controller)).Controller::m_q,lp);
+            __store__< std::priority_queue< Aircraft  , std::vector< Aircraft  , std::allocator< Aircraft  >  >  , std::less< Aircraft  >  >  > (( *(s -> airport_state::controller)).Controller::m_q,lp);
           }
           else {
           }
@@ -1970,7 +1970,7 @@ void event_handler_fw(airport_state *s,tw_bf *bf,air_traffic_message *msg,tw_lp 
         (__builtin_expect((!((lp -> tw_lp::gid) < NUMBER_OF_REGION_CONTROLLER)),0))?__assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/air_traffic/air_traffic.cpp",1244,"lp->gid < NUMBER_OF_REGION_CONTROLLER") : ((void )0);
         class Aircraft msg_aircraft(msg -> air_traffic_message::aircraft);
         msg_aircraft.Aircraft::m_clock = tw_now(lp);
-        __store__< std::deque< Aircraft  , std::allocator< Aircraft  >  >  > (( *(s -> airport_state::controller)).Controller::m_q,lp);
+        __store__< std::priority_queue< Aircraft  , std::vector< Aircraft  , std::allocator< Aircraft  >  >  , std::less< Aircraft  >  >  > (( *(s -> airport_state::controller)).Controller::m_q,lp);
         ( *(s -> airport_state::controller)). add_aircraft ((msg_aircraft),lp);
 //				s->controller->m_q.push(msg_aircraft);
         int path1 = 0;
@@ -2047,7 +2047,7 @@ void event_handler_fw(airport_state *s,tw_bf *bf,air_traffic_message *msg,tw_lp 
               ( *(s -> airport_state::controller)). handle_incoming (lp);
               s -> airport_state::transit_req_accepted++;
               s -> airport_state::transit_processed++;
-              __store__< std::deque< Aircraft  , std::allocator< Aircraft  >  >  > (( *(s -> airport_state::controller)).Controller::m_q,lp);
+              __store__< std::priority_queue< Aircraft  , std::vector< Aircraft  , std::allocator< Aircraft  >  >  , std::less< Aircraft  >  >  > (( *(s -> airport_state::controller)).Controller::m_q,lp);
               ( *(s -> airport_state::controller)). remove_aircraft (lp);
 //							s->controller->m_q.pop();
               ::__store__((s -> airport_state::delay_region),lp);
@@ -2088,7 +2088,7 @@ void event_handler_fw(airport_state *s,tw_bf *bf,air_traffic_message *msg,tw_lp 
           else {
           }
           if (!q_stored) {
-            __store__< std::deque< Aircraft  , std::allocator< Aircraft  >  >  > (( *(s -> airport_state::controller)).Controller::m_q,lp);
+            __store__< std::priority_queue< Aircraft  , std::vector< Aircraft  , std::allocator< Aircraft  >  >  , std::less< Aircraft  >  >  > (( *(s -> airport_state::controller)).Controller::m_q,lp);
           }
           else {
           }
@@ -2187,7 +2187,7 @@ void event_handler_fw(airport_state *s,tw_bf *bf,air_traffic_message *msg,tw_lp 
         (__builtin_expect((!((lp -> tw_lp::gid) > (NUMBER_OF_REGION_CONTROLLER - 1))),0))?__assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/air_traffic/air_traffic.cpp",1512,"lp->gid > NUMBER_OF_REGION_CONTROLLER-1") : ((void )0);
         class Aircraft aircraft(msg -> air_traffic_message::aircraft);
         aircraft.Aircraft::m_clock = tw_now(lp);
-        __store__< std::deque< Aircraft  , std::allocator< Aircraft  >  >  > (( *(s -> airport_state::controller)).Controller::m_q,lp);
+        __store__< std::priority_queue< Aircraft  , std::vector< Aircraft  , std::allocator< Aircraft  >  >  , std::less< Aircraft  >  >  > (( *(s -> airport_state::controller)).Controller::m_q,lp);
         ( *(s -> airport_state::controller)). add_aircraft ((aircraft),lp);
 //				s->controller->m_q.push(aircraft);
         int path1 = 0;
@@ -2245,7 +2245,7 @@ void event_handler_fw(airport_state *s,tw_bf *bf,air_traffic_message *msg,tw_lp 
             path1 = 1;
             ( *(s -> airport_state::controller)). handle_incoming (lp);
             s -> airport_state::landing_processed++;
-            __store__< std::deque< Aircraft  , std::allocator< Aircraft  >  >  > (( *(s -> airport_state::controller)).Controller::m_q,lp);
+            __store__< std::priority_queue< Aircraft  , std::vector< Aircraft  , std::allocator< Aircraft  >  >  , std::less< Aircraft  >  >  > (( *(s -> airport_state::controller)).Controller::m_q,lp);
             class Aircraft aircraft = ( *(s -> airport_state::controller)). get_aircraft (lp);
             ( *(s -> airport_state::controller)). remove_aircraft (lp);
 //						Aircraft aircraft = s->controller->m_q.top();
@@ -2282,7 +2282,7 @@ void event_handler_fw(airport_state *s,tw_bf *bf,air_traffic_message *msg,tw_lp 
           else {
           }
           if (!q_stored) {
-            __store__< std::deque< Aircraft  , std::allocator< Aircraft  >  >  > (( *(s -> airport_state::controller)).Controller::m_q,lp);
+            __store__< std::priority_queue< Aircraft  , std::vector< Aircraft  , std::allocator< Aircraft  >  >  , std::less< Aircraft  >  >  > (( *(s -> airport_state::controller)).Controller::m_q,lp);
           }
           else {
           }
@@ -2400,7 +2400,7 @@ void event_handler_rv(airport_state *s,tw_bf *bf,air_traffic_message *msg,tw_lp 
         }
         else {
         }
-        __restore__< std::deque< Aircraft  , std::allocator< Aircraft  >  >  > (( *(s -> airport_state::controller)).Controller::m_q,lp);
+        __restore__< std::priority_queue< Aircraft  , std::vector< Aircraft  , std::allocator< Aircraft  >  >  , std::less< Aircraft  >  >  > (( *(s -> airport_state::controller)).Controller::m_q,lp);
         break; 
       }
     }
@@ -2415,7 +2415,7 @@ void event_handler_rv(airport_state *s,tw_bf *bf,air_traffic_message *msg,tw_lp 
           __restore__(q_stored_in_path1,lp);
           (__builtin_expect((!(q_stored_in_path1 >= 0)),0))?__assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/air_traffic/air_traffic.cpp",1794,"q_stored_in_path1 >=0") : ((void )0);
           if (!q_stored_in_path1) {
-            __restore__< std::deque< Aircraft  , std::allocator< Aircraft  >  >  > (( *(s -> airport_state::controller)).Controller::m_q,lp);
+            __restore__< std::priority_queue< Aircraft  , std::vector< Aircraft  , std::allocator< Aircraft  >  >  , std::less< Aircraft  >  >  > (( *(s -> airport_state::controller)).Controller::m_q,lp);
           }
           else {
           }
@@ -2429,7 +2429,7 @@ void event_handler_rv(airport_state *s,tw_bf *bf,air_traffic_message *msg,tw_lp 
           bs_rand_rvs(s -> airport_state::rn,lp);
           __restore__(s -> airport_state::cdelay_airport_dep,lp);
           ::__restore__(s -> airport_state::delay_airport_dep,lp);
-          __restore__< std::deque< Aircraft  , std::allocator< Aircraft  >  >  > (( *(s -> airport_state::controller)).Controller::m_q,lp);
+          __restore__< std::priority_queue< Aircraft  , std::vector< Aircraft  , std::allocator< Aircraft  >  >  , std::less< Aircraft  >  >  > (( *(s -> airport_state::controller)).Controller::m_q,lp);
 //assert(q_stored_in_path1 == 1);
           s -> airport_state::dep_processed--;
           ( *(s -> airport_state::controller)).Controller::m_aircraft_processed--;
@@ -2495,7 +2495,7 @@ void event_handler_rv(airport_state *s,tw_bf *bf,air_traffic_message *msg,tw_lp 
         }
         else {
         }
-        __restore__< std::deque< Aircraft  , std::allocator< Aircraft  >  >  > (( *(s -> airport_state::controller)).Controller::m_q,lp);
+        __restore__< std::priority_queue< Aircraft  , std::vector< Aircraft  , std::allocator< Aircraft  >  >  , std::less< Aircraft  >  >  > (( *(s -> airport_state::controller)).Controller::m_q,lp);
         break; 
       }
     }
@@ -2513,7 +2513,7 @@ void event_handler_rv(airport_state *s,tw_bf *bf,air_traffic_message *msg,tw_lp 
           __restore__(q_stored_in_path1,lp);
           (__builtin_expect((!(q_stored_in_path1 >= 0)),0))?__assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/air_traffic/air_traffic.cpp",1909,"q_stored_in_path1 >=0") : ((void )0);
           if (!q_stored_in_path1) {
-            __restore__< std::deque< Aircraft  , std::allocator< Aircraft  >  >  > (( *(s -> airport_state::controller)).Controller::m_q,lp);
+            __restore__< std::priority_queue< Aircraft  , std::vector< Aircraft  , std::allocator< Aircraft  >  >  , std::less< Aircraft  >  >  > (( *(s -> airport_state::controller)).Controller::m_q,lp);
           }
           else {
           }
@@ -2535,7 +2535,7 @@ void event_handler_rv(airport_state *s,tw_bf *bf,air_traffic_message *msg,tw_lp 
               bs_rand_rvs(s -> airport_state::rn,lp);
               __restore__(s -> airport_state::cdelay_region,lp);
               ::__restore__(s -> airport_state::delay_region,lp);
-              __restore__< std::deque< Aircraft  , std::allocator< Aircraft  >  >  > (( *(s -> airport_state::controller)).Controller::m_q,lp);
+              __restore__< std::priority_queue< Aircraft  , std::vector< Aircraft  , std::allocator< Aircraft  >  >  , std::less< Aircraft  >  >  > (( *(s -> airport_state::controller)).Controller::m_q,lp);
 //assert(q_stored_in_path1 == 1);
               s -> airport_state::transit_req_accepted--;
               s -> airport_state::transit_processed--;
@@ -2601,7 +2601,7 @@ void event_handler_rv(airport_state *s,tw_bf *bf,air_traffic_message *msg,tw_lp 
         }
         else {
         }
-        __restore__< std::deque< Aircraft  , std::allocator< Aircraft  >  >  > (( *(s -> airport_state::controller)).Controller::m_q,lp);
+        __restore__< std::priority_queue< Aircraft  , std::vector< Aircraft  , std::allocator< Aircraft  >  >  , std::less< Aircraft  >  >  > (( *(s -> airport_state::controller)).Controller::m_q,lp);
         break; 
       }
     }
@@ -2616,7 +2616,7 @@ void event_handler_rv(airport_state *s,tw_bf *bf,air_traffic_message *msg,tw_lp 
           __restore__(q_stored_in_path1,lp);
           (__builtin_expect((!(q_stored_in_path1 >= 0)),0))?__assert_rtn(__func__,"/Users/lee1017/dev/rossnet/trunk/ross/models/air_traffic/air_traffic.cpp",2034,"q_stored_in_path1 >= 0") : ((void )0);
           if (!q_stored_in_path1) {
-            __restore__< std::deque< Aircraft  , std::allocator< Aircraft  >  >  > (( *(s -> airport_state::controller)).Controller::m_q,lp);
+            __restore__< std::priority_queue< Aircraft  , std::vector< Aircraft  , std::allocator< Aircraft  >  >  , std::less< Aircraft  >  >  > (( *(s -> airport_state::controller)).Controller::m_q,lp);
           }
           else {
           }
@@ -2630,7 +2630,7 @@ void event_handler_rv(airport_state *s,tw_bf *bf,air_traffic_message *msg,tw_lp 
           bs_rand_rvs(s -> airport_state::rn,lp);
           __restore__(s -> airport_state::cdelay_airport_land,lp);
           ::__restore__(s -> airport_state::delay_airport_land,lp);
-          __restore__< std::deque< Aircraft  , std::allocator< Aircraft  >  >  > (( *(s -> airport_state::controller)).Controller::m_q,lp);
+          __restore__< std::priority_queue< Aircraft  , std::vector< Aircraft  , std::allocator< Aircraft  >  >  , std::less< Aircraft  >  >  > (( *(s -> airport_state::controller)).Controller::m_q,lp);
 //assert(q_stored_in_path1 == 1);
           s -> airport_state::landing_processed--;
           ( *(s -> airport_state::controller)).Controller::m_aircraft_processed--;

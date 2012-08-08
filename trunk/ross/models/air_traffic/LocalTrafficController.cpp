@@ -24,13 +24,32 @@ void LocalTrafficController::handle_outgoing(tw_lp *lp)
 
 void LocalTrafficController::handle_aircraft(tw_lp *lp)
 {
-	int i=0;
-	int size = m_q.size();
-	while(i<size)
+	priority_queue < Aircraft, vector<Aircraft>, less<Aircraft> > *temp_q = new priority_queue < Aircraft, vector<Aircraft>, less<Aircraft> >();
+
+	Aircraft old_top = m_q.top();
+	int old_size = m_q.size();
+
+	while(!m_q.empty())
 	{
-		m_q.at(i).m_cdelay++;
-		i++;
+		Aircraft temp = m_q.top();
+		m_q.pop();
+		temp.m_cdelay++;
+		//cout<<temp.m_cdelay<<endl;
+		temp_q->push(temp);
 	}
+
+	while(!temp_q->empty())
+	{
+		Aircraft temp =temp_q->top();
+		temp_q->pop();
+
+		m_q.push(temp);
+	}
+
+	Aircraft new_top = m_q.top();
+	int new_size = m_q.size();
+
+	delete temp_q;
 }
 
 

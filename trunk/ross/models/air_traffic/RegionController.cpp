@@ -24,16 +24,36 @@ void RegionController::handle_outgoing(tw_lp *lp)
 void RegionController::handle_aircraft(tw_lp *lp)
 {
 
-	int i=0;
-	int size = m_q.size();
-	while(i<size)
+	priority_queue < Aircraft, vector<Aircraft>, less<Aircraft> > *temp_q = new priority_queue < Aircraft, vector<Aircraft>, less<Aircraft> >();
+
+	Aircraft old_top = m_q.top();
+	int old_size = m_q.size();
+
+	while(!m_q.empty())
 	{
-		m_q.at(i).m_process_time -= m_q.at(i).m_speed;
-		m_q.at(i).m_remaining_dist -= m_q.at(i).m_speed;
-		m_q.at(i).m_cdelay++;
-		
-		i++;
+		Aircraft temp = m_q.top();
+		m_q.pop();
+
+		temp.m_process_time -= temp.m_speed;
+		temp.m_remaining_dist -= temp.m_speed;
+		//if(temp.m_remaining_dist < 0) temp.m_remaining_dist = 0;
+
+		temp.m_cdelay++;
+		temp_q->push(temp);
 	}
+
+	while(!temp_q->empty())
+	{
+		Aircraft temp =temp_q->top();
+		temp_q->pop();
+
+		m_q.push(temp);
+	}
+
+	Aircraft new_top = m_q.top();
+	int new_size = m_q.size();
+
+	delete temp_q;
 	
 }
 

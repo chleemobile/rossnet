@@ -18,22 +18,19 @@ Controller::~Controller()
 
 Aircraft Controller::get_aircraft(tw_lp *lp) const
 {
-	Aircraft ret = *max_element<std::deque<Aircraft>::const_iterator>(m_q.begin(), m_q.end());
-
+	Aircraft ret = m_q.top();
 	return ret;
 }
 
 
 void Controller::remove_aircraft(tw_lp *lp)
 {
-	deque<Aircraft>::iterator target = max_element<std::deque<Aircraft>::iterator>(m_q.begin(), m_q.end());
-	m_q.erase(target);
-
+	m_q.pop();
 }
 
 void Controller::add_aircraft(Aircraft aircraft, tw_lp *lp)
 {
-	m_q.push_back(aircraft);
+	m_q.push(aircraft);
 }
 
 
