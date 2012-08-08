@@ -58,9 +58,8 @@ class Controller
 		double dummy_test;
 		
 //		priority_queue < Aircraft, vector<Aircraft>, less<Aircraft> > m_q;
-//		vector <Aircraft> m_q;
-		deque <Aircraft> m_q;
-		//vector<int> m_counter;
+		vector <Aircraft> m_q;
+//		deque <Aircraft> m_q;
 };
 
 #endif
