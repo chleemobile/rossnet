@@ -12,7 +12,6 @@ LocalTrafficController::~LocalTrafficController()
 
 void LocalTrafficController::handle_incoming(tw_lp *lp)
 {
-	//cout<<"LTC handle"<<endl;
 	m_current_capacity++;
 	m_aircraft_processed++;	
 
