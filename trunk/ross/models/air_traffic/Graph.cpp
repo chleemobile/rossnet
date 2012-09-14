@@ -4,7 +4,8 @@
 #include <string>
 #include <sstream>
 #include <assert.h>
-
+#include <stdio.h>
+#include <stdlib.h>
 
 
 Graph::Graph(int nodes)

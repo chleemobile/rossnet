@@ -167,10 +167,142 @@ tw_peid mapping_to_pe(tw_lpid gid)
 		{
 			return 15;
 		}
+	}
+	else if(tw_nnodes() == 32)
+	{
+		if(gid == 0 || (gid >= 20 && gid <= 29))
+		{
+			return 0;
+		}
+		else if(gid == 1 ||  (gid >= 30 && gid <= 39))
+		{
+			return 1;
+		}
+		else if(gid == 2 || (gid >= 40 && gid <= 49))
+		{
+			return 2;
+		}
+		else if(gid == 3 ||  (gid >= 50 && gid <= 59))
+		{
+			return 3;
+		}
+		else if(gid == 4 || (gid >= 60 && gid <= 69))
+		{
+			return 4;
+		}
+		else if(gid == 5 || (gid >= 70 && gid <= 79))
+		{
+			return 5;
+		}
+		else if(gid == 6 || (gid >= 80 && gid <= 89))
+		{
+			return 6;
+		}
+		else if(gid == 7 || (gid >= 90 && gid <= 99))
+		{
+			return 7;
+		}
+		else if(gid == 8 || (gid >= 100 && gid <= 109))
+		{
+			return 8;
+		}
+		else if(gid == 9 || (gid >= 110 && gid <= 119))
+		{
+			return 9;
+		}
+		else if(gid == 10 || (gid >= 120 && gid <= 129))
+		{
+			return 10;
+		}
+		else if(gid == 11 ||  (gid >= 130 && gid <= 139))
+		{
+			return 11;
+		}
+		else if(gid == 12 || (gid >= 140 && gid <= 149))
+		{
+			return 12;
+		}
+		else if(gid == 13 || (gid >= 150 && gid <= 159))
+		{
+			return 13;
+		}
+		else if(gid == 14 || (gid >= 160 && gid <= 169))
+		{
+			return 14;
+		}
+		else if(gid == 15 || (gid >= 170 && gid <= 179))
+		{
+			return 15;
+		}
+		else if(gid == 16 || (gid >= 180 && gid <= 189))
+		{
+			return 16;
+		}
+		else if(gid == 17 || (gid >= 190 && gid <= 199))
+		{
+			return 17;
+		}
+		else if(gid == 18 || (gid >= 200 && gid <= 209))
+		{
+			return 18;
+		}
+		else if(gid == 19 || (gid >= 210 && gid <= 219))
+		{
+			return 19;
+		}
+		else if(gid >= 220 && gid <= 230)
+		{
+			return 20;
+		}
+		else if(gid >= 231 && gid <= 241)
+		{
+			return 21;
+		}
+		else if(gid >= 242 && gid <= 252)
+		{
+			return 22;
+		}
+		else if(gid >= 253 && gid <= 263)
+		{
+			return 23;
+		}
+		else if(gid >= 264 && gid <= 274)
+		{
+			return 24;
+		}
+		else if(gid >= 275 && gid <= 285)
+		{
+			return 25;
+		}
+		else if(gid >= 286 && gid <= 296)
+		{
+			return 26;
+		}
+		else if(gid >= 297 && gid <= 307)
+		{
+			return 27;
+		}
+		else if(gid >= 308 && gid <= 318)
+		{
+			return 28;
+		}
+		else if(gid >= 319 && gid <= 329)
+		{
+			return 29;
+		}
+		else if(gid >= 330 && gid <= 340)
+		{
+			return 30;
+		}
+		else if(gid >= 341 && gid <= 351)
+		{
+			return 31;
+		}
 	}	
+	
 	else 
 	{
-		std::cout << "support upto 16 cores"<<std::endl;
+		std::cout << "support upto 32 cores"<<std::endl;
 		assert(false);
 	}
 
@@ -196,7 +328,43 @@ void init(airport_state * s, tw_lp * lp)
 
 	int num_aircraft_per_core = num_aircraft / tw_nnodes();
 	int aircraft_id_offset = num_aircraft_per_core * g_tw_mynode;
-	if(tw_nnodes() == 16)
+	
+	if(tw_nnodes() == 32)
+	{
+		if (g_tw_mynode == 0) aircraft_id_offset = 0;
+		else if(g_tw_mynode == 1) aircraft_id_offset = 20;
+		else if(g_tw_mynode == 2) aircraft_id_offset = 40;
+		else if(g_tw_mynode == 3) aircraft_id_offset = 60;
+		else if(g_tw_mynode == 4) aircraft_id_offset = 80;
+		else if(g_tw_mynode == 5) aircraft_id_offset = 100;
+		else if(g_tw_mynode == 6) aircraft_id_offset = 120;
+		else if(g_tw_mynode == 7) aircraft_id_offset = 140;
+		else if(g_tw_mynode == 8) aircraft_id_offset = 160;
+		else if(g_tw_mynode == 9) aircraft_id_offset = 180;
+		else if(g_tw_mynode == 10) aircraft_id_offset = 200;
+		else if(g_tw_mynode == 11) aircraft_id_offset = 220;
+		else if(g_tw_mynode == 12) aircraft_id_offset = 240;
+		else if(g_tw_mynode == 13) aircraft_id_offset = 260;
+		else if(g_tw_mynode == 14) aircraft_id_offset = 280;
+		else if(g_tw_mynode == 15) aircraft_id_offset = 300;
+		else if(g_tw_mynode == 16) aircraft_id_offset = 320;
+		else if(g_tw_mynode == 17) aircraft_id_offset = 340;
+		else if(g_tw_mynode == 18) aircraft_id_offset = 360;
+		else if(g_tw_mynode == 19) aircraft_id_offset = 380;
+		else if(g_tw_mynode == 20) aircraft_id_offset = 400;
+		else if(g_tw_mynode == 21) aircraft_id_offset = 422;
+		else if(g_tw_mynode == 22) aircraft_id_offset = 444;
+		else if(g_tw_mynode == 23) aircraft_id_offset = 466;
+		else if(g_tw_mynode == 24) aircraft_id_offset = 488;
+		else if(g_tw_mynode == 25) aircraft_id_offset = 510;
+		else if(g_tw_mynode == 26) aircraft_id_offset = 532;
+		else if(g_tw_mynode == 27) aircraft_id_offset = 554;
+		else if(g_tw_mynode == 28) aircraft_id_offset = 576;
+		else if(g_tw_mynode == 29) aircraft_id_offset = 598;
+		else if(g_tw_mynode == 30) aircraft_id_offset = 620;
+		else if(g_tw_mynode == 31) aircraft_id_offset = 642;
+	}
+	else if(tw_nnodes() == 16)
 	{
 		if (g_tw_mynode == 0) aircraft_id_offset = 0;
 		else if(g_tw_mynode == 1) aircraft_id_offset = 40;
@@ -2127,8 +2295,8 @@ tw_lptype airport_lps[] =
 {
 	{
 		(init_f) init,
-		(event_f) event_handler_fw,
-		(revent_f) event_handler_rv,
+		(event_f) event_handler_forward,
+		(revent_f) event_handler_reverse,
 		(final_f) final,
 		(map_f) mapping_to_pe,
 		sizeof(airport_state),
@@ -2446,11 +2614,233 @@ tw_lp* mapping_to_lp(tw_lpid lpid)
 			ret = ret - 330;
 		}
 	}
-	
+	else if (tw_nnodes() == 32) 
+	{
+		if(g_tw_mynode == 0)
+		{
+			if(lpid >= 20 && lpid <= 29)
+				ret = ret - 19;
+		}
+		else if (g_tw_mynode == 1)
+		{
+			if(lpid == 1)
+				ret = ret + 10;
+			if(lpid >= 30 && lpid <= 39)
+				ret = ret - 18;
 
+			ret = ret - 11;
+		}
+		else if (g_tw_mynode == 2)
+		{
+			if(lpid == 2)
+				ret = ret + 20;        
+			if(lpid >= 40 && lpid <= 49)
+				ret = ret - 17;                
+
+			ret = ret - 22;
+		}
+		else if (g_tw_mynode == 3)
+		{
+			if(lpid == 3)
+				ret = ret + 30;      
+			if(lpid >= 50 && lpid <= 59)
+				ret = ret - 16;                
+
+			ret = ret - 33;
+		}
+		else if (g_tw_mynode == 4)
+		{
+			if(lpid == 4 )
+				ret = ret + 40;         			
+			if(lpid >= 60 && lpid <= 69)
+				ret = ret - 15;                
+
+			ret = ret - 44;
+		}
+		else if (g_tw_mynode == 5)
+		{
+			if(lpid == 5 )
+				ret = ret + 50;      
+			if(lpid >= 70 && lpid <= 79 )
+				ret = ret - 14;     			
+              
+			ret = ret - 55;
+		}
+		else if (g_tw_mynode == 6)
+		{
+			if(lpid == 6 )
+				ret = ret + 60;        			
+			if(lpid >= 80 && lpid <= 89)
+				ret = ret - 13;                
+
+			ret = ret - 66;
+		}
+		else if (g_tw_mynode == 7)
+		{
+			if(lpid == 7 )
+				ret = ret + 70;   			
+			if(lpid >= 90 && lpid <= 99)
+				ret = ret - 12;
+
+			ret = ret - 77;
+		}
+		else if (g_tw_mynode == 8)
+		{
+			if(lpid == 8 )
+				ret = ret + 80;   			
+			if(lpid >= 100 && lpid <= 109)
+				ret = ret - 11;
+
+			ret = ret - 88;
+		}
+		else if (g_tw_mynode == 9)
+		{
+			if(lpid == 9 )
+				ret = ret + 90;   			
+			if(lpid >= 110 && lpid <= 119)
+				ret = ret - 10;
+
+			ret = ret - 99;
+		}
+		else if (g_tw_mynode == 10)
+		{
+			if(lpid == 10 )
+				ret = ret + 100;   			
+			if(lpid >= 120 && lpid <= 129)
+				ret = ret - 9;
+
+			ret = ret - 110;
+		}
+		else if (g_tw_mynode == 11)
+		{
+			if(lpid == 11 )
+				ret = ret + 110;   			
+			if(lpid >= 130 && lpid <= 139)
+				ret = ret - 8;
+
+			ret = ret - 121;
+		}
+		else if (g_tw_mynode == 12)
+		{
+			if(lpid == 12 )
+				ret = ret + 120;   			
+			if(lpid >= 140 && lpid <= 149)
+				ret = ret - 7;
+
+			ret = ret - 132;
+		}
+		else if (g_tw_mynode == 13)
+		{
+			if(lpid == 13 )
+				ret = ret + 130;   			
+			if(lpid >= 150 && lpid <= 159)
+				ret = ret - 6;
+
+			ret = ret - 143;
+		}
+		else if (g_tw_mynode == 14)
+		{
+			if(lpid == 14 )
+				ret = ret + 140;   			
+			if(lpid >= 160 && lpid <= 169)
+				ret = ret - 5;
+
+			ret = ret - 154;
+		}
+		else if (g_tw_mynode == 15)
+		{
+			if(lpid == 15 )
+				ret = ret + 150;   			
+			if(lpid >= 170 && lpid <= 179)
+				ret = ret - 4;
+
+			ret = ret - 165;
+		}
+		else if (g_tw_mynode == 16)
+		{
+			if(lpid == 16 )
+				ret = ret + 160;   			
+			if(lpid >= 180 && lpid <= 189)
+				ret = ret - 3;
+
+			ret = ret - 176;
+		}
+		else if (g_tw_mynode == 17)
+		{
+			if(lpid == 17 )
+				ret = ret + 170;   			
+			if(lpid >= 190 && lpid <= 199)
+				ret = ret - 2;
+
+			ret = ret - 187;
+		}
+		else if (g_tw_mynode == 18)
+		{
+			if(lpid == 18 )
+				ret = ret + 180;   			
+			if(lpid >= 200 && lpid <= 209)
+				ret = ret - 1;
+
+			ret = ret - 198;
+		}
+		else if (g_tw_mynode == 19)
+		{
+			if(lpid == 19 )
+				ret = ret + 190;   			
+			ret = ret - 209;
+		}
+		else if (g_tw_mynode == 20)
+		{
+			ret = ret - 220;
+		}
+		else if (g_tw_mynode == 21)
+		{
+			ret = ret - 231;
+		}
+		else if (g_tw_mynode == 22)
+		{
+			ret = ret - 242;
+		}
+		else if (g_tw_mynode == 23)
+		{
+			ret = ret - 253;
+		}
+		else if (g_tw_mynode == 24)
+		{
+			ret = ret - 264;
+		}
+		else if (g_tw_mynode == 25)
+		{
+			ret = ret - 275;
+		}
+		else if (g_tw_mynode == 26)
+		{
+			ret = ret - 286;
+		}
+		else if (g_tw_mynode == 27)
+		{
+			ret = ret - 297;
+		}
+		else if (g_tw_mynode == 28)
+		{
+			ret = ret - 308;
+		}
+		else if (g_tw_mynode == 29)
+		{
+			ret = ret - 319;
+		}
+		else if (g_tw_mynode == 30)
+		{
+			ret = ret - 330;
+		}
+		else if (g_tw_mynode == 31)
+		{
+			ret = ret - 341;
+		}
+	}
 	else 
 	{
-		std::cout << "Only support upto 16 cores "<<std::endl;;
+		std::cout << "Only support upto 32 cores "<<std::endl;;
 		assert(false);
 	}
 
@@ -2477,7 +2867,6 @@ int mapping_to_local_index(int lpid)
 				ret = ret + 166;
 			ret = ret - 176;
 		}
-
 	}
 	else if (tw_nnodes() == 4) 
 	{
@@ -2753,10 +3142,233 @@ int mapping_to_local_index(int lpid)
 			ret = ret - 330;
 		}
 	}
-	
+	else if (tw_nnodes() == 32) 
+	{
+		if(g_tw_mynode == 0)
+		{
+			if(lpid >= 20 && lpid <= 29)
+				ret = ret - 19;
+		}
+		else if (g_tw_mynode == 1)
+		{
+			if(lpid == 1)
+				ret = ret + 10;
+			if(lpid >= 30 && lpid <= 39)
+				ret = ret - 18;
+
+			ret = ret - 11;
+		}
+		else if (g_tw_mynode == 2)
+		{
+			if(lpid == 2)
+				ret = ret + 20;        
+			if(lpid >= 40 && lpid <= 49)
+				ret = ret - 17;                
+
+			ret = ret - 22;
+		}
+		else if (g_tw_mynode == 3)
+		{
+			if(lpid == 3)
+				ret = ret + 30;      
+			if(lpid >= 50 && lpid <= 59)
+				ret = ret - 16;                
+
+			ret = ret - 33;
+		}
+		else if (g_tw_mynode == 4)
+		{
+			if(lpid == 4 )
+				ret = ret + 40;         			
+			if(lpid >= 60 && lpid <= 69)
+				ret = ret - 15;                
+
+			ret = ret - 44;
+		}
+		else if (g_tw_mynode == 5)
+		{
+			if(lpid == 5 )
+				ret = ret + 50;      
+			if(lpid >= 70 && lpid <= 79 )
+				ret = ret - 14;     			
+              
+			ret = ret - 55;
+		}
+		else if (g_tw_mynode == 6)
+		{
+			if(lpid == 6 )
+				ret = ret + 60;        			
+			if(lpid >= 80 && lpid <= 89)
+				ret = ret - 13;                
+
+			ret = ret - 66;
+		}
+		else if (g_tw_mynode == 7)
+		{
+			if(lpid == 7 )
+				ret = ret + 70;   			
+			if(lpid >= 90 && lpid <= 99)
+				ret = ret - 12;
+
+			ret = ret - 77;
+		}
+		else if (g_tw_mynode == 8)
+		{
+			if(lpid == 8 )
+				ret = ret + 80;   			
+			if(lpid >= 100 && lpid <= 109)
+				ret = ret - 11;
+
+			ret = ret - 88;
+		}
+		else if (g_tw_mynode == 9)
+		{
+			if(lpid == 9 )
+				ret = ret + 90;   			
+			if(lpid >= 110 && lpid <= 119)
+				ret = ret - 10;
+
+			ret = ret - 99;
+		}
+		else if (g_tw_mynode == 10)
+		{
+			if(lpid == 10 )
+				ret = ret + 100;   			
+			if(lpid >= 120 && lpid <= 129)
+				ret = ret - 9;
+
+			ret = ret - 110;
+		}
+		else if (g_tw_mynode == 11)
+		{
+			if(lpid == 11 )
+				ret = ret + 110;   			
+			if(lpid >= 130 && lpid <= 139)
+				ret = ret - 8;
+
+			ret = ret - 121;
+		}
+		else if (g_tw_mynode == 12)
+		{
+			if(lpid == 12 )
+				ret = ret + 120;   			
+			if(lpid >= 140 && lpid <= 149)
+				ret = ret - 7;
+
+			ret = ret - 132;
+		}
+		else if (g_tw_mynode == 13)
+		{
+			if(lpid == 13 )
+				ret = ret + 130;   			
+			if(lpid >= 150 && lpid <= 159)
+				ret = ret - 6;
+
+			ret = ret - 143;
+		}
+		else if (g_tw_mynode == 14)
+		{
+			if(lpid == 14 )
+				ret = ret + 140;   			
+			if(lpid >= 160 && lpid <= 169)
+				ret = ret - 5;
+
+			ret = ret - 154;
+		}
+		else if (g_tw_mynode == 15)
+		{
+			if(lpid == 15 )
+				ret = ret + 150;   			
+			if(lpid >= 170 && lpid <= 179)
+				ret = ret - 4;
+
+			ret = ret - 165;
+		}
+		else if (g_tw_mynode == 16)
+		{
+			if(lpid == 16 )
+				ret = ret + 160;   			
+			if(lpid >= 180 && lpid <= 189)
+				ret = ret - 3;
+
+			ret = ret - 176;
+		}
+		else if (g_tw_mynode == 17)
+		{
+			if(lpid == 17 )
+				ret = ret + 170;   			
+			if(lpid >= 190 && lpid <= 199)
+				ret = ret - 2;
+
+			ret = ret - 187;
+		}
+		else if (g_tw_mynode == 18)
+		{
+			if(lpid == 18 )
+				ret = ret + 180;   			
+			if(lpid >= 200 && lpid <= 209)
+				ret = ret - 1;
+
+			ret = ret - 198;
+		}
+		else if (g_tw_mynode == 19)
+		{
+			if(lpid == 19 )
+				ret = ret + 190;   			
+			ret = ret - 209;
+		}
+		else if (g_tw_mynode == 20)
+		{
+			ret = ret - 220;
+		}
+		else if (g_tw_mynode == 21)
+		{
+			ret = ret - 231;
+		}
+		else if (g_tw_mynode == 22)
+		{
+			ret = ret - 242;
+		}
+		else if (g_tw_mynode == 23)
+		{
+			ret = ret - 253;
+		}
+		else if (g_tw_mynode == 24)
+		{
+			ret = ret - 264;
+		}
+		else if (g_tw_mynode == 25)
+		{
+			ret = ret - 275;
+		}
+		else if (g_tw_mynode == 26)
+		{
+			ret = ret - 286;
+		}
+		else if (g_tw_mynode == 27)
+		{
+			ret = ret - 297;
+		}
+		else if (g_tw_mynode == 28)
+		{
+			ret = ret - 308;
+		}
+		else if (g_tw_mynode == 29)
+		{
+			ret = ret - 319;
+		}
+		else if (g_tw_mynode == 30)
+		{
+			ret = ret - 330;
+		}
+		else if (g_tw_mynode == 31)
+		{
+			ret = ret - 341;
+		}
+	}
 	else 
 	{
-		std::cout << "Only support upto 16 cores "<<std::endl;;
+		std::cout << "Only support upto 32 cores "<<std::endl;;
 		assert(false);
 	}
 
