@@ -1,6 +1,5 @@
-const char *GRAPH_CSV_FILE_PATH = "adjlist.csv";
-//const char *GRAPH_CSV_FILE_PATH = "/nethome/clee333/rossnet-build/ross/models/air_traffic//adjlist.csv";
-
+//const char *GRAPH_CSV_FILE_PATH = "adjlist.csv";
+const char *GRAPH_CSV_FILE_PATH = "/home/chayong82/rossnet-build/ross/models/air_traffic/adjlist.csv";
 
 const int DEBUG = 0;
 
